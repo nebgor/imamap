@@ -266,6 +266,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script>
     function buildRouteGraph(routes) {
@@ -365,7 +366,13 @@
     const railLayer = L.layerGroup().addTo(map);
     const stationLayer = L.layerGroup().addTo(map);
     const simLayer = L.layerGroup().addTo(map);
-    const heatLayer = L.layerGroup().addTo(map);
+    const heatLineLayer = L.layerGroup().addTo(map);
+    const heatVisLayer = L.heatLayer([], {
+      radius: 18,
+      blur: 12,
+      maxZoom: 17,
+      gradient: { 0.1: "#1e3a8a", 0.4: "#22d3ee", 0.7: "#facc15", 1.0: "#ef4444" }
+    }).addTo(map);
     let simTimer = null;
     let routeGraph = null;
 
@@ -992,22 +999,42 @@
     }
 
     function renderHeat() {
-      heatLayer.clearLayers();
+      heatLineLayer.clearLayers();
       const heat = loadHeat();
+      const heatPoints = [];
       heat.forEach((h) => {
         L.polyline(h.path, {
           color: h.color,
           weight: 2,
-          opacity: 0.25
-        }).addTo(heatLayer);
+          opacity: 0.18
+        }).addTo(heatLineLayer);
+        const sampled = samplePath(h.path);
+        sampled.forEach((p) => heatPoints.push([p[0], p[1], h.weight]));
       });
+      heatVisLayer.setLatLngs(heatPoints);
+    }
+
+    function samplePath(path) {
+      const pts = [];
+      for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i];
+        const b = path[i + 1];
+        const seg = haversine(a[0], a[1], b[0], b[1]);
+        const steps = Math.max(1, Math.floor(seg / 0.35)); // sample roughly every 350m
+        for (let s = 0; s <= steps; s++) {
+          const t = s / steps;
+          pts.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      return pts;
     }
 
     function addHeatPath(path, minutes) {
       const heat = loadHeat();
       const color = colourForMinutes(minutes);
-      heat.unshift({ path, color, ts: Date.now() });
-      const trimmed = heat.slice(0, 120);
+      const weight = Math.min(1, Math.max(0.2, minutes / 90));
+      heat.unshift({ path, color, ts: Date.now(), weight });
+      const trimmed = heat.slice(0, 200);
       saveHeat(trimmed);
       renderHeat();
     }
