@@ -281,6 +281,8 @@
     const stopsLayer = L.layerGroup().addTo(map);
     const railLayer = L.layerGroup().addTo(map);
     const stationLayer = L.layerGroup().addTo(map);
+    const simLayer = L.layerGroup().addTo(map);
+    let simTimer = null;
 
     const corridors = [
       // Mandurah line corridor
@@ -681,6 +683,132 @@
 
     renderSnapshots();
     init();
+
+    function nearestStop(lat, lon) {
+      if (!window.__stops) return null;
+      let best = null;
+      let bestDist = Infinity;
+      window.__stops.forEach((s) => {
+        const d = haversine(lat, lon, s.lat, s.lon);
+        if (d < bestDist) {
+          bestDist = d;
+          best = s;
+        }
+      });
+      return { stop: best, distKm: bestDist };
+    }
+
+    function animateTravel(clickLatLng) {
+      if (!window.__stops) return;
+      simLayer.clearLayers();
+      if (simTimer) {
+        clearInterval(simTimer);
+        simTimer = null;
+      }
+
+      const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
+      if (!near.stop) return;
+
+      const base = Number(baseWait.value);
+      const speed = Number(netSpeed.value);
+      const commute = computeCommute(near.stop, base, speed);
+      const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
+      const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
+
+      const path = [
+        [clickLatLng.lat, clickLatLng.lng],
+        [near.stop.lat, near.stop.lon],
+        [target.lat, target.lon]
+      ];
+
+      const segLengths = [];
+      let totalLen = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+        segLengths.push(seg);
+        totalLen += seg;
+      }
+
+      const routeLine = L.polyline(path, { color: "#94a3b8", weight: 3, opacity: 0.6 }).addTo(simLayer);
+
+      const startMarker = L.circleMarker(path[0], { radius: 5, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
+      startMarker.bindTooltip("Clicked origin", { direction: "top", offset: [0, -4], permanent: false });
+      const stopMarker = L.circleMarker(path[1], { radius: 7, color: "#f97316", fillColor: "#f97316", fillOpacity: 0.9 }).addTo(simLayer);
+      stopMarker.bindTooltip(`Nearest stop: ${near.stop.stopname || near.stop.stopid}`, { direction: "top", offset: [0, -4], permanent: false });
+
+      const mover = L.circleMarker(path[1], { radius: 6, color: "#f59e0b", fillColor: "#f59e0b", fillOpacity: 0.95 }).addTo(simLayer);
+      const label = L.marker(path[1], {
+        icon: L.divIcon({
+          className: "rail-label",
+          html: "",
+          iconSize: null
+        })
+      }).addTo(simLayer);
+
+      const startTs = performance.now();
+      simTimer = setInterval(() => {
+        const elapsed = (performance.now() - startTs) / 1000;
+        const progress = Math.min(1, elapsed / totalSec);
+        const minutesUsed = progress * commute;
+        const minutesLeft = Math.max(0, commute - minutesUsed);
+
+        if (progress < waitRatio) {
+          mover.setLatLng(path[1]);
+          label.setLatLng(path[1]);
+          label.setIcon(
+            L.divIcon({
+              className: "rail-label",
+              html: `Waiting… ${minutesLeft.toFixed(1)}m`,
+              iconSize: null
+            })
+          );
+        } else {
+          const moveProgress = (progress - waitRatio) / (1 - waitRatio);
+          const moveDist = moveProgress * totalLen;
+          let acc = 0;
+          let segIndex = 0;
+          while (segIndex < segLengths.length && acc + segLengths[segIndex] < moveDist) {
+            acc += segLengths[segIndex];
+            segIndex++;
+          }
+          if (segIndex >= segLengths.length) {
+            mover.setLatLng(path[path.length - 1]);
+            label.setLatLng(path[path.length - 1]);
+          } else {
+            const segStart = path[segIndex];
+            const segEnd = path[segIndex + 1];
+            const segFrac = (moveDist - acc) / Math.max(segLengths[segIndex], 0.0001);
+            const lat = segStart[0] + (segEnd[0] - segStart[0]) * segFrac;
+            const lon = segStart[1] + (segEnd[1] - segStart[1]) * segFrac;
+            mover.setLatLng([lat, lon]);
+            label.setLatLng([lat, lon]);
+          }
+          label.setIcon(
+            L.divIcon({
+              className: "rail-label",
+              html: `ETA ${minutesLeft.toFixed(1)}m`,
+              iconSize: null
+            })
+          );
+        }
+
+        if (progress >= 1) {
+          clearInterval(simTimer);
+          simTimer = null;
+          label.setIcon(
+            L.divIcon({
+              className: "rail-label",
+              html: "Arrived CBD",
+              iconSize: null
+            })
+          );
+        }
+      }, 30);
+    }
+
+    map.on("click", (e) => {
+      animateTravel(e.latlng);
+    });
   </script>
 </body>
 </html>
