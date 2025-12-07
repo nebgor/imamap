@@ -267,10 +267,92 @@
   ></script>
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script>
+    function buildRouteGraph(routes) {
+      const nodes = new Map();
+      const key = (lat, lon) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
+      function addEdge(a, b) {
+        const ka = key(a[0], a[1]);
+        const kb = key(b[0], b[1]);
+        const d = haversine(a[0], a[1], b[0], b[1]);
+        if (!nodes.has(ka)) nodes.set(ka, { lat: a[0], lon: a[1], edges: [] });
+        if (!nodes.has(kb)) nodes.set(kb, { lat: b[0], lon: b[1], edges: [] });
+        nodes.get(ka).edges.push({ k: kb, w: d });
+        nodes.get(kb).edges.push({ k: ka, w: d });
+      }
+      routes.forEach((r) => {
+        (r.paths || []).forEach((path) => {
+          for (let i = 0; i < path.length - 1; i++) {
+            addEdge(path[i], path[i + 1]);
+          }
+        });
+      });
+      return { nodes, routes };
+    }
+
+    function shortestPath(graph, start, goal) {
+      const nodes = graph.nodes;
+      const startKey = nearestNodeKey(nodes, start.lat, start.lon);
+      const goalKey = nearestNodeKey(nodes, goal.lat, goal.lon);
+      if (!startKey || !goalKey) return null;
+      const dist = new Map();
+      const prev = new Map();
+      const pq = [];
+      function push(k, d) {
+        pq.push({ k, d });
+        pq.sort((a, b) => a.d - b.d);
+      }
+      nodes.forEach((_, k) => dist.set(k, Infinity));
+      dist.set(startKey, 0);
+      push(startKey, 0);
+      while (pq.length) {
+        const { k } = pq.shift();
+        if (k === goalKey) break;
+        const n = nodes.get(k);
+        if (!n) continue;
+        n.edges.forEach((e) => {
+          const alt = dist.get(k) + e.w;
+          if (alt < dist.get(e.k)) {
+            dist.set(e.k, alt);
+            prev.set(e.k, k);
+            push(e.k, alt + heuristic(nodes.get(e.k), nodes.get(goalKey)));
+          }
+        });
+      }
+      if (!prev.has(goalKey) && startKey !== goalKey) return null;
+      const path = [];
+      let u = goalKey;
+      path.unshift(nodes.get(u));
+      while (prev.has(u)) {
+        u = prev.get(u);
+        path.unshift(nodes.get(u));
+      }
+      return path.map((p) => [p.lat, p.lon]);
+    }
+
+    function heuristic(a, b) {
+      return haversine(a.lat, a.lon, b.lat, b.lon);
+    }
+
+    function nearestNodeKey(nodes, lat, lon) {
+      let best = null;
+      let bestD = Infinity;
+      nodes.forEach((v, k) => {
+        const d = haversine(lat, lon, v.lat, v.lon);
+        if (d < bestD) {
+          bestD = d;
+          best = k;
+        }
+      });
+      return best;
+    }
+  </script>
+  <script>
     const target = { lat: -31.9523, lon: 115.8590 };
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
     const STOP_CACHE_MAX_AGE_HRS = 6;
+    const ROUTE_CACHE_KEY = "routesCacheV1";
+    const ROUTE_CACHE_MAX_AGE_HRS = 12;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -283,6 +365,7 @@
     const stationLayer = L.layerGroup().addTo(map);
     const simLayer = L.layerGroup().addTo(map);
     let simTimer = null;
+    let routeGraph = null;
 
     const corridors = [
       // Mandurah line corridor
@@ -695,6 +778,57 @@
       localStorage.setItem(STOP_CACHE_KEY, JSON.stringify({ ts: Date.now(), stops }));
     }
 
+    function readRouteCache() {
+      const cached = localStorage.getItem(ROUTE_CACHE_KEY);
+      if (!cached) return null;
+      try {
+        const parsed = JSON.parse(cached);
+        const ageHours = (Date.now() - parsed.ts) / 36e5;
+        if (ageHours > ROUTE_CACHE_MAX_AGE_HRS) return null;
+        return parsed.routes;
+      } catch {
+        return null;
+      }
+    }
+
+    function writeRouteCache(routes) {
+      localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify({ ts: Date.now(), routes }));
+    }
+
+    async function fetchRoutes(bbox) {
+      const status = document.getElementById("status");
+      const cached = readRouteCache();
+      if (cached) {
+        return cached;
+      }
+      const [minLat, minLon, maxLat, maxLon] = bbox;
+      status.textContent = "Fetching routes…";
+      const url =
+        "https://services.slip.wa.gov.au/public/rest/services/SLIP_Public_Services/Transport/MapServer/15/query" +
+        "?where=1%3D1" +
+        "&outFields=route_name,route_number" +
+        `&geometry=${minLon},${minLat},${maxLon},${maxLat}` +
+        "&geometryType=esriGeometryEnvelope" +
+        "&inSR=4326&spatialRel=esriSpatialRelIntersects" +
+        "&outSR=4326&f=json";
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch routes: ${res.status}`);
+      }
+      const data = await res.json();
+      const routes = (data.features || [])
+        .map((f) => ({
+          name: f.attributes.route_name || f.attributes.route_number || "route",
+          paths: f.geometry.paths || []
+        }))
+        .filter((r) => r.paths.length > 0);
+      if (routes.length) {
+        writeRouteCache(routes);
+      }
+      status.textContent = `Routes loaded (${routes.length})`;
+      return routes;
+    }
+
     async function fetchStops() {
       const status = document.getElementById("status");
       const cached = readStopCache();
@@ -741,6 +875,9 @@
         window.__stops = stops;
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
+        // prefetch metro routes
+        const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
+        routeGraph = buildRouteGraph(routes);
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
         document.getElementById("debug").firstElementChild.textContent = "Debug — ok";
@@ -887,20 +1024,28 @@
 
     function bestBusRouteForStop(stop) {
       let winner = null;
-      busRoutes.forEach((route) => {
-        const nearStop = nearestPointIndex(route.points, stop.lat, stop.lon);
-        const nearCbd = nearestPointIndex(route.points, target.lat, target.lon);
-        const span = Math.abs(nearStop.idx - nearCbd.idx);
-        if (!winner || nearStop.distKm < winner.stopDist) {
-          winner = {
-            route,
-            stopIdx: nearStop.idx,
-            stopDist: nearStop.distKm,
-            cbdIdx: nearCbd.idx,
-            cbdDist: nearCbd.distKm,
-            span
-          };
-        }
+      const sources = [];
+      if (routeGraph && routeGraph.routes) {
+        routeGraph.routes.forEach((r) => sources.push({ dynamic: true, route: r }));
+      }
+      busRoutes.forEach((r) => sources.push({ dynamic: false, route: { name: r.name, paths: [r.points] } }));
+      sources.forEach((src) => {
+        src.route.paths.forEach((pts) => {
+          const nearStop = nearestPointIndex(pts, stop.lat, stop.lon);
+          const nearCbd = nearestPointIndex(pts, target.lat, target.lon);
+          const span = Math.abs(nearStop.idx - nearCbd.idx);
+          if (!winner || nearStop.distKm < winner.stopDist) {
+            winner = {
+              route: src.route,
+              stopIdx: nearStop.idx,
+              stopDist: nearStop.distKm,
+              cbdIdx: nearCbd.idx,
+              cbdDist: nearCbd.distKm,
+              span,
+              points: pts
+            };
+          }
+        });
       });
       return winner;
     }
@@ -946,7 +1091,7 @@
       const busSpan = busChoice ? Math.abs(busChoice.stopIdx - busChoice.cbdIdx) : Infinity;
 
       if (busChoice && busSpan <= railSpan) {
-        buildCorridor(busChoice, busChoice.route.points);
+        buildCorridor(busChoice, busChoice.points);
       } else if (railChoice) {
         buildCorridor(railChoice, railChoice.line.points);
       }
