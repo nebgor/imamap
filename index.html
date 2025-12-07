@@ -158,6 +158,50 @@
       font-size: 11px;
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
+    .gallery {
+      margin-top: 8px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      display: grid;
+      gap: 6px;
+    }
+    .gallery h2 {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .snapshots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    .snapshot-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      display: grid;
+      gap: 4px;
+    }
+    .snapshot-card img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .snapshot-card button {
+      width: 100%;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #d7e6ff;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: none;
+    }
+    .snapshot-meta {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
     @media (max-width: 600px) {
       .panel {
         width: calc(100% - 24px);
@@ -189,6 +233,7 @@
     </div>
     <div class="controls">
       <button id="recompute">Recompute</button>
+      <button id="saveSnapshot">Save snapshot</button>
       <label style="display:flex;align-items:center;gap:6px;">
         <input type="checkbox" id="toggleRail" checked />
         Show rail lines
@@ -202,6 +247,10 @@
       </div>
     </div>
     <div class="status" id="status">Fetching stops…</div>
+    <div class="gallery">
+      <h2>Snapshots (cached locally)</h2>
+      <div class="snapshots" id="snapshots"></div>
+    </div>
   </div>
   <div class="debug" id="debug">
     <div><strong>Debug</strong> — ready</div>
@@ -213,8 +262,12 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+  <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script>
     const target = { lat: -31.9523, lon: 115.8590 };
+    const STOP_CACHE_KEY = "stopsCacheV1";
+    const SNAPSHOT_CACHE_KEY = "snapshotsV1";
+    const STOP_CACHE_MAX_AGE_HRS = 6;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -386,8 +439,30 @@
       debugMeta.textContent = `Stops: ${stops.length} · Base wait: ${baseWait} min · Speed: ${netSpeed} km/h`;
     }
 
+    function readStopCache() {
+      const cached = localStorage.getItem(STOP_CACHE_KEY);
+      if (!cached) return null;
+      try {
+        const parsed = JSON.parse(cached);
+        const ageHours = (Date.now() - parsed.ts) / 36e5;
+        if (ageHours > STOP_CACHE_MAX_AGE_HRS) return null;
+        return parsed.stops;
+      } catch {
+        return null;
+      }
+    }
+
+    function writeStopCache(stops) {
+      localStorage.setItem(STOP_CACHE_KEY, JSON.stringify({ ts: Date.now(), stops }));
+    }
+
     async function fetchStops() {
       const status = document.getElementById("status");
+      const cached = readStopCache();
+      if (cached) {
+        status.textContent = `Loaded ${cached.length} stops from cache`;
+        return cached;
+      }
       status.textContent = "Fetching stops…";
       const url =
         "https://services.slip.wa.gov.au/public/rest/services/SLIP_Public_Services/Transport_Public_PT_Stops/FeatureServer/14/query" +
@@ -411,6 +486,7 @@
         }))
         .filter((s) => s.lat && s.lon);
       status.textContent = `Loaded ${stops.length} stops`;
+      writeStopCache(stops);
       return stops;
     }
 
@@ -443,6 +519,86 @@
       renderRailLines(e.target.checked);
     });
 
+    function loadSnapshots() {
+      const raw = localStorage.getItem(SNAPSHOT_CACHE_KEY);
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveSnapshots(list) {
+      localStorage.setItem(SNAPSHOT_CACHE_KEY, JSON.stringify(list));
+    }
+
+    function renderSnapshots() {
+      const container = document.getElementById("snapshots");
+      container.innerHTML = "";
+      const snaps = loadSnapshots();
+      snaps.forEach((snap) => {
+        const card = document.createElement("div");
+        card.className = "snapshot-card";
+        const img = document.createElement("img");
+        img.src = snap.dataUrl;
+        img.alt = "Map snapshot";
+        card.appendChild(img);
+        const meta = document.createElement("div");
+        meta.className = "snapshot-meta";
+        meta.textContent = `${new Date(snap.ts).toLocaleString()} · z${snap.zoom}`;
+        card.appendChild(meta);
+        const btn = document.createElement("button");
+        btn.textContent = "Load view";
+        btn.onclick = () => {
+          map.setView([snap.center.lat, snap.center.lon], snap.zoom);
+          if (window.__stops) {
+            renderStops(window.__stops, snap.baseWait, snap.netSpeed);
+          }
+        };
+        card.appendChild(btn);
+        const del = document.createElement("button");
+        del.textContent = "Delete";
+        del.onclick = () => {
+          const next = loadSnapshots().filter((s) => s.id !== snap.id);
+          saveSnapshots(next);
+          renderSnapshots();
+        };
+        card.appendChild(del);
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById("saveSnapshot").addEventListener("click", () => {
+      if (!window.leafletImage) {
+        alert("Snapshot helper not loaded yet.");
+        return;
+      }
+      leafletImage(map, (err, canvas) => {
+        if (err) {
+          alert("Snapshot failed");
+          return;
+        }
+        const dataUrl = canvas.toDataURL("image/png");
+        const snaps = loadSnapshots();
+        const snap = {
+          id: crypto.randomUUID(),
+          ts: Date.now(),
+          dataUrl,
+          center: { lat: map.getCenter().lat, lon: map.getCenter().lng },
+          zoom: map.getZoom(),
+          baseWait: Number(baseWait.value),
+          netSpeed: Number(netSpeed.value)
+        };
+        snaps.unshift(snap);
+        const trimmed = snaps.slice(0, 6);
+        saveSnapshots(trimmed);
+        renderSnapshots();
+      });
+    });
+
+    renderSnapshots();
     init();
   </script>
 </body>

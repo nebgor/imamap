@@ -19,6 +19,7 @@ module.exports = {
       env: {
         node: true
       },
+      parserOptions: { sourceType: "module" },
       globals: {
         describe: "readonly",
         it: "readonly",
