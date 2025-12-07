@@ -306,19 +306,22 @@
         name: "Mandurah",
         points: [
           [-31.95, 115.86],
-          [-31.977, 115.86],
-          [-31.987, 115.859],
-          [-32.008, 115.855], // Elizabeth Quay
-          [-32.049, 115.85], // Canning Bridge
-          [-32.064, 115.85], // Bull Creek
-          [-32.073, 115.847], // Murdoch
-          [-32.127, 115.852], // Cockburn
-          [-32.175, 115.843], // Aubin Grove
-          [-32.249, 115.821], // Rockingham
-          [-32.279, 115.771], // Warnbro
-          [-32.348, 115.757], // Lakelands-ish
-          [-32.375, 115.757],
-          [-32.45, 115.75] // Mandurah
+          [-31.97, 115.86],
+          [-31.986, 115.857], // Elizabeth Quay
+          [-32.021, 115.857], // South Perth-ish alignment
+          [-32.049, 115.851], // Canning Bridge
+          [-32.062, 115.849], // Bull Creek
+          [-32.071, 115.848], // Murdoch
+          [-32.103, 115.85], // Cockburn approach
+          [-32.127, 115.85], // Cockburn Central
+          [-32.15, 115.846], // Success
+          [-32.175, 115.842], // Aubin Grove
+          [-32.205, 115.834], // Kwinana industrial curve
+          [-32.249, 115.822], // Rockingham
+          [-32.279, 115.781], // Warnbro
+          [-32.32, 115.766], // Karnup/Lakelands curve
+          [-32.37, 115.754],
+          [-32.45, 115.747] // Mandurah
         ]
       },
       {
@@ -337,15 +340,74 @@
           [-31.712, 115.732], // Clarkson
           [-31.689, 115.73], // Butler
           [-31.64, 115.71], // Alkimos
-          [-31.58, 115.69], // Eglinton est.
-          [-31.48, 115.7] // Yanchep approx
+          [-31.58, 115.69], // Eglinton
+          [-31.52, 115.69], // interim curve
+          [-31.48, 115.7] // Yanchep
         ]
       },
-      { name: "Fremantle", points: [[-31.95, 115.86], [-31.99, 115.84], [-32.03, 115.81], [-32.05, 115.78]] },
-      { name: "Midland", points: [[-31.95, 115.86], [-31.92, 115.9], [-31.89, 115.96], [-31.87, 116.0], [-31.88, 116.05]] },
-      { name: "Armadale/Thornlie", points: [[-31.95, 115.86], [-32.0, 115.88], [-32.04, 115.93], [-32.08, 115.98], [-32.12, 116.02]] },
-      { name: "Airport", points: [[-31.95, 115.86], [-31.93, 115.89], [-31.92, 115.96], [-31.93, 116.0]] },
-      { name: "Ellenbrook", points: [[-31.95, 115.86], [-31.89, 115.91], [-31.85, 115.94], [-31.82, 115.97], [-31.78, 115.98]] }
+      {
+        name: "Fremantle",
+        points: [
+          [-31.95, 115.86],
+          [-31.958, 115.853], // City West
+          [-31.964, 115.842], // West Leederville
+          [-31.97, 115.829], // Subi
+          [-31.989, 115.79], // Claremont
+          [-32.009, 115.756], // Cottesloe
+          [-32.033, 115.752],
+          [-32.053, 115.748] // Fremantle
+        ]
+      },
+      {
+        name: "Midland",
+        points: [
+          [-31.95, 115.86],
+          [-31.948, 115.872], // McIver/Claisebrook
+          [-31.94, 115.885],
+          [-31.93, 115.9],
+          [-31.914, 115.914], // Bayswater
+          [-31.9, 115.967], // Guildford
+          [-31.889, 116.005] // Midland
+        ]
+      },
+      {
+        name: "Armadale/Thornlie",
+        points: [
+          [-31.95, 115.86],
+          [-31.961, 115.894], // Burswood
+          [-31.98, 115.897], // Oats St
+          [-32.0, 115.92],
+          [-32.04, 115.93],
+          [-32.061, 115.952], // Thornlie spur
+          [-32.079, 115.999], // Gosnells
+          [-32.12, 116.02] // Armadale approach
+        ]
+      },
+      {
+        name: "Airport",
+        points: [
+          [-31.95, 115.86],
+          [-31.941, 115.882],
+          [-31.93, 115.92], // Burswood/Belmont approach
+          [-31.927, 115.949], // Redcliffe
+          [-31.938, 115.967], // Airport Central
+          [-31.941, 116.0] // High Wycombe
+        ]
+      },
+      {
+        name: "Ellenbrook",
+        points: [
+          [-31.95, 115.86],
+          [-31.93, 115.89],
+          [-31.91, 115.915], // Bayswater connection
+          [-31.89, 115.93],
+          [-31.865, 115.897], // Noranda
+          [-31.846, 115.89], // Malaga
+          [-31.824, 115.95], // Whiteman
+          [-31.79, 115.965],
+          [-31.776, 115.97] // Ellenbrook
+        ]
+      }
     ];
 
     const railStations = [
@@ -698,6 +760,37 @@
       return { stop: best, distKm: bestDist };
     }
 
+    function nearestPointIndex(points, lat, lon) {
+      let idx = 0;
+      let best = Infinity;
+      points.forEach((p, i) => {
+        const d = haversine(lat, lon, p[0], p[1]);
+        if (d < best) {
+          best = d;
+          idx = i;
+        }
+      });
+      return { idx, distKm: best };
+    }
+
+    function bestLineForStop(stop) {
+      let winner = null;
+      railLines.forEach((line) => {
+        const nearStop = nearestPointIndex(line.points, stop.lat, stop.lon);
+        if (!winner || nearStop.distKm < winner.stopDist) {
+          const nearCbd = nearestPointIndex(line.points, target.lat, target.lon);
+          winner = {
+            line,
+            stopIdx: nearStop.idx,
+            stopDist: nearStop.distKm,
+            cbdIdx: nearCbd.idx,
+            cbdDist: nearCbd.distKm
+          };
+        }
+      });
+      return winner;
+    }
+
     function animateTravel(clickLatLng) {
       if (!window.__stops) return;
       simLayer.clearLayers();
@@ -715,11 +808,26 @@
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
 
-      const path = [
-        [clickLatLng.lat, clickLatLng.lng],
-        [near.stop.lat, near.stop.lon],
-        [target.lat, target.lon]
-      ];
+      const path = [];
+      path.push([clickLatLng.lat, clickLatLng.lng]);
+      path.push([near.stop.lat, near.stop.lon]);
+
+      const chosen = bestLineForStop(near.stop);
+      if (chosen) {
+        const linePoints = chosen.line.points;
+        const stopIdx = chosen.stopIdx;
+        const cbdIdx = chosen.cbdIdx;
+        // connect stop to corridor anchor
+        path.push(linePoints[stopIdx]);
+        const slice =
+          stopIdx <= cbdIdx ? linePoints.slice(stopIdx, cbdIdx + 1) : linePoints.slice(cbdIdx, stopIdx + 1).reverse();
+        slice.forEach((p) => {
+          const last = path[path.length - 1];
+          if (!(last[0] === p[0] && last[1] === p[1])) path.push(p);
+        });
+      }
+
+      path.push([target.lat, target.lon]);
 
       const segLengths = [];
       let totalLen = 0;
