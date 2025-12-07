@@ -280,6 +280,7 @@
 
     const stopsLayer = L.layerGroup().addTo(map);
     const railLayer = L.layerGroup().addTo(map);
+    const stationLayer = L.layerGroup().addTo(map);
 
     const corridors = [
       // Mandurah line corridor
@@ -303,26 +304,39 @@
         name: "Mandurah",
         points: [
           [-31.95, 115.86],
-          [-31.99, 115.86],
-          [-32.07, 115.86],
-          [-32.15, 115.84],
-          [-32.24, 115.82],
-          [-32.33, 115.79],
-          [-32.41, 115.77],
-          [-32.45, 115.75]
+          [-31.977, 115.86],
+          [-31.987, 115.859],
+          [-32.008, 115.855], // Elizabeth Quay
+          [-32.049, 115.85], // Canning Bridge
+          [-32.064, 115.85], // Bull Creek
+          [-32.073, 115.847], // Murdoch
+          [-32.127, 115.852], // Cockburn
+          [-32.175, 115.843], // Aubin Grove
+          [-32.249, 115.821], // Rockingham
+          [-32.279, 115.771], // Warnbro
+          [-32.348, 115.757], // Lakelands-ish
+          [-32.375, 115.757],
+          [-32.45, 115.75] // Mandurah
         ]
       },
       {
         name: "Joondalup/Yanchep",
         points: [
           [-31.95, 115.86],
-          [-31.9, 115.83],
-          [-31.84, 115.79],
-          [-31.77, 115.75],
-          [-31.68, 115.72],
-          [-31.61, 115.71],
-          [-31.55, 115.7],
-          [-31.48, 115.7]
+          [-31.936, 115.846], // Leederville
+          [-31.917, 115.84], // Glendalough
+          [-31.897, 115.81], // Stirling
+          [-31.866, 115.8], // Warwick
+          [-31.844, 115.782], // Greenwood
+          [-31.819, 115.768], // Whitfords
+          [-31.78, 115.756], // Edgewater
+          [-31.746, 115.742], // Joondalup
+          [-31.728, 115.735], // Currambine
+          [-31.712, 115.732], // Clarkson
+          [-31.689, 115.73], // Butler
+          [-31.64, 115.71], // Alkimos
+          [-31.58, 115.69], // Eglinton est.
+          [-31.48, 115.7] // Yanchep approx
         ]
       },
       { name: "Fremantle", points: [[-31.95, 115.86], [-31.99, 115.84], [-32.03, 115.81], [-32.05, 115.78]] },
@@ -330,6 +344,56 @@
       { name: "Armadale/Thornlie", points: [[-31.95, 115.86], [-32.0, 115.88], [-32.04, 115.93], [-32.08, 115.98], [-32.12, 116.02]] },
       { name: "Airport", points: [[-31.95, 115.86], [-31.93, 115.89], [-31.92, 115.96], [-31.93, 116.0]] },
       { name: "Ellenbrook", points: [[-31.95, 115.86], [-31.89, 115.91], [-31.85, 115.94], [-31.82, 115.97], [-31.78, 115.98]] }
+    ];
+
+    const railStations = [
+      // Core CBD
+      { name: "Perth Station", lat: -31.9516, lon: 115.8605 },
+      { name: "Perth Underground", lat: -31.9524, lon: 115.8579 },
+      { name: "Elizabeth Quay", lat: -31.9563, lon: 115.8543 },
+      // Mandurah line
+      { name: "Canning Bridge", lat: -32.0494, lon: 115.8517 },
+      { name: "Bull Creek", lat: -32.064, lon: 115.852 },
+      { name: "Murdoch", lat: -32.071, lon: 115.85 },
+      { name: "Cockburn Central", lat: -32.1267, lon: 115.85 },
+      { name: "Aubin Grove", lat: -32.175, lon: 115.843 },
+      { name: "Rockingham", lat: -32.2745, lon: 115.73 },
+      { name: "Mandurah", lat: -32.536, lon: 115.742 },
+      // Joondalup / Yanchep
+      { name: "Leederville", lat: -31.9361, lon: 115.8414 },
+      { name: "Glendalough", lat: -31.917, lon: 115.84 },
+      { name: "Stirling", lat: -31.8962, lon: 115.8097 },
+      { name: "Warwick", lat: -31.8592, lon: 115.807 },
+      { name: "Whitfords", lat: -31.811, lon: 115.767 },
+      { name: "Joondalup", lat: -31.744, lon: 115.768 },
+      { name: "Butler", lat: -31.639, lon: 115.71 },
+      { name: "Yanchep", lat: -31.55, lon: 115.69 },
+      // Fremantle
+      { name: "Subiaco", lat: -31.95, lon: 115.817 },
+      { name: "Claremont", lat: -31.986, lon: 115.781 },
+      { name: "Cottesloe", lat: -32.009, lon: 115.756 },
+      { name: "Fremantle", lat: -32.053, lon: 115.748 },
+      // Midland
+      { name: "Claisebrook", lat: -31.9503, lon: 115.8735 },
+      { name: "Bayswater", lat: -31.9147, lon: 115.9136 },
+      { name: "Guildford", lat: -31.9, lon: 115.967 },
+      { name: "Midland", lat: -31.889, lon: 116.005 },
+      // Armadale / Thornlie
+      { name: "Burswood", lat: -31.961, lon: 115.894 },
+      { name: "Oats Street", lat: -31.9805, lon: 115.8974 },
+      { name: "Thornlie", lat: -32.0618, lon: 115.9521 },
+      { name: "Gosnells", lat: -32.079, lon: 115.999 },
+      { name: "Armadale", lat: -32.153, lon: 116.016 },
+      // Airport
+      { name: "Redcliffe", lat: -31.927, lon: 115.949 },
+      { name: "Airport Central", lat: -31.938, lon: 115.967 },
+      { name: "High Wycombe", lat: -31.9405, lon: 116.007 },
+      // Ellenbrook
+      { name: "Bayswater (Ellenbrook)", lat: -31.9147, lon: 115.9136 },
+      { name: "Noranda", lat: -31.865, lon: 115.897 },
+      { name: "Malaga", lat: -31.846, lon: 115.89 },
+      { name: "Whiteman Park", lat: -31.824, lon: 115.95 },
+      { name: "Ellenbrook", lat: -31.776, lon: 115.97 }
     ];
 
     const hillsZone = { latMin: -32.05, latMax: -31.75, lonMin: 116.0, lonMax: 116.2 };
@@ -400,12 +464,13 @@
 
     function renderRailLines(show) {
       railLayer.clearLayers();
+      stationLayer.clearLayers();
       if (!show) return;
       railLines.forEach((line) => {
         const poly = L.polyline(line.points, {
           color: "var(--rail)",
           weight: 4,
-          opacity: 0.7,
+          opacity: 0.8,
           dashArray: "4 6"
         }).addTo(railLayer);
         const midpoint = line.points[Math.floor(line.points.length / 2)];
@@ -418,16 +483,29 @@
           })
         }).addTo(railLayer);
       });
+      railStations.forEach((st) => {
+        L.circleMarker([st.lat, st.lon], {
+          radius: 5,
+          color: "#0b1220",
+          weight: 1,
+          fillColor: "#ffffff",
+          fillOpacity: 0.9
+        })
+          .bindTooltip(st.name, { permanent: false, direction: "top", offset: [0, -4] })
+          .addTo(stationLayer);
+      });
     }
 
     function renderStops(stops, baseWait, netSpeed) {
       stopsLayer.clearLayers();
+      const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
       stops.forEach((stop) => {
         const commute = computeCommute(stop, baseWait, netSpeed);
         const color = colourForMinutes(commute);
+        const isMajor = majorPattern.test(stop.stopname || "");
         L.circleMarker([stop.lat, stop.lon], {
-          radius: 6,
-          color: "#0d1b2a",
+          radius: isMajor ? 8 : 5.5,
+          color: isMajor ? "#d9f99d" : "#0d1b2a",
           weight: 1,
           fillColor: color,
           fillOpacity: 0.9
