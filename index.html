@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perth PT Commute Sketch</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2at0z1hSzYXCtyS3qYpHfM1w4DkM4R1dCwo0+3s="
+    crossorigin=""
+  />
+  <style>
+    :root {
+      --panel-bg: rgba(20, 24, 31, 0.88);
+      --panel-text: #e8f1ff;
+      --accent: #7bdcb5;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.12);
+      --font: "Inter", system-ui, -apple-system, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 20%, #0f172a, #0b1020 55%);
+      font-family: var(--font);
+      color: var(--panel-text);
+      overflow: hidden;
+    }
+    #map {
+      position: absolute;
+      inset: 0;
+    }
+    .panel {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 320px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+      color: #e0fbff;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .row label {
+      flex: 1;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--panel-text);
+      font-size: 14px;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    button {
+      padding: 9px 14px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      background: linear-gradient(120deg, #4dd4a4, #5fb3ff);
+      color: #04131e;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    .legend {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend-bar {
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, hsl(120, 75%, 45%), hsl(60, 80%, 52%), hsl(0, 80%, 50%));
+      border: 1px solid var(--border);
+      margin: 6px 0 4px;
+    }
+    .legend-scale {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media (max-width: 600px) {
+      .panel {
+        width: calc(100% - 24px);
+        left: 12px;
+        right: 12px;
+      }
+      .row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="panel">
+    <h1>Perth PT commute sketch</h1>
+    <div class="row">
+      <label>Base wait (min)
+        <input type="number" id="baseWait" value="8" min="0" step="1" />
+      </label>
+      <label>Network speed (km/h)
+        <input type="number" id="netSpeed" value="40" min="1" step="1" />
+      </label>
+    </div>
+    <div class="controls">
+      <button id="recompute">Recompute</button>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleRail" checked />
+        Show rail lines
+      </label>
+    </div>
+    <div class="legend">
+      Commute minutes
+      <div class="legend-bar"></div>
+      <div class="legend-scale">
+        <span>short</span><span>medium</span><span>long</span>
+      </div>
+    </div>
+    <div class="status" id="status">Fetching stops…</div>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1j7kFfC5fo0wuO3GNz6E1GkVpWwYvFxP6Nf2daTg="
+    crossorigin=""
+  ></script>
+  <script>
+    const target = { lat: -31.9523, lon: 115.8590 };
+    const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+    L.control.zoom({ position: "bottomright" }).addTo(map);
+
+    const stopsLayer = L.layerGroup().addTo(map);
+    const railLayer = L.layerGroup().addTo(map);
+
+    const corridors = [
+      // Mandurah line
+      [[-31.95, 115.86], [-32.02, 115.86], [-32.12, 115.86], [-32.19, 115.83], [-32.3, 115.76], [-32.35, 115.76], [-32.45, 115.75]],
+      // Joondalup / Yanchep
+      [[-31.95, 115.86], [-31.89, 115.84], [-31.8, 115.78], [-31.68, 115.72], [-31.55, 115.7], [-31.48, 115.7]],
+      // Fremantle
+      [[-31.95, 115.86], [-32.0, 115.83], [-32.05, 115.78]],
+      // Midland
+      [[-31.95, 115.86], [-31.92, 115.9], [-31.88, 115.95], [-31.87, 116.0], [-31.88, 116.05]],
+      // Armadale / Thornlie
+      [[-31.95, 115.86], [-32.0, 115.88], [-32.05, 115.93], [-32.08, 115.98], [-32.12, 116.02]],
+      // Airport
+      [[-31.95, 115.86], [-31.93, 115.89], [-31.92, 115.96], [-31.93, 116.0]],
+      // Ellenbrook
+      [[-31.95, 115.86], [-31.88, 115.9], [-31.83, 115.94], [-31.81, 115.97], [-31.78, 115.98]]
+    ];
+
+    const railLines = [
+      { name: "Mandurah", points: [[-31.95, 115.86], [-32.45, 115.75]] },
+      { name: "Joondalup/Yanchep", points: [[-31.95, 115.86], [-31.48, 115.7]] },
+      { name: "Fremantle", points: [[-31.95, 115.86], [-32.05, 115.78]] },
+      { name: "Midland", points: [[-31.95, 115.86], [-31.88, 116.05]] },
+      { name: "Armadale/Thornlie", points: [[-31.95, 115.86], [-32.12, 116.02]] },
+      { name: "Airport", points: [[-31.95, 115.86], [-31.93, 116.0]] },
+      { name: "Ellenbrook", points: [[-31.95, 115.86], [-31.78, 115.98]] }
+    ];
+
+    const hillsZone = { latMin: -32.05, latMax: -31.75, lonMin: 116.0, lonMax: 116.2 };
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = (d) => (d * Math.PI) / 180;
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(a));
+    }
+
+    function pointSegmentDistance(p, a, b) {
+      const toRad = (d) => (d * Math.PI) / 180;
+      const latScale = 111;
+      const x1 = (a[1] - p[1]) * Math.cos(toRad((a[0] + p[0]) / 2)) * latScale;
+      const y1 = (a[0] - p[0]) * latScale;
+      const x2 = (b[1] - p[1]) * Math.cos(toRad((b[0] + p[0]) / 2)) * latScale;
+      const y2 = (b[0] - p[0]) * latScale;
+      const dot = x1 * x2 + y1 * y2;
+      const lenSq = x2 * x2 + y2 * y2;
+      const t = Math.max(0, Math.min(1, lenSq === 0 ? 0 : dot / lenSq));
+      const projX = t * x2;
+      const projY = t * y2;
+      const dx = projX - x1;
+      const dy = projY - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function corridorFactor(lat, lon) {
+      let factor = 1;
+      corridors.forEach((line) => {
+        for (let i = 0; i < line.length - 1; i++) {
+          const d = pointSegmentDistance([lat, lon], line[i], line[i + 1]);
+          if (d < 1.5) {
+            factor = Math.min(factor, 0.78 + d * 0.05);
+          }
+        }
+      });
+      if (
+        lat >= hillsZone.latMin &&
+        lat <= hillsZone.latMax &&
+        lon >= hillsZone.lonMin &&
+        lon <= hillsZone.lonMax
+      ) {
+        factor *= 1.12;
+      }
+      return factor;
+    }
+
+    function colourForMinutes(mins) {
+      const clamped = Math.max(0, Math.min(90, mins));
+      const ratio = clamped / 90;
+      const hue = 120 - ratio * 120;
+      const sat = 80;
+      const light = 50 + ratio * 5;
+      return `hsl(${hue}, ${sat}%, ${light}%)`;
+    }
+
+    function computeCommute(stop, baseWait, netSpeed) {
+      const distanceKm = haversine(stop.lat, stop.lon, target.lat, target.lon);
+      const corridor = corridorFactor(stop.lat, stop.lon);
+      const effectiveSpeed = netSpeed * (1 / corridor);
+      const rideMins = (distanceKm / Math.max(effectiveSpeed, 1)) * 60;
+      return baseWait + rideMins;
+    }
+
+    function renderRailLines(show) {
+      railLayer.clearLayers();
+      if (!show) return;
+      railLines.forEach((line) => {
+        L.polyline(line.points, {
+          color: "#77c3ff",
+          weight: 4,
+          opacity: 0.6,
+          dashArray: "6 6"
+        }).addTo(railLayer);
+      });
+    }
+
+    function renderStops(stops, baseWait, netSpeed) {
+      stopsLayer.clearLayers();
+      stops.forEach((stop) => {
+        const commute = computeCommute(stop, baseWait, netSpeed);
+        const color = colourForMinutes(commute);
+        L.circleMarker([stop.lat, stop.lon], {
+          radius: 6,
+          color: "#0d1b2a",
+          weight: 1,
+          fillColor: color,
+          fillOpacity: 0.9
+        })
+          .bindPopup(
+            `<strong>${stop.stopname || "Stop"}</strong><br>ID: ${stop.stopid}<br>${commute.toFixed(1)} min`
+          )
+          .addTo(stopsLayer);
+      });
+      document.getElementById("status").textContent = `Rendered ${stops.length} stops`;
+    }
+
+    async function fetchStops() {
+      const status = document.getElementById("status");
+      status.textContent = "Fetching stops…";
+      const url =
+        "https://services.slip.wa.gov.au/public/rest/services/SLIP_Public_Services/Transport_Public_PT_Stops/FeatureServer/14/query" +
+        "?where=1%3D1" +
+        "&outFields=stopid,stopname" +
+        "&geometry=-32.6,115.5,-31.4,116.2" +
+        "&geometryType=esriGeometryEnvelope" +
+        "&inSR=4326&spatialRel=esriSpatialRelIntersects" +
+        "&outSR=4326&f=json";
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch stops: ${res.status}`);
+      }
+      const data = await res.json();
+      const stops = (data.features || [])
+        .map((f) => ({
+          stopid: f.attributes.stopid,
+          stopname: f.attributes.stopname,
+          lat: f.geometry.y,
+          lon: f.geometry.x
+        }))
+        .filter((s) => s.lat && s.lon);
+      status.textContent = `Loaded ${stops.length} stops`;
+      return stops;
+    }
+
+    async function init() {
+      try {
+        const stops = await fetchStops();
+        window.__stops = stops;
+        renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
+        renderRailLines(toggleRail.checked);
+      } catch (e) {
+        document.getElementById("status").textContent = e.message;
+      }
+    }
+
+    document.getElementById("recompute").addEventListener("click", () => {
+      if (!window.__stops) return;
+      renderStops(window.__stops, Number(baseWait.value), Number(netSpeed.value));
+    });
+    document.getElementById("toggleRail").addEventListener("change", (e) => {
+      renderRailLines(e.target.checked);
+    });
+
+    init();
+  </script>
+</body>
+</html>
