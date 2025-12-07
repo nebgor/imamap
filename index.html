@@ -1060,7 +1060,12 @@
 
     renderSnapshots();
     renderHeat();
-    init();
+    init().then(() => {
+      // seed a small batch if no heat is cached
+      if (!loadHeat().length) {
+        simulateRandom(15);
+      }
+    });
 
     function nearestStop(lat, lon) {
       if (!window.__stops) return null;
@@ -1184,10 +1189,12 @@
       const travel = buildTravelPath(clickLatLng);
       if (!travel) return;
       const { path, near } = travel;
-
+      // persist heat contribution for this click
       const base = Number(baseWait.value);
       const speed = Number(netSpeed.value);
       const commute = computeCommute(near.stop, base, speed);
+      addHeatPath(path, commute);
+
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
 
