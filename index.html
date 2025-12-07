@@ -237,6 +237,7 @@
     <div class="controls">
       <button id="recompute">Recompute</button>
       <button id="saveSnapshot">Save snapshot</button>
+      <button id="simulateRandom">Simulate random</button>
       <label style="display:flex;align-items:center;gap:6px;">
         <input type="checkbox" id="toggleRail" checked />
         Show rail lines
@@ -364,6 +365,7 @@
     const railLayer = L.layerGroup().addTo(map);
     const stationLayer = L.layerGroup().addTo(map);
     const simLayer = L.layerGroup().addTo(map);
+    const heatLayer = L.layerGroup().addTo(map);
     let simTimer = null;
     let routeGraph = null;
 
@@ -974,7 +976,63 @@
       });
     });
 
+    function loadHeat() {
+      const raw = localStorage.getItem("simHeatV1");
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHeat(list) {
+      localStorage.setItem("simHeatV1", JSON.stringify(list));
+    }
+
+    function renderHeat() {
+      heatLayer.clearLayers();
+      const heat = loadHeat();
+      heat.forEach((h) => {
+        L.polyline(h.path, {
+          color: h.color,
+          weight: 2,
+          opacity: 0.25
+        }).addTo(heatLayer);
+      });
+    }
+
+    function addHeatPath(path, minutes) {
+      const heat = loadHeat();
+      const color = colourForMinutes(minutes);
+      heat.unshift({ path, color, ts: Date.now() });
+      const trimmed = heat.slice(0, 120);
+      saveHeat(trimmed);
+      renderHeat();
+    }
+
+    function simulateRandom(count = 20) {
+      const bounds = { minLat: -32.6, maxLat: -31.4, minLon: 115.5, maxLon: 116.2 };
+      for (let i = 0; i < count; i++) {
+        const lat = bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
+        const lon = bounds.minLon + Math.random() * (bounds.maxLon - bounds.minLon);
+        const travel = buildTravelPath({ lat, lng: lon });
+        if (travel) {
+          const base = Number(baseWait.value);
+          const speed = Number(netSpeed.value);
+          const commute = computeCommute(travel.near.stop, base, speed);
+          addHeatPath(travel.path, commute);
+        }
+      }
+    }
+
+    document.getElementById("simulateRandom").addEventListener("click", () => {
+      simulateRandom(25);
+    });
+
     renderSnapshots();
+    renderHeat();
     init();
 
     function nearestStop(lat, lon) {
@@ -1050,22 +1108,10 @@
       return winner;
     }
 
-    function animateTravel(clickLatLng) {
-      if (!window.__stops) return;
-      simLayer.clearLayers();
-      if (simTimer) {
-        clearInterval(simTimer);
-        simTimer = null;
-      }
-
+    function buildTravelPath(clickLatLng) {
+      if (!window.__stops) return null;
       const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
-      if (!near.stop) return;
-
-      const base = Number(baseWait.value);
-      const speed = Number(netSpeed.value);
-      const commute = computeCommute(near.stop, base, speed);
-      const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
-      const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
+      if (!near.stop) return null;
 
       const path = [];
       path.push([clickLatLng.lat, clickLatLng.lng]);
@@ -1097,6 +1143,26 @@
       }
 
       path.push([target.lat, target.lon]);
+      return { path, near, railChoice, busChoice };
+    }
+
+    function animateTravel(clickLatLng) {
+      if (!window.__stops) return;
+      simLayer.clearLayers();
+      if (simTimer) {
+        clearInterval(simTimer);
+        simTimer = null;
+      }
+
+      const travel = buildTravelPath(clickLatLng);
+      if (!travel) return;
+      const { path, near } = travel;
+
+      const base = Number(baseWait.value);
+      const speed = Number(netSpeed.value);
+      const commute = computeCommute(near.stop, base, speed);
+      const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
+      const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
 
       const segLengths = [];
       let totalLen = 0;
