@@ -410,6 +410,100 @@
       }
     ];
 
+    const busRoutes = [
+      {
+        name: "Kwinana Fwy BUS",
+        points: [
+          [-32.25, 115.84],
+          [-32.2, 115.84],
+          [-32.15, 115.84],
+          [-32.1, 115.84],
+          [-32.05, 115.85],
+          [-32.0, 115.86],
+          [-31.97, 115.86],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Mitchell Fwy BUS",
+        points: [
+          [-31.48, 115.7],
+          [-31.6, 115.71],
+          [-31.65, 115.71],
+          [-31.7, 115.72],
+          [-31.75, 115.74],
+          [-31.8, 115.76],
+          [-31.85, 115.78],
+          [-31.9, 115.82],
+          [-31.93, 115.84],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Albany Hwy",
+        points: [
+          [-32.15, 116.02],
+          [-32.12, 116.0],
+          [-32.08, 115.98],
+          [-32.04, 115.95],
+          [-32.0, 115.92],
+          [-31.98, 115.9],
+          [-31.96, 115.89],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Wanneroo Rd",
+        points: [
+          [-31.72, 115.78],
+          [-31.78, 115.79],
+          [-31.82, 115.81],
+          [-31.86, 115.82],
+          [-31.9, 115.84],
+          [-31.93, 115.85],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Great Eastern Hwy",
+        points: [
+          [-31.94, 116.01],
+          [-31.92, 115.99],
+          [-31.9, 115.96],
+          [-31.9, 115.93],
+          [-31.92, 115.89],
+          [-31.93, 115.87],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Canning Hwy",
+        points: [
+          [-32.05, 115.84],
+          [-32.04, 115.85],
+          [-32.02, 115.85],
+          [-31.99, 115.85],
+          [-31.97, 115.855],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Marmion/West Coast",
+        points: [
+          [-31.55, 115.74],
+          [-31.6, 115.75],
+          [-31.65, 115.76],
+          [-31.7, 115.77],
+          [-31.75, 115.78],
+          [-31.8, 115.79],
+          [-31.84, 115.8],
+          [-31.88, 115.81],
+          [-31.92, 115.83],
+          [-31.95, 115.86]
+        ]
+      }
+    ];
+
     const railStations = [
       // Core CBD
       { name: "Perth Station", lat: -31.9516, lon: 115.8605 },
@@ -791,6 +885,26 @@
       return winner;
     }
 
+    function bestBusRouteForStop(stop) {
+      let winner = null;
+      busRoutes.forEach((route) => {
+        const nearStop = nearestPointIndex(route.points, stop.lat, stop.lon);
+        const nearCbd = nearestPointIndex(route.points, target.lat, target.lon);
+        const span = Math.abs(nearStop.idx - nearCbd.idx);
+        if (!winner || nearStop.distKm < winner.stopDist) {
+          winner = {
+            route,
+            stopIdx: nearStop.idx,
+            stopDist: nearStop.distKm,
+            cbdIdx: nearCbd.idx,
+            cbdDist: nearCbd.distKm,
+            span
+          };
+        }
+      });
+      return winner;
+    }
+
     function animateTravel(clickLatLng) {
       if (!window.__stops) return;
       simLayer.clearLayers();
@@ -812,12 +926,13 @@
       path.push([clickLatLng.lat, clickLatLng.lng]);
       path.push([near.stop.lat, near.stop.lon]);
 
-      const chosen = bestLineForStop(near.stop);
-      if (chosen) {
-        const linePoints = chosen.line.points;
-        const stopIdx = chosen.stopIdx;
-        const cbdIdx = chosen.cbdIdx;
-        // connect stop to corridor anchor
+      const railChoice = bestLineForStop(near.stop);
+      const busChoice = bestBusRouteForStop(near.stop);
+
+      function buildCorridor(choice, points) {
+        const linePoints = points;
+        const stopIdx = choice.stopIdx;
+        const cbdIdx = choice.cbdIdx;
         path.push(linePoints[stopIdx]);
         const slice =
           stopIdx <= cbdIdx ? linePoints.slice(stopIdx, cbdIdx + 1) : linePoints.slice(cbdIdx, stopIdx + 1).reverse();
@@ -825,6 +940,15 @@
           const last = path[path.length - 1];
           if (!(last[0] === p[0] && last[1] === p[1])) path.push(p);
         });
+      }
+
+      const railSpan = railChoice ? Math.abs(railChoice.stopIdx - railChoice.cbdIdx) : Infinity;
+      const busSpan = busChoice ? Math.abs(busChoice.stopIdx - busChoice.cbdIdx) : Infinity;
+
+      if (busChoice && busSpan <= railSpan) {
+        buildCorridor(busChoice, busChoice.route.points);
+      } else if (railChoice) {
+        buildCorridor(railChoice, railChoice.line.points);
       }
 
       path.push([target.lat, target.lon]);
