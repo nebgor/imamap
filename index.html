@@ -266,7 +266,11 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script
+    src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"
+    integrity="sha256-UeHt70RwwG8+dBSnupnXhZ2dEoWQWA31pLPVbRLCp6A="
+    crossorigin=""
+  ></script>
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script>
     function buildRouteGraph(routes) {
@@ -349,6 +353,40 @@
     }
   </script>
   <script>
+    const qs = new URLSearchParams(window.location.search);
+    if (qs.get("status") === "json") {
+      const heatLen = (() => {
+        try {
+          const v = localStorage.getItem("simHeatV1");
+          return v ? JSON.parse(v).length : 0;
+        } catch {
+          return 0;
+        }
+      })();
+      const stopLen = (() => {
+        try {
+          const v = localStorage.getItem("stopsCacheV1");
+          if (!v) return 0;
+          const p = JSON.parse(v);
+          return (p.stops || []).length;
+        } catch {
+          return 0;
+        }
+      })();
+      document.body.innerHTML = `<pre>${JSON.stringify(
+        {
+          status: "ok",
+          timestamp: new Date().toISOString(),
+          heatCount: heatLen,
+          stopCacheCount: stopLen,
+          note: "status-only mode; map not initialized"
+        },
+        null,
+        2
+      )}</pre>`;
+      throw new Error("status-only-mode");
+    }
+
     const target = { lat: -31.9523, lon: 115.8590 };
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
@@ -893,6 +931,7 @@
       } catch (e) {
         document.getElementById("status").textContent = e.message;
         document.getElementById("debug").firstElementChild.textContent = `Debug — ${e.message}`;
+        console.error(e);
       }
     }
 
