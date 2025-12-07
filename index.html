@@ -12,19 +12,22 @@
   />
   <style>
     :root {
-      --panel-bg: rgba(20, 24, 31, 0.88);
-      --panel-text: #e8f1ff;
-      --accent: #7bdcb5;
-      --muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.12);
+      --panel-bg: rgba(12, 16, 27, 0.9);
+      --panel-text: #eaf3ff;
+      --accent: #6fe7c9;
+      --muted: #9fb1c7;
+      --border: rgba(255, 255, 255, 0.14);
       --font: "Inter", system-ui, -apple-system, sans-serif;
+      --rail: #64b5ff;
+      --bg-1: #0b1020;
+      --bg-2: #0f1a32;
     }
     * {
       box-sizing: border-box;
     }
     body {
       margin: 0;
-      background: radial-gradient(circle at 20% 20%, #0f172a, #0b1020 55%);
+      background: radial-gradient(circle at 35% 25%, #10213f 0%, #0b1228 50%, #080c1a 100%);
       font-family: var(--font);
       color: var(--panel-text);
       overflow: hidden;
@@ -35,9 +38,9 @@
     }
     .panel {
       position: absolute;
-      top: 16px;
-      left: 16px;
-      width: 320px;
+      top: 14px;
+      left: 14px;
+      width: 340px;
       background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -47,7 +50,7 @@
     }
     h1 {
       margin: 0 0 10px;
-      font-size: 16px;
+      font-size: 17px;
       letter-spacing: 0.4px;
       font-weight: 700;
       color: #e0fbff;
@@ -104,7 +107,13 @@
     .legend-bar {
       height: 12px;
       border-radius: 999px;
-      background: linear-gradient(90deg, hsl(120, 75%, 45%), hsl(60, 80%, 52%), hsl(0, 80%, 50%));
+      background: linear-gradient(
+        90deg,
+        hsl(120, 75%, 45%),
+        hsl(60, 80%, 52%),
+        hsl(30, 85%, 55%),
+        hsl(0, 80%, 50%)
+      );
       border: 1px solid var(--border);
       margin: 6px 0 4px;
     }
@@ -118,6 +127,33 @@
       font-size: 12px;
       color: var(--muted);
     }
+    .debug {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      background: rgba(8, 11, 20, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      max-width: 460px;
+      font-size: 12px;
+      color: #cbd5e1;
+      display: grid;
+      gap: 4px;
+      line-height: 1.4;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    }
+    .debug strong {
+      color: #e2f3ff;
+    }
+    .rail-label {
+      background: rgba(15, 102, 175, 0.5);
+      color: #e7f6ff;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
     @media (max-width: 600px) {
       .panel {
         width: calc(100% - 24px);
@@ -126,6 +162,11 @@
       }
       .row {
         flex-direction: column;
+      }
+      .debug {
+        max-width: calc(100% - 24px);
+        left: 12px;
+        right: 12px;
       }
     }
   </style>
@@ -158,7 +199,11 @@
     </div>
     <div class="status" id="status">Fetching stops…</div>
   </div>
-
+  <div class="debug" id="debug">
+    <div><strong>Debug</strong> — ready</div>
+    <div id="debug-meta"></div>
+    <div id="debug-corridor"></div>
+  </div>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-o9N1j7kFfC5fo0wuO3GNz6E1GkVpWwYvFxP6Nf2daTg="
@@ -167,9 +212,9 @@
   <script>
     const target = { lat: -31.9523, lon: 115.8590 };
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: "&copy; OpenStreetMap contributors"
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors & Carto'
     }).addTo(map);
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
@@ -177,30 +222,54 @@
     const railLayer = L.layerGroup().addTo(map);
 
     const corridors = [
-      // Mandurah line
-      [[-31.95, 115.86], [-32.02, 115.86], [-32.12, 115.86], [-32.19, 115.83], [-32.3, 115.76], [-32.35, 115.76], [-32.45, 115.75]],
+      // Mandurah line corridor
+      [[-31.95, 115.86], [-32.0, 115.86], [-32.1, 115.86], [-32.18, 115.83], [-32.25, 115.8], [-32.35, 115.78], [-32.45, 115.75]],
       // Joondalup / Yanchep
-      [[-31.95, 115.86], [-31.89, 115.84], [-31.8, 115.78], [-31.68, 115.72], [-31.55, 115.7], [-31.48, 115.7]],
+      [[-31.95, 115.86], [-31.9, 115.84], [-31.83, 115.8], [-31.74, 115.75], [-31.63, 115.71], [-31.55, 115.7], [-31.48, 115.7]],
       // Fremantle
-      [[-31.95, 115.86], [-32.0, 115.83], [-32.05, 115.78]],
+      [[-31.95, 115.86], [-31.99, 115.84], [-32.03, 115.8], [-32.05, 115.78]],
       // Midland
-      [[-31.95, 115.86], [-31.92, 115.9], [-31.88, 115.95], [-31.87, 116.0], [-31.88, 116.05]],
+      [[-31.95, 115.86], [-31.92, 115.9], [-31.89, 115.95], [-31.87, 116.0], [-31.88, 116.05]],
       // Armadale / Thornlie
-      [[-31.95, 115.86], [-32.0, 115.88], [-32.05, 115.93], [-32.08, 115.98], [-32.12, 116.02]],
+      [[-31.95, 115.86], [-32.0, 115.88], [-32.04, 115.92], [-32.08, 115.98], [-32.12, 116.02]],
       // Airport
       [[-31.95, 115.86], [-31.93, 115.89], [-31.92, 115.96], [-31.93, 116.0]],
       // Ellenbrook
-      [[-31.95, 115.86], [-31.88, 115.9], [-31.83, 115.94], [-31.81, 115.97], [-31.78, 115.98]]
+      [[-31.95, 115.86], [-31.89, 115.91], [-31.85, 115.94], [-31.82, 115.97], [-31.78, 115.98]]
     ];
 
     const railLines = [
-      { name: "Mandurah", points: [[-31.95, 115.86], [-32.45, 115.75]] },
-      { name: "Joondalup/Yanchep", points: [[-31.95, 115.86], [-31.48, 115.7]] },
-      { name: "Fremantle", points: [[-31.95, 115.86], [-32.05, 115.78]] },
-      { name: "Midland", points: [[-31.95, 115.86], [-31.88, 116.05]] },
-      { name: "Armadale/Thornlie", points: [[-31.95, 115.86], [-32.12, 116.02]] },
-      { name: "Airport", points: [[-31.95, 115.86], [-31.93, 116.0]] },
-      { name: "Ellenbrook", points: [[-31.95, 115.86], [-31.78, 115.98]] }
+      {
+        name: "Mandurah",
+        points: [
+          [-31.95, 115.86],
+          [-31.99, 115.86],
+          [-32.07, 115.86],
+          [-32.15, 115.84],
+          [-32.24, 115.82],
+          [-32.33, 115.79],
+          [-32.41, 115.77],
+          [-32.45, 115.75]
+        ]
+      },
+      {
+        name: "Joondalup/Yanchep",
+        points: [
+          [-31.95, 115.86],
+          [-31.9, 115.83],
+          [-31.84, 115.79],
+          [-31.77, 115.75],
+          [-31.68, 115.72],
+          [-31.61, 115.71],
+          [-31.55, 115.7],
+          [-31.48, 115.7]
+        ]
+      },
+      { name: "Fremantle", points: [[-31.95, 115.86], [-31.99, 115.84], [-32.03, 115.81], [-32.05, 115.78]] },
+      { name: "Midland", points: [[-31.95, 115.86], [-31.92, 115.9], [-31.89, 115.96], [-31.87, 116.0], [-31.88, 116.05]] },
+      { name: "Armadale/Thornlie", points: [[-31.95, 115.86], [-32.0, 115.88], [-32.04, 115.93], [-32.08, 115.98], [-32.12, 116.02]] },
+      { name: "Airport", points: [[-31.95, 115.86], [-31.93, 115.89], [-31.92, 115.96], [-31.93, 116.0]] },
+      { name: "Ellenbrook", points: [[-31.95, 115.86], [-31.89, 115.91], [-31.85, 115.94], [-31.82, 115.97], [-31.78, 115.98]] }
     ];
 
     const hillsZone = { latMin: -32.05, latMax: -31.75, lonMin: 116.0, lonMax: 116.2 };
@@ -273,11 +342,20 @@
       railLayer.clearLayers();
       if (!show) return;
       railLines.forEach((line) => {
-        L.polyline(line.points, {
-          color: "#77c3ff",
+        const poly = L.polyline(line.points, {
+          color: "var(--rail)",
           weight: 4,
-          opacity: 0.6,
-          dashArray: "6 6"
+          opacity: 0.7,
+          dashArray: "4 6"
+        }).addTo(railLayer);
+        const midpoint = line.points[Math.floor(line.points.length / 2)];
+        L.marker(midpoint, {
+          interactive: false,
+          icon: L.divIcon({
+            className: "rail-label",
+            html: line.name,
+            iconSize: null
+          })
         }).addTo(railLayer);
       });
     }
@@ -300,6 +378,8 @@
           .addTo(stopsLayer);
       });
       document.getElementById("status").textContent = `Rendered ${stops.length} stops`;
+      const debugMeta = document.getElementById("debug-meta");
+      debugMeta.textContent = `Stops: ${stops.length} · Base wait: ${baseWait} min · Speed: ${netSpeed} km/h`;
     }
 
     async function fetchStops() {
@@ -330,14 +410,24 @@
       return stops;
     }
 
+    function sampleCorridorDebug(lat, lon) {
+      const factor = corridorFactor(lat, lon);
+      const mins = computeCommute({ lat, lon }, Number(baseWait.value), Number(netSpeed.value));
+      return { factor, mins };
+    }
+
     async function init() {
       try {
         const stops = await fetchStops();
         window.__stops = stops;
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
+        const dbg = sampleCorridorDebug(-31.96, 115.86);
+        document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
+        document.getElementById("debug").firstElementChild.textContent = "Debug — ok";
       } catch (e) {
         document.getElementById("status").textContent = e.message;
+        document.getElementById("debug").firstElementChild.textContent = `Debug — ${e.message}`;
       }
     }
 

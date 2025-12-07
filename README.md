@@ -9,3 +9,9 @@ Leaflet-based single-page map that sketches approximate public transport commute
 ## Running locally
 
 Open `index.html` in a modern browser; it fetches data directly from the WA SLIP API.
+
+## Quality checks
+
+- Lint: `npm run lint`
+- Test: `npm test` (basic contract checks on the HTML)
+- CI: see `.github/workflows/ci.yml`
