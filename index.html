@@ -489,6 +489,22 @@
       fallback: "#ef4444",
       auto: "#22c55e"
     };
+    async function loadLocalFallbackStops() {
+      try {
+        const [busRes, railRes] = await Promise.all([
+          fetch("data/fallback-bus-sample.json"),
+          fetch("data/fallback-rail-stops.json")
+        ]);
+        if (!busRes.ok || !railRes.ok) throw new Error("fallback file missing");
+        const [bus, rail] = await Promise.all([busRes.json(), railRes.json()]);
+        const merged = [...bus, ...rail].filter((s) => s.lat && s.lon);
+        if (merged.length) return merged;
+        throw new Error("empty fallback files");
+      } catch (err) {
+        lastError = err.message || "fallback read failed";
+        return null;
+      }
+    }
     const SAMPLE_STOPS = [
       { stopid: "CBD", stopname: "Perth Station", lat: -31.9516, lon: 115.8605 },
       { stopid: "EQ", stopname: "Elizabeth Quay", lat: -31.9563, lon: 115.8543 },
@@ -1345,9 +1361,17 @@
         return stops;
       } catch (err) {
         console.warn("Stop fetch failed, using fallback sample stops", err);
+        lastError = err.message || "stop fetch failed";
+        const local = await loadLocalFallbackStops();
+        if (local && local.length) {
+          DATA_SOURCE = "local-fallback";
+          status.textContent = `Using local fallback stops (${local.length})`;
+          writeStopCache(local);
+          return local;
+        }
         const fallbacks = [...SAMPLE_STOPS, ...FALLBACK_STOPS.busStops, ...FALLBACK_STOPS.railStops];
-        DATA_SOURCE = "fallback";
-        status.textContent = `Using fallback stops (${fallbacks.length})`;
+        DATA_SOURCE = "generated-fallback";
+        status.textContent = `Using generated fallback stops (${fallbacks.length})`;
         writeStopCache(fallbacks);
         return fallbacks;
       }

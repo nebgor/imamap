@@ -1,0 +1,3734 @@
+[
+  {
+    "stopid": "30972081",
+    "stopname": "Poynter Dr Before Griffell Wy",
+    "lat": -31.8393174,
+    "lon": 115.775063
+  },
+  {
+    "stopid": "244783004",
+    "stopname": "Bus stop",
+    "lat": -31.8064651,
+    "lon": 116.0194646
+  },
+  {
+    "stopid": "244783276",
+    "stopname": "Bus stop",
+    "lat": -31.8479793,
+    "lon": 116.0149208
+  },
+  {
+    "stopid": "443230993",
+    "stopname": "Beach Rd After Sequoia Rd",
+    "lat": -31.8457116,
+    "lon": 115.7830324
+  },
+  {
+    "stopid": "452516847",
+    "stopname": "Bus stop",
+    "lat": -31.8362296,
+    "lon": 115.7776764
+  },
+  {
+    "stopid": "458635123",
+    "stopname": "Warwick Rd Before Roche Rd",
+    "lat": -31.8347323,
+    "lon": 115.7694414
+  },
+  {
+    "stopid": "458769892",
+    "stopname": "Bus stop",
+    "lat": -31.8234461,
+    "lon": 115.7973057
+  },
+  {
+    "stopid": "458769946",
+    "stopname": "Trappers Dr After Camarino Dr",
+    "lat": -31.7841099,
+    "lon": 115.7871737
+  },
+  {
+    "stopid": "458769982",
+    "stopname": "Trappers Dr Before Timberlane Dr",
+    "lat": -31.7966923,
+    "lon": 115.794684
+  },
+  {
+    "stopid": "471854268",
+    "stopname": "Glengarry Dr Before Maybug Rd",
+    "lat": -31.8208042,
+    "lon": 115.7777417
+  },
+  {
+    "stopid": "471854321",
+    "stopname": "Timberlane Dr After Karri Ct",
+    "lat": -31.7895785,
+    "lon": 115.7981293
+  },
+  {
+    "stopid": "512414157",
+    "stopname": "Protea St After Tenardi Ct",
+    "lat": -31.83425,
+    "lon": 115.7954923
+  },
+  {
+    "stopid": "512414206",
+    "stopname": "Whitfords Av after Timbercrest Rise",
+    "lat": -31.8002206,
+    "lon": 115.7929333
+  },
+  {
+    "stopid": "512414273",
+    "stopname": "Bus stop",
+    "lat": -31.8131243,
+    "lon": 115.7904577
+  },
+  {
+    "stopid": "520155523",
+    "stopname": "Bus stop",
+    "lat": -31.8269462,
+    "lon": 115.7485947
+  },
+  {
+    "stopid": "527084860",
+    "stopname": "Whitfords Av Before Dampier Av",
+    "lat": -31.7954384,
+    "lon": 115.7500063
+  },
+  {
+    "stopid": "534264004",
+    "stopname": "Coral St After Camberwarra Dr",
+    "lat": -31.7903046,
+    "lon": 115.7564473
+  },
+  {
+    "stopid": "540207907",
+    "stopname": "Marmion Av After Cygnet St",
+    "lat": -31.7939942,
+    "lon": 115.7543636
+  },
+  {
+    "stopid": "546390169",
+    "stopname": "Ocean Reef Rd After Marmion Av",
+    "lat": -31.7705391,
+    "lon": 115.7505637
+  },
+  {
+    "stopid": "546390845",
+    "stopname": "Camberwarra Dr After Coral St",
+    "lat": -31.7902006,
+    "lon": 115.7577165
+  },
+  {
+    "stopid": "556653451",
+    "stopname": "Lilburne Rd After Readshaw Rd",
+    "lat": -31.8212484,
+    "lon": 115.7699053
+  },
+  {
+    "stopid": "556653532",
+    "stopname": "Gibson Av Before Warner Dr",
+    "lat": -31.7997841,
+    "lon": 115.7726926
+  },
+  {
+    "stopid": "556653854",
+    "stopname": "Gradient Wy Before Gunter Gr",
+    "lat": -31.7760142,
+    "lon": 115.7572993
+  },
+  {
+    "stopid": "557458107",
+    "stopname": "Kings Park Rd Colin Street Cat Id 142",
+    "lat": -31.9525517,
+    "lon": 115.8400494
+  },
+  {
+    "stopid": "559549532",
+    "stopname": "Waterford Dr After Campbell Dr",
+    "lat": -31.8097451,
+    "lon": 115.7532528
+  },
+  {
+    "stopid": "559549652",
+    "stopname": "Craigie Dr Before Leander St",
+    "lat": -31.7777083,
+    "lon": 115.770211
+  },
+  {
+    "stopid": "566210027",
+    "stopname": "Oats St Before Paterson Rd",
+    "lat": -31.975066,
+    "lon": 115.9309841
+  },
+  {
+    "stopid": "571126022",
+    "stopname": "Newcastle Street after Beaufort Street",
+    "lat": -31.9476566,
+    "lon": 115.8643274
+  },
+  {
+    "stopid": "571469012",
+    "stopname": "Bus stop",
+    "lat": -31.8110964,
+    "lon": 115.7560314
+  },
+  {
+    "stopid": "571490339",
+    "stopname": "Stirling Highway after Victoria Street",
+    "lat": -32.0120165,
+    "lon": 115.7553872
+  },
+  {
+    "stopid": "576201957",
+    "stopname": "Whitfords Av After Mooro St",
+    "lat": -31.8031123,
+    "lon": 115.8073912
+  },
+  {
+    "stopid": "579678010",
+    "stopname": "Cliff St After Ozone Rd",
+    "lat": -31.8414669,
+    "lon": 115.7535965
+  },
+  {
+    "stopid": "579678080",
+    "stopname": "Freeman Wy Before Keppell Rd",
+    "lat": -31.8367505,
+    "lon": 115.7626929
+  },
+  {
+    "stopid": "579678155",
+    "stopname": "Waterford Dr Before Tuxen Pl",
+    "lat": -31.8127329,
+    "lon": 115.7444196
+  },
+  {
+    "stopid": "579678264",
+    "stopname": "Regatta Dr Before Treetop Av",
+    "lat": -31.7625183,
+    "lon": 115.7788885
+  },
+  {
+    "stopid": "582869103",
+    "stopname": "Cliff St Before Lennard St",
+    "lat": -31.8443395,
+    "lon": 115.7537239
+  },
+  {
+    "stopid": "582912529",
+    "stopname": "Marmion Av After Whitfords Av",
+    "lat": -31.7946139,
+    "lon": 115.7539605
+  },
+  {
+    "stopid": "598766191",
+    "stopname": "Chipping Rd Before Belford Rd",
+    "lat": -31.9256165,
+    "lon": 115.7585073
+  },
+  {
+    "stopid": "600416574",
+    "stopname": "Cambridge St Before Selby St",
+    "lat": -31.9407178,
+    "lon": 115.8035538
+  },
+  {
+    "stopid": "602110163",
+    "stopname": "Peninsula Av After Sail Tce",
+    "lat": -31.7646115,
+    "lon": 115.7587223
+  },
+  {
+    "stopid": "606949413",
+    "stopname": "Oceanic Dr After Hornsey Rd",
+    "lat": -31.9407373,
+    "lon": 115.7951898
+  },
+  {
+    "stopid": "610880138",
+    "stopname": "Caridean St After Admiral Gr",
+    "lat": -31.7593892,
+    "lon": 115.7630864
+  },
+  {
+    "stopid": "614141591",
+    "stopname": "Bus stop",
+    "lat": -31.7598449,
+    "lon": 115.7399204
+  },
+  {
+    "stopid": "618039991",
+    "stopname": "Oceanside Prom Before Mullaloo Dr",
+    "lat": -31.7859461,
+    "lon": 115.7353897
+  },
+  {
+    "stopid": "618040013",
+    "stopname": "Hodges Dr After Venturi Dr",
+    "lat": -31.7580761,
+    "lon": 115.737384
+  },
+  {
+    "stopid": "624005771",
+    "stopname": "Constellation Dr Beaumaris Shopping Centre",
+    "lat": -31.7514416,
+    "lon": 115.7341829
+  },
+  {
+    "stopid": "631635205",
+    "stopname": "Bus stop",
+    "lat": -31.8445096,
+    "lon": 115.7674152
+  },
+  {
+    "stopid": "631635306",
+    "stopname": "Ellersdale Av Before Ackworth Cr",
+    "lat": -31.8368931,
+    "lon": 115.8061939
+  },
+  {
+    "stopid": "634218245",
+    "stopname": "Murdoch Station Stand 9",
+    "lat": -32.0660642,
+    "lon": 115.8509601
+  },
+  {
+    "stopid": "634218266",
+    "stopname": "Somerville Bvd After Keall Pass",
+    "lat": -32.0570587,
+    "lon": 115.8206513
+  },
+  {
+    "stopid": "634983060",
+    "stopname": "South St After Windelya Rd",
+    "lat": -32.068444,
+    "lon": 115.8242726
+  },
+  {
+    "stopid": "638450630",
+    "stopname": "Erindale Road after Beach Road",
+    "lat": -31.84369,
+    "lon": 115.8128076
+  },
+  {
+    "stopid": "653128644",
+    "stopname": "Clontarf Rd After Newmarket St",
+    "lat": -32.0755925,
+    "lon": 115.7628176
+  },
+  {
+    "stopid": "665089121",
+    "stopname": "Delgado Pde After Temple Mews",
+    "lat": -31.741548,
+    "lon": 115.7283801
+  },
+  {
+    "stopid": "670407152",
+    "stopname": "Shenton Av After Mitchell Fwy",
+    "lat": -31.7409035,
+    "lon": 115.7543324
+  },
+  {
+    "stopid": "676573529",
+    "stopname": "Bus stop",
+    "lat": -31.997118,
+    "lon": 115.8648221
+  },
+  {
+    "stopid": "688764548",
+    "stopname": "Joondalup Station Stand 2",
+    "lat": -31.745619,
+    "lon": 115.7676427
+  },
+  {
+    "stopid": "694264728",
+    "stopname": "Grand Bvd After Piccadilly Cir",
+    "lat": -31.7350223,
+    "lon": 115.7678913
+  },
+  {
+    "stopid": "703333323",
+    "stopname": "Lefroy Rd After Hale St",
+    "lat": -32.0675569,
+    "lon": 115.760492
+  },
+  {
+    "stopid": "705159027",
+    "stopname": "Bus stop",
+    "lat": -31.722971,
+    "lon": 115.761135
+  },
+  {
+    "stopid": "713355074",
+    "stopname": "Shenton Av After Mclarty Av",
+    "lat": -31.7398195,
+    "lon": 115.7682536
+  },
+  {
+    "stopid": "717259153",
+    "stopname": "University Drive after Kendrew Crescent",
+    "lat": -31.7505691,
+    "lon": 115.7731504
+  },
+  {
+    "stopid": "741059583",
+    "stopname": "Selkirk Dr After Stonehaven Pde",
+    "lat": -31.7183312,
+    "lon": 115.7424199
+  },
+  {
+    "stopid": "752876389",
+    "stopname": "Kinross Dr Before Callander Av",
+    "lat": -31.721898,
+    "lon": 115.7398257
+  },
+  {
+    "stopid": "762501438",
+    "stopname": "Hay St Carlton Cat Id 82",
+    "lat": -31.9582493,
+    "lon": 115.8712449
+  },
+  {
+    "stopid": "907807761",
+    "stopname": "Bus stop",
+    "lat": -31.9601334,
+    "lon": 115.7863505
+  },
+  {
+    "stopid": "997412905",
+    "stopname": "Wanneroo Rd After Warwick Rd",
+    "lat": -31.8332339,
+    "lon": 115.8213063
+  },
+  {
+    "stopid": "1252274415",
+    "stopname": "Clontarf Rd After Parnell Rd",
+    "lat": -32.0757313,
+    "lon": 115.7716788
+  },
+  {
+    "stopid": "1456909036",
+    "stopname": "Great Eastern Highway before Kimberley Street",
+    "lat": -31.9394294,
+    "lon": 115.9298505
+  },
+  {
+    "stopid": "1646919489",
+    "stopname": "Bus stop",
+    "lat": -31.8806213,
+    "lon": 116.1224285
+  },
+  {
+    "stopid": "1705017628",
+    "stopname": "Stratton Bvd After Bus Stop 15345",
+    "lat": -31.8685591,
+    "lon": 116.0416699
+  },
+  {
+    "stopid": "1705017688",
+    "stopname": "Lloyd St Before Spring Av",
+    "lat": -31.8785776,
+    "lon": 116.0167984
+  },
+  {
+    "stopid": "1705017757",
+    "stopname": "Morrison Rd After Beaconsfield Av",
+    "lat": -31.8859692,
+    "lon": 116.0254235
+  },
+  {
+    "stopid": "1926987809",
+    "stopname": "Empire Av Before Erskine Pl",
+    "lat": -31.9217075,
+    "lon": 115.7654423
+  },
+  {
+    "stopid": "2099265637",
+    "stopname": "Warnbro Sound Av After Endeavour Dr",
+    "lat": -32.3674325,
+    "lon": 115.7556596
+  },
+  {
+    "stopid": "2099634740",
+    "stopname": "Warnbro Sound Av After Holcombe Rd",
+    "lat": -32.3412423,
+    "lon": 115.7604044
+  },
+  {
+    "stopid": "2337818744",
+    "stopname": "Southwell Cr Before Rodd Pl",
+    "lat": -32.0916116,
+    "lon": 115.7921914
+  },
+  {
+    "stopid": "2491856140",
+    "stopname": "Sutton St After Tuckey St",
+    "lat": -32.5330764,
+    "lon": 115.7225424
+  },
+  {
+    "stopid": "2564669988",
+    "stopname": "Bull Creek Station, Stand 1",
+    "lat": -32.0467919,
+    "lon": 115.8535047
+  },
+  {
+    "stopid": "2724814360",
+    "stopname": "Chatsworth Dr After Havana Vista",
+    "lat": -31.7708383,
+    "lon": 115.8200276
+  },
+  {
+    "stopid": "3268998608",
+    "stopname": "Ferndale Cr After Bern Rd",
+    "lat": -32.032163,
+    "lon": 115.9160818
+  },
+  {
+    "stopid": "3285336295",
+    "stopname": "High Rd After Belvedaire Wy",
+    "lat": -32.0420927,
+    "lon": 115.9200574
+  },
+  {
+    "stopid": "3545977099",
+    "stopname": "Little Salmon Bay",
+    "lat": -32.024228,
+    "lon": 115.5250939
+  },
+  {
+    "stopid": "4122278585",
+    "stopname": "South St Before Wiluna Av",
+    "lat": -32.0634748,
+    "lon": 115.7684733
+  },
+  {
+    "stopid": "4201838795",
+    "stopname": "Great Eastern Highway after Epsom Avenue",
+    "lat": -31.9366445,
+    "lon": 115.9337847
+  },
+  {
+    "stopid": "4223880704",
+    "stopname": "St Georges Tce Stand O - After Irwin St",
+    "lat": -31.9566644,
+    "lon": 115.8622445
+  },
+  {
+    "stopid": "4247951957",
+    "stopname": "Mint St Before Shepperton Rd",
+    "lat": -31.9821096,
+    "lon": 115.9067432
+  },
+  {
+    "stopid": "4265466191",
+    "stopname": "St Georges Tce Stand 1 - Cat Id 31",
+    "lat": -31.9530913,
+    "lon": 115.8518319
+  },
+  {
+    "stopid": "4665000819",
+    "stopname": "Cedric St before Karrinyup Rd",
+    "lat": -31.8878755,
+    "lon": 115.8098323
+  },
+  {
+    "stopid": "4988359082",
+    "stopname": "Leederville Station",
+    "lat": -31.9398958,
+    "lon": 115.8404928
+  },
+  {
+    "stopid": "5221089549",
+    "stopname": "Canning Hwy Before East St",
+    "lat": -32.0422022,
+    "lon": 115.757784
+  },
+  {
+    "stopid": "5401107377",
+    "stopname": "Howard Street",
+    "lat": -32.0608119,
+    "lon": 115.7488739
+  },
+  {
+    "stopid": "5411549198",
+    "stopname": "Art Centre",
+    "lat": -31.9484264,
+    "lon": 115.8629644
+  },
+  {
+    "stopid": "5416837251",
+    "stopname": "His Majesty's",
+    "lat": -31.9522642,
+    "lon": 115.8528659
+  },
+  {
+    "stopid": "5464813325",
+    "stopname": "Wellington St Royal Perth Hospital Cat Id 56",
+    "lat": -31.9538334,
+    "lon": 115.8657414
+  },
+  {
+    "stopid": "6074923373",
+    "stopname": "Partridge Street after Kasanka Avenue",
+    "lat": -31.8225709,
+    "lon": 115.9690072
+  },
+  {
+    "stopid": "6074925993",
+    "stopname": "Kennedia Entrance after Attenuata Way",
+    "lat": -31.8596566,
+    "lon": 115.9714059
+  },
+  {
+    "stopid": "6075344138",
+    "stopname": "Gnangara Road before Callaway Street",
+    "lat": -31.7999703,
+    "lon": 115.8431194
+  },
+  {
+    "stopid": "6083885736",
+    "stopname": "Galleria Bus Station Stand 12",
+    "lat": -31.8990832,
+    "lon": 115.89831
+  },
+  {
+    "stopid": "6129631212",
+    "stopname": "Curtin Central Bus Station Stand 7",
+    "lat": -32.002067,
+    "lon": 115.890875
+  },
+  {
+    "stopid": "6239166968",
+    "stopname": "Thelma St Before Labouchere Rd",
+    "lat": -31.9963413,
+    "lon": 115.8613976
+  },
+  {
+    "stopid": "6287472685",
+    "stopname": "Terminal Transfer Bus",
+    "lat": -31.9416989,
+    "lon": 115.974544
+  },
+  {
+    "stopid": "6467350757",
+    "stopname": "Spencer Rd After Yale Rd",
+    "lat": -32.0486608,
+    "lon": 115.9543779
+  },
+  {
+    "stopid": "6467384921",
+    "stopname": "Eucalyptus Boulevard after Waratah Boulevard",
+    "lat": -32.0753113,
+    "lon": 115.9162748
+  },
+  {
+    "stopid": "6467489166",
+    "stopname": "Thornlie Station Stand 4",
+    "lat": -32.0474798,
+    "lon": 115.9523394
+  },
+  {
+    "stopid": "6467602574",
+    "stopname": "South St Before Calley Dr",
+    "lat": -32.0659371,
+    "lon": 115.8574582
+  },
+  {
+    "stopid": "6630510386",
+    "stopname": "Kent St Before Jarrah Rd",
+    "lat": -31.9923251,
+    "lon": 115.8875949
+  },
+  {
+    "stopid": "6639752675",
+    "stopname": "York Street before Federal Street",
+    "lat": -31.8980941,
+    "lon": 115.8340699
+  },
+  {
+    "stopid": "6639791595",
+    "stopname": "McDonald Street before Stoneham Street",
+    "lat": -31.9060821,
+    "lon": 115.8350264
+  },
+  {
+    "stopid": "6639791616",
+    "stopname": "Loftus Street before Austen Lane",
+    "lat": -31.9310681,
+    "lon": 115.8462898
+  },
+  {
+    "stopid": "6639791636",
+    "stopname": "Perth Busport Zone B",
+    "lat": -31.9496819,
+    "lon": 115.856606
+  },
+  {
+    "stopid": "6659928000",
+    "stopname": "Ovens Rd before Sutherland Dr",
+    "lat": -32.0651305,
+    "lon": 115.9586354
+  },
+  {
+    "stopid": "6659928021",
+    "stopname": "Furley Rd After Waterview Pde",
+    "lat": -32.1008858,
+    "lon": 115.9401651
+  },
+  {
+    "stopid": "6659928041",
+    "stopname": "Huntingdale Road before Flowerwood Way",
+    "lat": -32.0769964,
+    "lon": 115.9632223
+  },
+  {
+    "stopid": "6659928061",
+    "stopname": "Towncentre Dr After Murdoch Rd",
+    "lat": -32.064174,
+    "lon": 115.9456688
+  },
+  {
+    "stopid": "6659928081",
+    "stopname": "Berehaven Av Before Whiteman St",
+    "lat": -32.0600654,
+    "lon": 115.9501533
+  },
+  {
+    "stopid": "6686011927",
+    "stopname": "Fairway before Princess Road",
+    "lat": -31.9860541,
+    "lon": 115.8157114
+  },
+  {
+    "stopid": "6686011947",
+    "stopname": "Thomas St Heytesbury Road Cat Id 138",
+    "lat": -31.9547817,
+    "lon": 115.8283963
+  },
+  {
+    "stopid": "6687130505",
+    "stopname": "Wellington Road after Kensington Avenue",
+    "lat": -31.8887006,
+    "lon": 115.8902649
+  },
+  {
+    "stopid": "6687130525",
+    "stopname": "Alexander Drive before Homer Street",
+    "lat": -31.9034933,
+    "lon": 115.8678858
+  },
+  {
+    "stopid": "6687130545",
+    "stopname": "Alexander Drive after Cornwall Street",
+    "lat": -31.8969975,
+    "lon": 115.8688316
+  },
+  {
+    "stopid": "6690293541",
+    "stopname": "Wylde Road before McGilvray Avenue",
+    "lat": -31.8793957,
+    "lon": 115.8962563
+  },
+  {
+    "stopid": "6690293561",
+    "stopname": "Walter Road before Tilford Place",
+    "lat": -31.894682,
+    "lon": 115.9081946
+  },
+  {
+    "stopid": "6690293581",
+    "stopname": "Emberson Road after Spruce Road",
+    "lat": -31.8824725,
+    "lon": 115.9128605
+  },
+  {
+    "stopid": "6691829779",
+    "stopname": "Stirling Station Stand 1",
+    "lat": -31.8937845,
+    "lon": 115.8050054
+  },
+  {
+    "stopid": "6691873403",
+    "stopname": "Glendalough Station Stand 1",
+    "lat": -31.9148047,
+    "lon": 115.8223097
+  },
+  {
+    "stopid": "6691873431",
+    "stopname": "Kelmscott Station Stand 4",
+    "lat": -32.1130228,
+    "lon": 116.013271
+  },
+  {
+    "stopid": "6691873451",
+    "stopname": "Aubin Grove Station Stand 1",
+    "lat": -32.1556371,
+    "lon": 115.8563188
+  },
+  {
+    "stopid": "6691873471",
+    "stopname": "Rockingham Station Stand 8",
+    "lat": -32.2893206,
+    "lon": 115.761016
+  },
+  {
+    "stopid": "6691873491",
+    "stopname": "Mandurah Station Stand 7",
+    "lat": -32.5261056,
+    "lon": 115.7465521
+  },
+  {
+    "stopid": "6691873512",
+    "stopname": "Scarborough Beach Bus Station Stand 2",
+    "lat": -31.8942857,
+    "lon": 115.7570083
+  },
+  {
+    "stopid": "6693894059",
+    "stopname": "William Street after Glendower Street",
+    "lat": -31.9397147,
+    "lon": 115.864386
+  },
+  {
+    "stopid": "6693894081",
+    "stopname": "North Street after South View Road",
+    "lat": -31.9263015,
+    "lon": 115.8705737
+  },
+  {
+    "stopid": "6693922536",
+    "stopname": "Walter Road after Coode Street",
+    "lat": -31.8989224,
+    "lon": 115.8899839
+  },
+  {
+    "stopid": "6694173228",
+    "stopname": "Elizabeth Quay Bus Station Stand A6",
+    "lat": -31.9561677,
+    "lon": 115.854612
+  },
+  {
+    "stopid": "6694173248",
+    "stopname": "Elizabeth Quay Bus Station Stand D7",
+    "lat": -31.956609,
+    "lon": 115.8545014
+  },
+  {
+    "stopid": "6702602255",
+    "stopname": "Crimea Street after Walter Road",
+    "lat": -31.8924302,
+    "lon": 115.9048117
+  },
+  {
+    "stopid": "6702602275",
+    "stopname": "Bennett Springs Drive after Beechboro Road",
+    "lat": -31.8576613,
+    "lon": 115.9258961
+  },
+  {
+    "stopid": "6702617395",
+    "stopname": "Beechboro Road after Chaffers Street",
+    "lat": -31.8804961,
+    "lon": 115.9252405
+  },
+  {
+    "stopid": "6702617415",
+    "stopname": "Wheatstone Drive after Discovery Drive",
+    "lat": -31.8852735,
+    "lon": 115.9340338
+  },
+  {
+    "stopid": "6702617436",
+    "stopname": "Sacramento Avenue before Thams Court",
+    "lat": -31.8627203,
+    "lon": 115.9397821
+  },
+  {
+    "stopid": "6702617456",
+    "stopname": "Amazon Drive after Madeira Avenue",
+    "lat": -31.8698379,
+    "lon": 115.9413357
+  },
+  {
+    "stopid": "6708055259",
+    "stopname": "Lord Street after Bradshaw Street",
+    "lat": -31.8923896,
+    "lon": 115.9547074
+  },
+  {
+    "stopid": "6708055279",
+    "stopname": "Brockmill Avenue after Bray Place",
+    "lat": -31.8727595,
+    "lon": 115.9524674
+  },
+  {
+    "stopid": "6708089599",
+    "stopname": "Sturtridge Road after Lupton Way",
+    "lat": -31.880233,
+    "lon": 115.9529476
+  },
+  {
+    "stopid": "6708089619",
+    "stopname": "Walter Road East after Rugby Street",
+    "lat": -31.8948358,
+    "lon": 115.9322605
+  },
+  {
+    "stopid": "6708089639",
+    "stopname": "Titus Road after Dolan Way",
+    "lat": -31.8760066,
+    "lon": 115.9490851
+  },
+  {
+    "stopid": "6708089659",
+    "stopname": "Suffolk Street after Kerner Avenue",
+    "lat": -31.8666602,
+    "lon": 115.9673438
+  },
+  {
+    "stopid": "6715812691",
+    "stopname": "Causeway Bus Station Stand 3",
+    "lat": -31.9682448,
+    "lon": 115.8892167
+  },
+  {
+    "stopid": "6817994237",
+    "stopname": "Vahland Av After Burrendah Bvd",
+    "lat": -32.0611865,
+    "lon": 115.8894409
+  },
+  {
+    "stopid": "6818577803",
+    "stopname": "Beaufort Street after First Avenue",
+    "lat": -31.9291446,
+    "lon": 115.8768357
+  },
+  {
+    "stopid": "6818620132",
+    "stopname": "Wanneroo Rd Before Ravenswood Dr",
+    "lat": -31.8765075,
+    "lon": 115.8330291
+  },
+  {
+    "stopid": "6862356385",
+    "stopname": "Stirling Hwy Before Boronia Av",
+    "lat": -31.9790929,
+    "lon": 115.8034605
+  },
+  {
+    "stopid": "7116148116",
+    "stopname": "Wilber St Before Webb St",
+    "lat": -32.0418271,
+    "lon": 115.8667467
+  },
+  {
+    "stopid": "7258412969",
+    "stopname": "Walderton Avenue after Wilmington Crescent",
+    "lat": -31.8632756,
+    "lon": 115.8409806
+  },
+  {
+    "stopid": "7258452089",
+    "stopname": "Stroughton Road after Arkana Road",
+    "lat": -31.8660402,
+    "lon": 115.8448377
+  },
+  {
+    "stopid": "7258452109",
+    "stopname": "Gnangara Road after Sydney Road",
+    "lat": -31.7943366,
+    "lon": 115.8588995
+  },
+  {
+    "stopid": "7278545110",
+    "stopname": "Niche Parade before Wisdom Terrace",
+    "lat": -31.794685,
+    "lon": 115.8519155
+  },
+  {
+    "stopid": "7278566879",
+    "stopname": "The Broadview before The Broadview",
+    "lat": -31.8082362,
+    "lon": 115.8629457
+  },
+  {
+    "stopid": "7278604892",
+    "stopname": "Abbotswood Drive after Stonewall Circuit",
+    "lat": -31.8123417,
+    "lon": 115.8619795
+  },
+  {
+    "stopid": "7278604912",
+    "stopname": "Mirrabooka Avenue after Aristos Way",
+    "lat": -31.8325573,
+    "lon": 115.8534931
+  },
+  {
+    "stopid": "7279051277",
+    "stopname": "Northwood Drive after Kokoda Boulevard",
+    "lat": -31.8696825,
+    "lon": 115.8663557
+  },
+  {
+    "stopid": "7279069797",
+    "stopname": "Marangaroo Drive after Koondoola Avenue",
+    "lat": -31.8342229,
+    "lon": 115.860784
+  },
+  {
+    "stopid": "7279069817",
+    "stopname": "Koondoola Avenue after Marangaroo Drive",
+    "lat": -31.8338264,
+    "lon": 115.8623014
+  },
+  {
+    "stopid": "7279069837",
+    "stopname": "Australis Avenue before Alexander Drive",
+    "lat": -31.8594847,
+    "lon": 115.8775255
+  },
+  {
+    "stopid": "7284046542",
+    "stopname": "Fernhurst Crescent after Walderton Avenue",
+    "lat": -31.8614742,
+    "lon": 115.8440044
+  },
+  {
+    "stopid": "7284046563",
+    "stopname": "Amberton Avenue after Hatfield Way",
+    "lat": -31.8400096,
+    "lon": 115.8471586
+  },
+  {
+    "stopid": "7465475777",
+    "stopname": "Lisford Av Before Charnwood Av",
+    "lat": -31.4981053,
+    "lon": 115.5878211
+  },
+  {
+    "stopid": "7729759464",
+    "stopname": "Geddes St Before Washington St",
+    "lat": -31.9734995,
+    "lon": 115.8885889
+  },
+  {
+    "stopid": "7761757062",
+    "stopname": "Albany Hwy Before Duncan St",
+    "lat": -31.9743185,
+    "lon": 115.8974149
+  },
+  {
+    "stopid": "8008176097",
+    "stopname": "Hale Rd Forrestfield Shopping Ctr",
+    "lat": -31.9891277,
+    "lon": 116.0106113
+  },
+  {
+    "stopid": "8172261835",
+    "stopname": "Berkshire Rd After Bougainvillea Av",
+    "lat": -31.9772683,
+    "lon": 116.0100413
+  },
+  {
+    "stopid": "8201983268",
+    "stopname": "Jubilee Rd After Claire Street",
+    "lat": -31.995422,
+    "lon": 116.0149722
+  },
+  {
+    "stopid": "8201983295",
+    "stopname": "Hawtin Rd After Azalea Gdns",
+    "lat": -31.9766165,
+    "lon": 116.0209563
+  },
+  {
+    "stopid": "8218219929",
+    "stopname": "Hayman Rd Before Adie Ct",
+    "lat": -32.0025122,
+    "lon": 115.895849
+  },
+  {
+    "stopid": "8218219949",
+    "stopname": "Henley St After Abjornson St",
+    "lat": -32.0058233,
+    "lon": 115.8734276
+  },
+  {
+    "stopid": "8288870330",
+    "stopname": "Avenell Road after Winifred Road",
+    "lat": -31.9162795,
+    "lon": 115.9149937
+  },
+  {
+    "stopid": "8318962574",
+    "stopname": "Scarborough Beach Rd after Princess Rd",
+    "lat": -31.8973235,
+    "lon": 115.7844631
+  },
+  {
+    "stopid": "8318962594",
+    "stopname": "Scarborough Beach Road after Harborne Street",
+    "lat": -31.9130337,
+    "lon": 115.8180379
+  },
+  {
+    "stopid": "8344076119",
+    "stopname": "Elmridge Parkway before Jervis Drive",
+    "lat": -31.7607441,
+    "lon": 115.9773238
+  },
+  {
+    "stopid": "8344472442",
+    "stopname": "The Promenade after Brookmount Drive",
+    "lat": -31.7767062,
+    "lon": 115.9637383
+  },
+  {
+    "stopid": "8344553963",
+    "stopname": "Gnangara Road after Henley Brook Avenue",
+    "lat": -31.7954252,
+    "lon": 115.9816192
+  },
+  {
+    "stopid": "8345949291",
+    "stopname": "Hancock Avenue before Hollingworth Drive",
+    "lat": -31.7824322,
+    "lon": 115.9932521
+  },
+  {
+    "stopid": "8373802274",
+    "stopname": "Gateways Access Rd Cockburn Gateway Shop Ctr",
+    "lat": -32.1291934,
+    "lon": 115.857381
+  },
+  {
+    "stopid": "8373802296",
+    "stopname": "Collis Road after Mortimer Street",
+    "lat": -32.1649377,
+    "lon": 115.814248
+  },
+  {
+    "stopid": "8373820420",
+    "stopname": "Barfield Road after Plumwood Avenue",
+    "lat": -32.1626938,
+    "lon": 115.8530172
+  },
+  {
+    "stopid": "8373981349",
+    "stopname": "Lyon Road after Aristata Parade",
+    "lat": -32.1745018,
+    "lon": 115.861142
+  },
+  {
+    "stopid": "8374372465",
+    "stopname": "Baningan Avenue before Kenworth Pass",
+    "lat": -32.1427314,
+    "lon": 115.8488617
+  },
+  {
+    "stopid": "8374372486",
+    "stopname": "Wentworth Parade after Richmond Entrance",
+    "lat": -32.1415843,
+    "lon": 115.8565524
+  },
+  {
+    "stopid": "8374372510",
+    "stopname": "Lyon Road after Alliance Entrance",
+    "lat": -32.1566684,
+    "lon": 115.86094
+  },
+  {
+    "stopid": "8439710311",
+    "stopname": "Dawson Av Before Burtonia Wy",
+    "lat": -31.9795056,
+    "lon": 115.997228
+  },
+  {
+    "stopid": "8482844359",
+    "stopname": "Guildford Road after Falkirk Avenue",
+    "lat": -31.9298394,
+    "lon": 115.8959235
+  },
+  {
+    "stopid": "8627660877",
+    "stopname": "Farmaner Parkway after Starke Turn",
+    "lat": -31.7623223,
+    "lon": 115.9751068
+  },
+  {
+    "stopid": "8668301356",
+    "stopname": "Collier Link after Wright Street",
+    "lat": -31.9052011,
+    "lon": 115.9191448
+  },
+  {
+    "stopid": "8870971062",
+    "stopname": "Cottonwood Crescent after Dianella Drive",
+    "lat": -31.8787771,
+    "lon": 115.8587167
+  },
+  {
+    "stopid": "8894136962",
+    "stopname": "Altone Road after Benara Road",
+    "lat": -31.8739618,
+    "lon": 115.9445508
+  },
+  {
+    "stopid": "8894354046",
+    "stopname": "Banrock Drive after Gibbney Way",
+    "lat": -31.751683,
+    "lon": 115.99246
+  },
+  {
+    "stopid": "8894354066",
+    "stopname": "Banrock Drive after Elmridge Parkway",
+    "lat": -31.7585096,
+    "lon": 115.9870704
+  },
+  {
+    "stopid": "8897148514",
+    "stopname": "West Swan Road after George Street South",
+    "lat": -31.8429479,
+    "lon": 115.9897588
+  },
+  {
+    "stopid": "8897175034",
+    "stopname": "Great Northern Highway before Bishop Road",
+    "lat": -31.8680452,
+    "lon": 116.0141865
+  },
+  {
+    "stopid": "8902903222",
+    "stopname": "Broadway After Hillway",
+    "lat": -31.986896,
+    "lon": 115.8144732
+  },
+  {
+    "stopid": "8915777939",
+    "stopname": "Stirling Hwy After Bay Rd",
+    "lat": -31.9819252,
+    "lon": 115.788301
+  },
+  {
+    "stopid": "8928080528",
+    "stopname": "Great Northern Highway after Margaret Street",
+    "lat": -31.8822246,
+    "lon": 116.0077417
+  },
+  {
+    "stopid": "9073151562",
+    "stopname": "Kings Town (Shuttle Bus)",
+    "lat": -32.0041091,
+    "lon": 115.5540247
+  },
+  {
+    "stopid": "9106535261",
+    "stopname": "Wellington Street before Gibbon Street",
+    "lat": -32.0145071,
+    "lon": 115.7561891
+  },
+  {
+    "stopid": "9106535281",
+    "stopname": "Palmerston St Before Rhodes Pl",
+    "lat": -32.0144253,
+    "lon": 115.7663875
+  },
+  {
+    "stopid": "9106627424",
+    "stopname": "Stirling Hwy After Wellington St",
+    "lat": -32.0159384,
+    "lon": 115.7546639
+  },
+  {
+    "stopid": "9106627444",
+    "stopname": "Stirling Hwy Before Dean St",
+    "lat": -31.9851813,
+    "lon": 115.7752149
+  },
+  {
+    "stopid": "9143467858",
+    "stopname": "Grace St Before Kinlock Av",
+    "lat": -32.028047,
+    "lon": 115.9344386
+  },
+  {
+    "stopid": "9147239486",
+    "stopname": "Ravenswood Drive before Wardong Road",
+    "lat": -31.8729028,
+    "lon": 115.8403782
+  },
+  {
+    "stopid": "9147239507",
+    "stopname": "Beach Rd After Dorchester Av",
+    "lat": -31.8453251,
+    "lon": 115.8101998
+  },
+  {
+    "stopid": "9147255527",
+    "stopname": "Yirrigan Drive after Broadmoor Avenue",
+    "lat": -31.8755752,
+    "lon": 115.8738494
+  },
+  {
+    "stopid": "9147520517",
+    "stopname": "Malaga Drive before Beach Road",
+    "lat": -31.857464,
+    "lon": 115.8933107
+  },
+  {
+    "stopid": "9147582626",
+    "stopname": "Beaufort Street after Bulwer Street",
+    "lat": -31.9418442,
+    "lon": 115.8674221
+  },
+  {
+    "stopid": "9166471466",
+    "stopname": "Dianella Drive after Gay Street",
+    "lat": -31.8810636,
+    "lon": 115.8615602
+  },
+  {
+    "stopid": "9204225062",
+    "stopname": "Illawarra Crescent after Kookaburra Terrace",
+    "lat": -31.8349859,
+    "lon": 115.8901853
+  },
+  {
+    "stopid": "9204225082",
+    "stopname": "Whitcombe Way after Snowy Close",
+    "lat": -31.8251457,
+    "lon": 115.8695374
+  },
+  {
+    "stopid": "9204225103",
+    "stopname": "Illawarra Crescent before Kingfisher Avenue",
+    "lat": -31.8396056,
+    "lon": 115.8936425
+  },
+  {
+    "stopid": "9204243223",
+    "stopname": "Guadalupe Drive before Yorkshire Dale",
+    "lat": -31.8537906,
+    "lon": 115.9084615
+  },
+  {
+    "stopid": "9206644158",
+    "stopname": "Cassowary Drive after Belair Gardens",
+    "lat": -31.8461118,
+    "lon": 115.8957302
+  },
+  {
+    "stopid": "9206644178",
+    "stopname": "Illawarra Crescent before Cassowary Drive",
+    "lat": -31.8445185,
+    "lon": 115.8905247
+  },
+  {
+    "stopid": "9217495388",
+    "stopname": "Marangaroo Drive after Deal Street",
+    "lat": -31.833991,
+    "lon": 115.8298762
+  },
+  {
+    "stopid": "9217749810",
+    "stopname": "Victoria Road after Narloo Street",
+    "lat": -31.86159,
+    "lon": 115.8985695
+  },
+  {
+    "stopid": "9234575564",
+    "stopname": "Giralt Road before Parin Road",
+    "lat": -31.8242213,
+    "lon": 115.8266001
+  },
+  {
+    "stopid": "9234781851",
+    "stopname": "Wanneroo Rd at Kingsway City Shopping Ctr",
+    "lat": -31.8179513,
+    "lon": 115.8209409
+  },
+  {
+    "stopid": "9234781871",
+    "stopname": "Kingsway Before Ashdale Boulevard",
+    "lat": -31.8132839,
+    "lon": 115.8466644
+  },
+  {
+    "stopid": "9236666002",
+    "stopname": "Haga Parkway before Alexander Drive",
+    "lat": -31.7998167,
+    "lon": 115.8737179
+  },
+  {
+    "stopid": "9236878074",
+    "stopname": "Highclere Bvd After Ellenbrae Pl",
+    "lat": -31.8239201,
+    "lon": 115.8412934
+  },
+  {
+    "stopid": "9236878094",
+    "stopname": "Westport Parade after Wicklow Circle",
+    "lat": -31.8099584,
+    "lon": 115.8375208
+  },
+  {
+    "stopid": "9249711923",
+    "stopname": "East St Before Holland St",
+    "lat": -32.0500493,
+    "lon": 115.7581187
+  },
+  {
+    "stopid": "9299603334",
+    "stopname": "Beaufort Street after Seventh Avenue",
+    "lat": -31.9235368,
+    "lon": 115.8834901
+  },
+  {
+    "stopid": "9355482016",
+    "stopname": "Rudloc Rd Before Drake St",
+    "lat": -31.9025023,
+    "lon": 115.8958357
+  },
+  {
+    "stopid": "9359732166",
+    "stopname": "Braithwaite Street before Trinity Avenue",
+    "lat": -31.9607443,
+    "lon": 115.8807713
+  },
+  {
+    "stopid": "9391020156",
+    "stopname": "Craven Street before Drummond Street",
+    "lat": -31.9092442,
+    "lon": 115.8876579
+  },
+  {
+    "stopid": "9415651099",
+    "stopname": "Murdoch Station Stand 0",
+    "lat": -32.0662199,
+    "lon": 115.8496578
+  },
+  {
+    "stopid": "9526803323",
+    "stopname": "Edinboro Street after Woodstock Street",
+    "lat": -31.9172212,
+    "lon": 115.8410473
+  },
+  {
+    "stopid": "9526884612",
+    "stopname": "Hamilton Street before Firsby Street",
+    "lat": -31.8988507,
+    "lon": 115.8230132
+  },
+  {
+    "stopid": "9570489694",
+    "stopname": "St Georges Tce Stand 3 - Before William St",
+    "lat": -31.9542889,
+    "lon": 115.8554305
+  },
+  {
+    "stopid": "9577537914",
+    "stopname": "Perth Stadium Bus Station Stand 12",
+    "lat": -31.9530701,
+    "lon": 115.889596
+  },
+  {
+    "stopid": "9584761860",
+    "stopname": "Mill Point Rd After Brandon St",
+    "lat": -31.9768603,
+    "lon": 115.8753307
+  },
+  {
+    "stopid": "9593885110",
+    "stopname": "Morley Drive before Grand Promenade",
+    "lat": -31.8900089,
+    "lon": 115.8647055
+  },
+  {
+    "stopid": "9596322164",
+    "stopname": "East Parade before Summers Street",
+    "lat": -31.9444408,
+    "lon": 115.8778547
+  },
+  {
+    "stopid": "9596650975",
+    "stopname": "Langley Road after Sudlow Street",
+    "lat": -31.907468,
+    "lon": 115.9130909
+  },
+  {
+    "stopid": "9596650995",
+    "stopname": "Guildford Road after First Avenue East",
+    "lat": -31.9344577,
+    "lon": 115.8846318
+  },
+  {
+    "stopid": "9596651016",
+    "stopname": "Power Street after Sudlow Street",
+    "lat": -31.9058767,
+    "lon": 115.9123912
+  },
+  {
+    "stopid": "9596735279",
+    "stopname": "West Road before Deakin Street",
+    "lat": -31.9133053,
+    "lon": 115.9535136
+  },
+  {
+    "stopid": "9596735299",
+    "stopname": "Hardy Road after River Road",
+    "lat": -31.9245396,
+    "lon": 115.9330511
+  },
+  {
+    "stopid": "9596752919",
+    "stopname": "Railway Parade after Wood Street",
+    "lat": -31.9123047,
+    "lon": 115.9360837
+  },
+  {
+    "stopid": "9596904795",
+    "stopname": "Peninsula Road before Wall Street",
+    "lat": -31.9415741,
+    "lon": 115.9055647
+  },
+  {
+    "stopid": "9596904816",
+    "stopname": "Roberts Street after Neville Street",
+    "lat": -31.9286546,
+    "lon": 115.918144
+  },
+  {
+    "stopid": "9596929440",
+    "stopname": "Whatley Crescent before Grafton Road",
+    "lat": -31.9227702,
+    "lon": 115.9001779
+  },
+  {
+    "stopid": "9619835795",
+    "stopname": "Charles St After Waugh St",
+    "lat": -31.9264331,
+    "lon": 115.8522718
+  },
+  {
+    "stopid": "9619835815",
+    "stopname": "Scarborough Beach Road before Edinboro Street",
+    "lat": -31.9224576,
+    "lon": 115.841828
+  },
+  {
+    "stopid": "9623118559",
+    "stopname": "Blythe Avenue after Milton Street",
+    "lat": -31.9015807,
+    "lon": 115.8547966
+  },
+  {
+    "stopid": "9623118579",
+    "stopname": "Holmfirth Street before Rothsay Crescent",
+    "lat": -31.9173421,
+    "lon": 115.8605545
+  },
+  {
+    "stopid": "9623335613",
+    "stopname": "Walcott Street after Dumbarton Crescent",
+    "lat": -31.9210034,
+    "lon": 115.8565474
+  },
+  {
+    "stopid": "9625688716",
+    "stopname": "Davison Street before Kelvin Road",
+    "lat": -32.044761,
+    "lon": 115.9888024
+  },
+  {
+    "stopid": "9679280718",
+    "stopname": "Beach Road after Harlond Avenue",
+    "lat": -31.8555079,
+    "lon": 115.8904803
+  },
+  {
+    "stopid": "9701367753",
+    "stopname": "Boardman Rd After Gamenya St",
+    "lat": -32.0734501,
+    "lon": 115.9371078
+  },
+  {
+    "stopid": "9763718313",
+    "stopname": "Maida Vale Road after Roe Highway",
+    "lat": -31.951778,
+    "lon": 116.0152634
+  },
+  {
+    "stopid": "9861698417",
+    "stopname": "South Tce After King William St",
+    "lat": -32.0669806,
+    "lon": 115.752412
+  },
+  {
+    "stopid": "9869672655",
+    "stopname": "Harborne Street after Salvado Road",
+    "lat": -31.941448,
+    "lon": 115.8197854
+  },
+  {
+    "stopid": "9903032348",
+    "stopname": "Jameson Street after Bent Street",
+    "lat": -32.0172954,
+    "lon": 115.9463325
+  },
+  {
+    "stopid": "9974499791",
+    "stopname": "Grand Parade after Copeland Drive",
+    "lat": -31.9480357,
+    "lon": 115.9509448
+  },
+  {
+    "stopid": "10027745966",
+    "stopname": "High Wycombe Station Stand 1",
+    "lat": -31.9542002,
+    "lon": 115.9925028
+  },
+  {
+    "stopid": "10027871445",
+    "stopname": "Beechboro Road before Linton Place",
+    "lat": -31.8941804,
+    "lon": 115.9241338
+  },
+  {
+    "stopid": "10049535103",
+    "stopname": "Kalamunda Road after Newburn Road",
+    "lat": -31.9357699,
+    "lon": 116.0043918
+  },
+  {
+    "stopid": "10062755236",
+    "stopname": "Peet Road after Cotherstone Road",
+    "lat": -31.9802463,
+    "lon": 116.0507234
+  },
+  {
+    "stopid": "10062798811",
+    "stopname": "Stoneville Rd Before Breckler Dr",
+    "lat": -31.8912459,
+    "lon": 116.1691687
+  },
+  {
+    "stopid": "10087487900",
+    "stopname": "Priory Road before Billara Street",
+    "lat": -31.9510403,
+    "lon": 116.0208989
+  },
+  {
+    "stopid": "10095777834",
+    "stopname": "Berkshire Road before Dawson Avenue",
+    "lat": -31.9727409,
+    "lon": 116.0045331
+  },
+  {
+    "stopid": "10103681128",
+    "stopname": "Canning Road after Heath Road",
+    "lat": -31.9725041,
+    "lon": 116.0568087
+  },
+  {
+    "stopid": "10247107010",
+    "stopname": "Main St after McDonald St",
+    "lat": -31.9047977,
+    "lon": 115.8281693
+  },
+  {
+    "stopid": "10247107030",
+    "stopname": "Main Street before Roberts Street",
+    "lat": -31.9074246,
+    "lon": 115.8283038
+  },
+  {
+    "stopid": "10247107050",
+    "stopname": "Oxford Street - Leederville TAFE",
+    "lat": -31.9337387,
+    "lon": 115.8411747
+  },
+  {
+    "stopid": "10279466879",
+    "stopname": "Galleria Bus Station Stand 13",
+    "lat": -31.8987797,
+    "lon": 115.8976944
+  },
+  {
+    "stopid": "10547802393",
+    "stopname": "Elizabeth St After Lacey St",
+    "lat": -32.0074457,
+    "lon": 115.965341
+  },
+  {
+    "stopid": "10547802513",
+    "stopname": "Renou St before Gerard St",
+    "lat": -32.0147295,
+    "lon": 115.9501058
+  },
+  {
+    "stopid": "10547802534",
+    "stopname": "Hale Rd Before Fife St",
+    "lat": -31.9895839,
+    "lon": 116.0067491
+  },
+  {
+    "stopid": "10548108453",
+    "stopname": "Dundas Rd After Musk Ct",
+    "lat": -31.9432131,
+    "lon": 115.9909178
+  },
+  {
+    "stopid": "10548108473",
+    "stopname": "Abernethy Road opposite Blue Scope Steel",
+    "lat": -31.9782792,
+    "lon": 115.982334
+  },
+  {
+    "stopid": "10548108493",
+    "stopname": "Abernethy Road after Esther Street",
+    "lat": -31.9567918,
+    "lon": 115.9297364
+  },
+  {
+    "stopid": "10548412119",
+    "stopname": "Maida Vale Road before Brenda Road",
+    "lat": -31.9518541,
+    "lon": 116.0174013
+  },
+  {
+    "stopid": "10589462920",
+    "stopname": "Archer Street before Weston Street",
+    "lat": -31.9741716,
+    "lon": 115.9159129
+  },
+  {
+    "stopid": "10589462940",
+    "stopname": "Belgravia Street before Gabriel Street",
+    "lat": -31.9632318,
+    "lon": 115.9455767
+  },
+  {
+    "stopid": "10589462960",
+    "stopname": "Albany Hwy After Balmoral St",
+    "lat": -31.9887506,
+    "lon": 115.9057811
+  },
+  {
+    "stopid": "10613453078",
+    "stopname": "Bruce Sr before Melvista Av",
+    "lat": -31.9894605,
+    "lon": 115.811098
+  },
+  {
+    "stopid": "10712794212",
+    "stopname": "Marlee Loop after Victoria Park Drive",
+    "lat": -31.9531454,
+    "lon": 115.8907526
+  },
+  {
+    "stopid": "10718321893",
+    "stopname": "Marmion Av After Revolution Av",
+    "lat": -31.5788153,
+    "lon": 115.6632102
+  },
+  {
+    "stopid": "10727270633",
+    "stopname": "Coolibah Av Before Third Av [sic]",
+    "lat": -32.5405782,
+    "lon": 115.7375373
+  },
+  {
+    "stopid": "10734403138",
+    "stopname": "Belmont Av Before Fulham St",
+    "lat": -31.9676947,
+    "lon": 115.9357085
+  },
+  {
+    "stopid": "10757809157",
+    "stopname": "Hay Street before De Vlamingh Avenue",
+    "lat": -31.9600306,
+    "lon": 115.8765685
+  },
+  {
+    "stopid": "10838991653",
+    "stopname": "Cedric St Before Sanderling St",
+    "lat": -31.8814145,
+    "lon": 115.809415
+  },
+  {
+    "stopid": "10887624012",
+    "stopname": "Hill View Tce After Berwick St",
+    "lat": -31.9957594,
+    "lon": 115.906722
+  },
+  {
+    "stopid": "10891454202",
+    "stopname": "Burrendah Bvd Before Vahland Av",
+    "lat": -32.0637379,
+    "lon": 115.8888116
+  },
+  {
+    "stopid": "10891658792",
+    "stopname": "High Rd Before Brampton Wy",
+    "lat": -32.0466591,
+    "lon": 115.9253641
+  },
+  {
+    "stopid": "10891838327",
+    "stopname": "Bull Creek Dr Before Orbell Wy",
+    "lat": -32.0559236,
+    "lon": 115.8564025
+  },
+  {
+    "stopid": "10892110967",
+    "stopname": "High Rd After Granville Wy",
+    "lat": -32.0388168,
+    "lon": 115.897768
+  },
+  {
+    "stopid": "10892429030",
+    "stopname": "Albany Hwy Carousel Shop Ctr",
+    "lat": -32.0207556,
+    "lon": 115.9373439
+  },
+  {
+    "stopid": "10892748068",
+    "stopname": "Nicholson Rd After Montrose St",
+    "lat": -32.0326183,
+    "lon": 115.9369589
+  },
+  {
+    "stopid": "10895341376",
+    "stopname": "High Rd After Centaur St",
+    "lat": -32.0385777,
+    "lon": 115.8834577
+  },
+  {
+    "stopid": "10895341398",
+    "stopname": "Bannister Rd Before South St",
+    "lat": -32.0724728,
+    "lon": 115.8922163
+  },
+  {
+    "stopid": "10895353371",
+    "stopname": "Bungaree Rd After Westlake St",
+    "lat": -32.0165101,
+    "lon": 115.9079925
+  },
+  {
+    "stopid": "10895907654",
+    "stopname": "Jarrah Rd After Pallitt St",
+    "lat": -32.001052,
+    "lon": 115.89973
+  },
+  {
+    "stopid": "10898654420",
+    "stopname": "Pinetree Gully Rd After Nebo Cl",
+    "lat": -32.0600353,
+    "lon": 115.8775936
+  },
+  {
+    "stopid": "10899752705",
+    "stopname": "Corbel St After Tudor Av",
+    "lat": -32.0265486,
+    "lon": 115.8941129
+  },
+  {
+    "stopid": "10900935549",
+    "stopname": "Fifth Av Before Central Rd",
+    "lat": -32.0382978,
+    "lon": 115.873244
+  },
+  {
+    "stopid": "10901314081",
+    "stopname": "Canning Hwy Before Conon Rd",
+    "lat": -32.0211588,
+    "lon": 115.8324497
+  },
+  {
+    "stopid": "10918290738",
+    "stopname": "Wright Rd Before Shepherd Ct",
+    "lat": -32.1082319,
+    "lon": 115.9364915
+  },
+  {
+    "stopid": "10925475771",
+    "stopname": "Lakelands Station Stand 4",
+    "lat": -32.4736169,
+    "lon": 115.7703656
+  },
+  {
+    "stopid": "10935456527",
+    "stopname": "Pitt Street after Waverley Street",
+    "lat": -31.8939309,
+    "lon": 115.8730391
+  },
+  {
+    "stopid": "10958919823",
+    "stopname": "Nollamara Avenue before Apara Way",
+    "lat": -31.880754,
+    "lon": 115.845543
+  },
+  {
+    "stopid": "10958919843",
+    "stopname": "Flinders Street before Ravenswood Drive",
+    "lat": -31.8714919,
+    "lon": 115.8456242
+  },
+  {
+    "stopid": "10958969109",
+    "stopname": "Erindale Rd After Reid Hwy",
+    "lat": -31.858729,
+    "lon": 115.8118268
+  },
+  {
+    "stopid": "10958969129",
+    "stopname": "Erindale Rd After Aintree St",
+    "lat": -31.8495917,
+    "lon": 115.8136262
+  },
+  {
+    "stopid": "10959095953",
+    "stopname": "Wanneroo Rd After Royal St",
+    "lat": -31.8960865,
+    "lon": 115.840344
+  },
+  {
+    "stopid": "10959241181",
+    "stopname": "Jones St before Caraway Gate",
+    "lat": -31.8833439,
+    "lon": 115.8151534
+  },
+  {
+    "stopid": "10961124425",
+    "stopname": "Salmson St Before Odin Dr",
+    "lat": -31.8701516,
+    "lon": 115.8064887
+  },
+  {
+    "stopid": "10965149770",
+    "stopname": "Brookdale St After Gunn St",
+    "lat": -31.945449,
+    "lon": 115.7916811
+  },
+  {
+    "stopid": "11043524034",
+    "stopname": "Talbot Rd Before O'Connor Rd",
+    "lat": -31.8733158,
+    "lon": 116.0524127
+  },
+  {
+    "stopid": "11043524055",
+    "stopname": "Fairfax Rd After Dalwood Rd",
+    "lat": -31.8830549,
+    "lon": 116.0460229
+  },
+  {
+    "stopid": "11045710605",
+    "stopname": "Great Eastern Hwy Before Ferguson St",
+    "lat": -31.8926663,
+    "lon": 116.0187648
+  },
+  {
+    "stopid": "11045710625",
+    "stopname": "James St After Johnson St",
+    "lat": -31.8992101,
+    "lon": 115.9700379
+  },
+  {
+    "stopid": "11045710645",
+    "stopname": "Robertson St Before Bushmead Rd",
+    "lat": -31.9002963,
+    "lon": 115.9921922
+  },
+  {
+    "stopid": "11045939506",
+    "stopname": "Great Eastern Hwy After Koojan Av",
+    "lat": -31.9159543,
+    "lon": 115.9619602
+  },
+  {
+    "stopid": "11052396117",
+    "stopname": "Bannister Rd After Hurley St",
+    "lat": -32.0590346,
+    "lon": 115.9089919
+  },
+  {
+    "stopid": "11070814302",
+    "stopname": "Peel St After Mandurah Tce",
+    "lat": -32.5263892,
+    "lon": 115.7229018
+  },
+  {
+    "stopid": "11107481603",
+    "stopname": "Stock Rd Before Stockdale Rd",
+    "lat": -32.0573461,
+    "lon": 115.7934459
+  },
+  {
+    "stopid": "11108861133",
+    "stopname": "Leach Hwy After North Lake Rd",
+    "lat": -32.0464605,
+    "lon": 115.8149034
+  },
+  {
+    "stopid": "11108996994",
+    "stopname": "Canning Hwy Before Irwin St",
+    "lat": -32.0389292,
+    "lon": 115.7739647
+  },
+  {
+    "stopid": "11109004914",
+    "stopname": "Canning Hwy After Doney St",
+    "lat": -32.0294589,
+    "lon": 115.8226046
+  },
+  {
+    "stopid": "11109004934",
+    "stopname": "Canning Hwy Before Brandon St",
+    "lat": -31.9789867,
+    "lon": 115.8788965
+  },
+  {
+    "stopid": "11252446568",
+    "stopname": "Orrong Road after Desmond Place",
+    "lat": -31.9670648,
+    "lon": 115.9138231
+  },
+  {
+    "stopid": "11252446590",
+    "stopname": "Orrong Rd Before Kew St",
+    "lat": -31.984554,
+    "lon": 115.9334166
+  },
+  {
+    "stopid": "11345585384",
+    "stopname": "Kewdale Rd After Dowd St",
+    "lat": -31.9843989,
+    "lon": 115.9539274
+  },
+  {
+    "stopid": "11545860292",
+    "stopname": "Stalker Rd Before Watson St",
+    "lat": -32.0744792,
+    "lon": 115.9950037
+  },
+  {
+    "stopid": "11816000484",
+    "stopname": "Blue Fin Dr Before Blue Fin Dr",
+    "lat": -32.4322754,
+    "lon": 115.7563612
+  },
+  {
+    "stopid": "11840797599",
+    "stopname": "Clarkson Road after Tranby Road",
+    "lat": -31.9485717,
+    "lon": 115.9111545
+  },
+  {
+    "stopid": "11842907175",
+    "stopname": "Beechboro Road before Drynan Street",
+    "lat": -31.9113538,
+    "lon": 115.9140726
+  },
+  {
+    "stopid": "11861719265",
+    "stopname": "Secret Harbour Bvd Before Siracusa Ct",
+    "lat": -32.4001523,
+    "lon": 115.7471902
+  },
+  {
+    "stopid": "11871750254",
+    "stopname": "Manning Rd After Braibrise Rd",
+    "lat": -32.0125758,
+    "lon": 115.9112194
+  },
+  {
+    "stopid": "11874022025",
+    "stopname": "Bluestone Pwy After Allatoona Av",
+    "lat": -32.413418,
+    "lon": 115.7647546
+  },
+  {
+    "stopid": "11919046455",
+    "stopname": "Bayswater Station Stand 6",
+    "lat": -31.918169,
+    "lon": 115.9128576
+  },
+  {
+    "stopid": "11965763427",
+    "stopname": "Dower St After Allnutt St",
+    "lat": -32.5286927,
+    "lon": 115.7402865
+  },
+  {
+    "stopid": "11982330346",
+    "stopname": "Pamplona Bvd After Edgbaston Cr",
+    "lat": -32.3553352,
+    "lon": 115.766806
+  },
+  {
+    "stopid": "11982377029",
+    "stopname": "The Avenue After Bondi Cr",
+    "lat": -32.3266611,
+    "lon": 115.7619187
+  },
+  {
+    "stopid": "12002671778",
+    "stopname": "Nairn Dr Before Fifty Rd",
+    "lat": -32.3076105,
+    "lon": 115.8157578
+  },
+  {
+    "stopid": "12022230365",
+    "stopname": "Patterson Rd After Flinders Lane",
+    "lat": -32.2778883,
+    "lon": 115.7361804
+  },
+  {
+    "stopid": "12053416944",
+    "stopname": "Two Rocks Road after Montebello Boulevard",
+    "lat": -31.5087109,
+    "lon": 115.6001612
+  },
+  {
+    "stopid": "12077892430",
+    "stopname": "Wanliss St Before Rockingham Beach Rd",
+    "lat": -32.273064,
+    "lon": 115.7344075
+  },
+  {
+    "stopid": "12082162728",
+    "stopname": "Eglinton Station Stand 6",
+    "lat": -31.583443,
+    "lon": 115.6721831
+  },
+  {
+    "stopid": "12147057913",
+    "stopname": "Stillwater Dr Before Selina Vw",
+    "lat": -32.3326261,
+    "lon": 115.8235084
+  },
+  {
+    "stopid": "12147057933",
+    "stopname": "Baldivis Rd After Helios Lp",
+    "lat": -32.357476,
+    "lon": 115.8295311
+  },
+  {
+    "stopid": "12153151680",
+    "stopname": "Yelverton Drive after Main Gate",
+    "lat": -31.8933375,
+    "lon": 116.0039045
+  },
+  {
+    "stopid": "12160110067",
+    "stopname": "Harrington Waters Dr Before Sunderland Way",
+    "lat": -32.3167183,
+    "lon": 115.7634442
+  },
+  {
+    "stopid": "12160110087",
+    "stopname": "Read St After Willmott Dr",
+    "lat": -32.2992231,
+    "lon": 115.745052
+  },
+  {
+    "stopid": "12160127536",
+    "stopname": "Read St After Malibu Rd",
+    "lat": -32.3023692,
+    "lon": 115.74653
+  },
+  {
+    "stopid": "12303924996",
+    "stopname": "Ballajura Station Stand 2",
+    "lat": -31.8496471,
+    "lon": 115.9225705
+  },
+  {
+    "stopid": "12303953816",
+    "stopname": "Morley Station Stand 10",
+    "lat": -31.8958546,
+    "lon": 115.919697
+  },
+  {
+    "stopid": "12303953836",
+    "stopname": "Ellenbrook Station Stand 8",
+    "lat": -31.7818495,
+    "lon": 115.9624915
+  },
+  {
+    "stopid": "12338919703",
+    "stopname": "Dunnett Drive before Rufous Lane",
+    "lat": -31.7440388,
+    "lon": 116.0125599
+  },
+  {
+    "stopid": "12361089977",
+    "stopname": "Lord Street after Morley Drive East",
+    "lat": -31.8867926,
+    "lon": 115.9559671
+  },
+  {
+    "stopid": "12361151368",
+    "stopname": "Amazon Drive before Darwin Crescent",
+    "lat": -31.8672482,
+    "lon": 115.9282722
+  },
+  {
+    "stopid": "12381235540",
+    "stopname": "Briggs Street before Downing Street",
+    "lat": -31.9894621,
+    "lon": 115.9196
+  },
+  {
+    "stopid": "12397258351",
+    "stopname": "Victoria Road before Irvine Drive",
+    "lat": -31.8614853,
+    "lon": 115.8859442
+  },
+  {
+    "stopid": "12397383517",
+    "stopname": "Benara Road after Mahogany Road",
+    "lat": -31.8756134,
+    "lon": 115.9204608
+  },
+  {
+    "stopid": "12399650486",
+    "stopname": "Henley Brook Avenue after Messara Avenue",
+    "lat": -31.7984893,
+    "lon": 115.9788529
+  },
+  {
+    "stopid": "12399716320",
+    "stopname": "Railway Parade after Rose Street",
+    "lat": -31.7722079,
+    "lon": 116.0255201
+  },
+  {
+    "stopid": "12399893612",
+    "stopname": "Great Northern Highway before Butternab Road",
+    "lat": -31.6824333,
+    "lon": 116.0327622
+  },
+  {
+    "stopid": "12399908088",
+    "stopname": "Mirrabooka Avenue before Landsdale Road",
+    "lat": -31.8170862,
+    "lon": 115.8544779
+  },
+  {
+    "stopid": "12410676780",
+    "stopname": "Starflower Road after Henley Street",
+    "lat": -31.7993426,
+    "lon": 115.9627954
+  },
+  {
+    "stopid": "12470544898",
+    "stopname": "McGilvray Avenue before Ham Place",
+    "lat": -31.880505,
+    "lon": 115.8966793
+  },
+  {
+    "stopid": "12658101131",
+    "stopname": "Butler Station Stand 3",
+    "lat": -31.6357334,
+    "lon": 115.7001087
+  },
+  {
+    "stopid": "12766304761",
+    "stopname": "North Street after Brighton Street",
+    "lat": -31.9820521,
+    "lon": 115.7569171
+  },
+  {
+    "stopid": "12784690768",
+    "stopname": "Shenton Rd After Wright Av",
+    "lat": -31.9803566,
+    "lon": 115.775423
+  },
+  {
+    "stopid": "12832681945",
+    "stopname": "Douro Rd After Thomas St",
+    "lat": -32.0739806,
+    "lon": 115.7557987
+  },
+  {
+    "stopid": "12874618500",
+    "stopname": "Oceanic Dr After Marapana Rd",
+    "lat": -31.9399597,
+    "lon": 115.7663991
+  },
+  {
+    "stopid": "12874825629",
+    "stopname": "Eucalyptus Bvd Before Karri Av",
+    "lat": -32.082752,
+    "lon": 115.9160912
+  },
+  {
+    "stopid": "12877073471",
+    "stopname": "Warton Rd After Tincurrin Dr",
+    "lat": -32.0840231,
+    "lon": 115.9499281
+  },
+  {
+    "stopid": "12878445520",
+    "stopname": "Amherst Rd After Greenland Bvd",
+    "lat": -32.0877969,
+    "lon": 115.9409353
+  },
+  {
+    "stopid": "12880804083",
+    "stopname": "Armadale Rd Before Anstey Rd",
+    "lat": -32.1476743,
+    "lon": 115.9332188
+  },
+  {
+    "stopid": "12881013741",
+    "stopname": "Armadale Rd After Alex Wood Dr",
+    "lat": -32.1474475,
+    "lon": 115.9655184
+  },
+  {
+    "stopid": "12890478964",
+    "stopname": "Parke Rd After Railway Rd",
+    "lat": -31.9640924,
+    "lon": 116.0518979
+  },
+  {
+    "stopid": "12890560832",
+    "stopname": "Railway Rd After Parke Rd",
+    "lat": -31.9647507,
+    "lon": 116.0538407
+  },
+  {
+    "stopid": "12891718177",
+    "stopname": "Canning Rd After Lawnbrook Rd",
+    "lat": -31.9963592,
+    "lon": 116.0667125
+  },
+  {
+    "stopid": "12893841511",
+    "stopname": "Kalamunda Rd After Priory Rd",
+    "lat": -31.9516028,
+    "lon": 116.0235078
+  },
+  {
+    "stopid": "12894336187",
+    "stopname": "Kalamunda Rd After Midland Rd",
+    "lat": -31.9464891,
+    "lon": 116.0202855
+  },
+  {
+    "stopid": "12894580575",
+    "stopname": "Canning Rd Before Sharyn Rd",
+    "lat": -31.9938098,
+    "lon": 116.0659668
+  },
+  {
+    "stopid": "12894652351",
+    "stopname": "Maida Vale Rd Before Hawtin Rd",
+    "lat": -31.9547714,
+    "lon": 116.0212576
+  },
+  {
+    "stopid": "12895885371",
+    "stopname": "Military Rd After Wells St",
+    "lat": -31.89925,
+    "lon": 116.0170388
+  },
+  {
+    "stopid": "12896024230",
+    "stopname": "Wittenoom Rd After Dundas Rd",
+    "lat": -31.9401887,
+    "lon": 115.9931674
+  },
+  {
+    "stopid": "12896076907",
+    "stopname": "Nicholson Road Station Stand 2",
+    "lat": -32.0614309,
+    "lon": 115.9350258
+  },
+  {
+    "stopid": "12896325013",
+    "stopname": "Dunreath Dr Before Fauntleroy Av",
+    "lat": -31.9310446,
+    "lon": 115.9539931
+  },
+  {
+    "stopid": "12896728075",
+    "stopname": "Walliabup Wy After Farmhouse Dr",
+    "lat": -32.0981672,
+    "lon": 115.8362687
+  },
+  {
+    "stopid": "12898494502",
+    "stopname": "North Lake Rd After Elderberry Dr",
+    "lat": -32.1094104,
+    "lon": 115.829695
+  },
+  {
+    "stopid": "12898504824",
+    "stopname": "Bibra Dr After Fantail Dr",
+    "lat": -32.1014169,
+    "lon": 115.8263294
+  },
+  {
+    "stopid": "12898546856",
+    "stopname": "Oats Street Station Stand 6",
+    "lat": -31.9891482,
+    "lon": 115.9170561
+  },
+  {
+    "stopid": "12898581161",
+    "stopname": "Calley Dr Before Oakland Hts",
+    "lat": -32.0699039,
+    "lon": 115.8541063
+  },
+  {
+    "stopid": "12898874250",
+    "stopname": "Farrington Rd After Grover Ct",
+    "lat": -32.0796275,
+    "lon": 115.8622056
+  },
+  {
+    "stopid": "12898970487",
+    "stopname": "Karel Av After Westminster Rd",
+    "lat": -32.0730476,
+    "lon": 115.8664687
+  },
+  {
+    "stopid": "12899313121",
+    "stopname": "Findlay Rd Before Bagot Ct",
+    "lat": -32.0767988,
+    "lon": 115.8587603
+  },
+  {
+    "stopid": "12902037734",
+    "stopname": "Carrington St Before Forrest Rd",
+    "lat": -32.0841267,
+    "lon": 115.7771304
+  },
+  {
+    "stopid": "12902191635",
+    "stopname": "Booragoon Bus Station, Stand A2",
+    "lat": -32.0362201,
+    "lon": 115.8367189
+  },
+  {
+    "stopid": "12906006136",
+    "stopname": "Booragoon Bus Station, Stand B3",
+    "lat": -32.0360539,
+    "lon": 115.8369478
+  },
+  {
+    "stopid": "12906006175",
+    "stopname": "Marmion St After Stock Rd",
+    "lat": -32.0469233,
+    "lon": 115.7928254
+  },
+  {
+    "stopid": "12911668942",
+    "stopname": "Rockingham Rd Before Packham Rd",
+    "lat": -32.0882961,
+    "lon": 115.7809336
+  },
+  {
+    "stopid": "12911733825",
+    "stopname": "Elderberry Dr After Apara Ct",
+    "lat": -32.1043108,
+    "lon": 115.8395656
+  },
+  {
+    "stopid": "12912747924",
+    "stopname": "Forrest Rd After O'Connell St",
+    "lat": -32.0862646,
+    "lon": 115.7924872
+  },
+  {
+    "stopid": "12913585371",
+    "stopname": "Forrest Rd After Stock Rd",
+    "lat": -32.0888058,
+    "lon": 115.802384
+  },
+  {
+    "stopid": "12913987566",
+    "stopname": "Garden St Before Sugarwood Dr",
+    "lat": -32.0681928,
+    "lon": 115.9395265
+  },
+  {
+    "stopid": "12914097679",
+    "stopname": "The Bridgeway After Shreeve Rd",
+    "lat": -32.0787512,
+    "lon": 115.9410126
+  },
+  {
+    "stopid": "12914817330",
+    "stopname": "The Bridgeway After Calley Wy",
+    "lat": -32.0792551,
+    "lon": 115.9409241
+  },
+  {
+    "stopid": "12916046471",
+    "stopname": "Clontarf Rd Before Mather Rd",
+    "lat": -32.0753131,
+    "lon": 115.7662345
+  },
+  {
+    "stopid": "12916423337",
+    "stopname": "Beeliar Dr After Hammond Rd",
+    "lat": -32.1272493,
+    "lon": 115.8431778
+  },
+  {
+    "stopid": "12917070941",
+    "stopname": "Rockingham Rd Before Barrett St",
+    "lat": -32.1129964,
+    "lon": 115.782785
+  },
+  {
+    "stopid": "12917384741",
+    "stopname": "The Grange After Beeliar Dr",
+    "lat": -32.1280969,
+    "lon": 115.8193157
+  },
+  {
+    "stopid": "12917459586",
+    "stopname": "Doolette St After Freeth Rd",
+    "lat": -32.0961801,
+    "lon": 115.7936421
+  },
+  {
+    "stopid": "12918625414",
+    "stopname": "Ivankovich Av South Coogee Prim Sch",
+    "lat": -32.1288432,
+    "lon": 115.7971076
+  },
+  {
+    "stopid": "12918978956",
+    "stopname": "Littlemore Rd Before Pengilly Rd",
+    "lat": -32.2295446,
+    "lon": 115.8145091
+  },
+  {
+    "stopid": "12919083197",
+    "stopname": "Matson St Before Brownell Cr",
+    "lat": -32.23043,
+    "lon": 115.8097645
+  },
+  {
+    "stopid": "12919141675",
+    "stopname": "Crawford Rd Before Sulphur Rd",
+    "lat": -32.2394721,
+    "lon": 115.8256369
+  },
+  {
+    "stopid": "12920987564",
+    "stopname": "Runnymede Gte Opposite Winchester Ct",
+    "lat": -32.2654359,
+    "lon": 115.8128521
+  },
+  {
+    "stopid": "12921174981",
+    "stopname": "Sicklemore Rd Before Adamson Rd",
+    "lat": -32.2397099,
+    "lon": 115.8368994
+  },
+  {
+    "stopid": "12923282419",
+    "stopname": "Gilmore Av After Wellard Rd",
+    "lat": -32.2530886,
+    "lon": 115.8119661
+  },
+  {
+    "stopid": "12925676044",
+    "stopname": "Bertram Rd After Moombaki Av",
+    "lat": -32.251906,
+    "lon": 115.8367187
+  },
+  {
+    "stopid": "12925737722",
+    "stopname": "Challenger Av After Sutherland Pde",
+    "lat": -32.2492589,
+    "lon": 115.8305013
+  },
+  {
+    "stopid": "12925822198",
+    "stopname": "Leda Bvd After Appleby St",
+    "lat": -32.2735949,
+    "lon": 115.8252791
+  },
+  {
+    "stopid": "12926873139",
+    "stopname": "Gilmore Av After Feilman Dr",
+    "lat": -32.2600909,
+    "lon": 115.8069728
+  },
+  {
+    "stopid": "12927314795",
+    "stopname": "Rockingham Rd Before Wattleup Rd",
+    "lat": -32.1763362,
+    "lon": 115.7941482
+  },
+  {
+    "stopid": "12927904954",
+    "stopname": "Orsino Bvd Before Patriot Lk",
+    "lat": -32.1069038,
+    "lon": 115.7643448
+  },
+  {
+    "stopid": "12927910937",
+    "stopname": "Patterson Rd Before Charles St",
+    "lat": -32.2536236,
+    "lon": 115.7679229
+  },
+  {
+    "stopid": "12928143843",
+    "stopname": "Cockburn Rd After Gemma Rd",
+    "lat": -32.170144,
+    "lon": 115.7729188
+  },
+  {
+    "stopid": "12941756676",
+    "stopname": "Council Av After Ennis Av",
+    "lat": -32.2848647,
+    "lon": 115.7570976
+  },
+  {
+    "stopid": "12941785018",
+    "stopname": "Kent St Before Weld St",
+    "lat": -32.2650001,
+    "lon": 115.7457295
+  },
+  {
+    "stopid": "12942329341",
+    "stopname": "Safety Bay Rd Before Otway Pl",
+    "lat": -32.2915938,
+    "lon": 115.7104708
+  },
+  {
+    "stopid": "12942329632",
+    "stopname": "Safety Bay Rd After Otway Pl",
+    "lat": -32.2920061,
+    "lon": 115.7107766
+  },
+  {
+    "stopid": "12942468412",
+    "stopname": "Hawker St After Maverick Prom",
+    "lat": -32.2956295,
+    "lon": 115.7207156
+  },
+  {
+    "stopid": "12942493434",
+    "stopname": "June Rd After Mayfield Rd",
+    "lat": -32.3072739,
+    "lon": 115.7255263
+  },
+  {
+    "stopid": "12944701394",
+    "stopname": "Safety Bay Rd After Donald Dr",
+    "lat": -32.308268,
+    "lon": 115.7284624
+  },
+  {
+    "stopid": "12945541569",
+    "stopname": "Darile St Before Merilup Ct",
+    "lat": -32.2808929,
+    "lon": 115.7698722
+  },
+  {
+    "stopid": "12946228002",
+    "stopname": "Lynwood Avenue after Ellesmere Road",
+    "lat": -32.0398925,
+    "lon": 115.9316213
+  },
+  {
+    "stopid": "12946767413",
+    "stopname": "Garden St Before Warton Rd",
+    "lat": -32.0810832,
+    "lon": 115.9502993
+  },
+  {
+    "stopid": "12949411940",
+    "stopname": "Safety Bay Rd Before David Rd",
+    "lat": -32.3222154,
+    "lon": 115.7444358
+  },
+  {
+    "stopid": "12955338905",
+    "stopname": "Guillardon Tce After Virginia Turn",
+    "lat": -32.4843645,
+    "lon": 115.7499839
+  },
+  {
+    "stopid": "12955452962",
+    "stopname": "Challenger Rd Before Madora Beach Rd",
+    "lat": -32.4705012,
+    "lon": 115.7510032
+  },
+  {
+    "stopid": "12955832828",
+    "stopname": "Oakmont Av Before Seminole Av",
+    "lat": -32.508999,
+    "lon": 115.7482287
+  },
+  {
+    "stopid": "12956331169",
+    "stopname": "Portrush Pde Opposite Raaf Estate",
+    "lat": -32.5019761,
+    "lon": 115.7528693
+  },
+  {
+    "stopid": "12956537886",
+    "stopname": "Mary St After View St",
+    "lat": -32.5256324,
+    "lon": 115.7074675
+  },
+  {
+    "stopid": "12956573148",
+    "stopname": "Sticks Bvd Before Quarriston Av",
+    "lat": -32.5562026,
+    "lon": 115.7045679
+  },
+  {
+    "stopid": "12958368803",
+    "stopname": "Janis St After Leighton Rd",
+    "lat": -32.5252831,
+    "lon": 115.7029453
+  },
+  {
+    "stopid": "12958842148",
+    "stopname": "Steerforth Dr Before Tankerton Wy",
+    "lat": -32.5440566,
+    "lon": 115.7495802
+  },
+  {
+    "stopid": "12959223935",
+    "stopname": "Coodanup Dr Before Erica St",
+    "lat": -32.5472192,
+    "lon": 115.745356
+  },
+  {
+    "stopid": "12959295588",
+    "stopname": "Access Rd Peel Health Campus",
+    "lat": -32.5321629,
+    "lon": 115.762458
+  },
+  {
+    "stopid": "12959346191",
+    "stopname": "Doongin Rd After Darbal Pl",
+    "lat": -32.5344183,
+    "lon": 115.7727212
+  },
+  {
+    "stopid": "12959489205",
+    "stopname": "Arpenteur Dr Before Bristlebird App",
+    "lat": -32.3507866,
+    "lon": 115.8035622
+  },
+  {
+    "stopid": "12960348969",
+    "stopname": "Safety Bay Rd Before Eighty Rd",
+    "lat": -32.330415,
+    "lon": 115.8056814
+  },
+  {
+    "stopid": "12960377807",
+    "stopname": "Bramall Tce After Overton L",
+    "lat": -32.3493161,
+    "lon": 115.8112028
+  },
+  {
+    "stopid": "12960586506",
+    "stopname": "Safety Bay Rd After Goulburn Rd",
+    "lat": -32.3323194,
+    "lon": 115.8194996
+  },
+  {
+    "stopid": "12963697578",
+    "stopname": "Pinjarra Rd Before South Yunderup Rd",
+    "lat": -32.5961826,
+    "lon": 115.8282879
+  },
+  {
+    "stopid": "12964222975",
+    "stopname": "Pinjarra Rd After Husband Rd",
+    "lat": -32.5494901,
+    "lon": 115.7759232
+  },
+  {
+    "stopid": "12964483386",
+    "stopname": "Pinjarra Rd After Nancarrow Wy",
+    "lat": -32.5820462,
+    "lon": 115.8267015
+  },
+  {
+    "stopid": "12976179803",
+    "stopname": "Currie St After Swallowtail Pde",
+    "lat": -32.344955,
+    "lon": 115.7531602
+  },
+  {
+    "stopid": "12976783568",
+    "stopname": "Tryall Av Before Roundhill Dr",
+    "lat": -32.3620079,
+    "lon": 115.7504299
+  },
+  {
+    "stopid": "12977407289",
+    "stopname": "Leslie St Before Gloucester St",
+    "lat": -32.540163,
+    "lon": 115.724927
+  },
+  {
+    "stopid": "12979298327",
+    "stopname": "Galatea Rd After Wanui St",
+    "lat": -32.5752952,
+    "lon": 115.6626897
+  },
+  {
+    "stopid": "12979429386",
+    "stopname": "Thera St After Yeedong Rd",
+    "lat": -32.5873323,
+    "lon": 115.6530724
+  },
+  {
+    "stopid": "12979521725",
+    "stopname": "Bus stop",
+    "lat": -31.9348665,
+    "lon": 115.9373882
+  },
+  {
+    "stopid": "12980114721",
+    "stopname": "Old Coast Rd After Mercedes Av",
+    "lat": -32.5865731,
+    "lon": 115.6579558
+  },
+  {
+    "stopid": "12981565862",
+    "stopname": "Southern River Rd After Gay St",
+    "lat": -32.0949871,
+    "lon": 115.9705911
+  },
+  {
+    "stopid": "12981930498",
+    "stopname": "Southern River Rd Before Gay St",
+    "lat": -32.0951155,
+    "lon": 115.9708032
+  },
+  {
+    "stopid": "12982383373",
+    "stopname": "Wright Rd After Broadway Bvd",
+    "lat": -32.1251089,
+    "lon": 115.9218996
+  },
+  {
+    "stopid": "12984982953",
+    "stopname": "Eastwood Pde Before Orkney Cr",
+    "lat": -32.0935649,
+    "lon": 115.9094892
+  },
+  {
+    "stopid": "12985315834",
+    "stopname": "Nicholson Rd After Clifton Rd",
+    "lat": -32.0998788,
+    "lon": 115.9148378
+  },
+  {
+    "stopid": "12987543915",
+    "stopname": "Ashburton St After Boulder St",
+    "lat": -32.0044922,
+    "lon": 115.9158882
+  },
+  {
+    "stopid": "12989601777",
+    "stopname": "Whitlock Rd After Wharf St",
+    "lat": -32.0002132,
+    "lon": 115.9528408
+  },
+  {
+    "stopid": "12993497130",
+    "stopname": "William St After Diamond St",
+    "lat": -32.0133108,
+    "lon": 115.9655854
+  },
+  {
+    "stopid": "12994207662",
+    "stopname": "Wilfred Rd After Lyrebird Wy",
+    "lat": -32.0448807,
+    "lon": 115.9503186
+  },
+  {
+    "stopid": "12994369044",
+    "stopname": "Westfield St After Vanda Pl",
+    "lat": -32.0541346,
+    "lon": 116.001119
+  },
+  {
+    "stopid": "12995166383",
+    "stopname": "Westfield St Before Kelvin Rd",
+    "lat": -32.0453129,
+    "lon": 115.9905367
+  },
+  {
+    "stopid": "12995446653",
+    "stopname": "Eva St After Maddington Rd",
+    "lat": -32.0399939,
+    "lon": 116.0025871
+  },
+  {
+    "stopid": "12995480506",
+    "stopname": "Brixton St After Edelweiss Wy",
+    "lat": -32.0199972,
+    "lon": 115.9618555
+  },
+  {
+    "stopid": "12995765288",
+    "stopname": "Dellar Rd Before Winterbourne Gld",
+    "lat": -32.0435751,
+    "lon": 116.0041657
+  },
+  {
+    "stopid": "12996641593",
+    "stopname": "Holmes St After Southern River Rd",
+    "lat": -32.0951155,
+    "lon": 115.9604854
+  },
+  {
+    "stopid": "12996699063",
+    "stopname": "Balfour St After Tolland Lp",
+    "lat": -32.0963223,
+    "lon": 115.9556896
+  },
+  {
+    "stopid": "12996782123",
+    "stopname": "Corfield St After Bardon Wy",
+    "lat": -32.0724406,
+    "lon": 115.9785311
+  },
+  {
+    "stopid": "12997003880",
+    "stopname": "Chamberlain St Before Drysdale St",
+    "lat": -32.0910123,
+    "lon": 115.9821173
+  },
+  {
+    "stopid": "12997095678",
+    "stopname": "Ilma St After Norman St",
+    "lat": -32.083037,
+    "lon": 116.0069379
+  },
+  {
+    "stopid": "12997415080",
+    "stopname": "Morrison St Before Lawrence St",
+    "lat": -32.0002274,
+    "lon": 115.8702126
+  },
+  {
+    "stopid": "12998483491",
+    "stopname": "King Edward St After Clarence St",
+    "lat": -31.9777802,
+    "lon": 115.8583019
+  },
+  {
+    "stopid": "13001229699",
+    "stopname": "Ashburton St After Pollock St",
+    "lat": -32.0069466,
+    "lon": 115.9128938
+  },
+  {
+    "stopid": "13001536815",
+    "stopname": "Champion Dr After Seville Dr",
+    "lat": -32.1293672,
+    "lon": 115.9999262
+  },
+  {
+    "stopid": "13001806031",
+    "stopname": "Fifth Rd After Marian Av",
+    "lat": -32.1511014,
+    "lon": 116.0069095
+  },
+  {
+    "stopid": "13004222561",
+    "stopname": "O'Sullivan Dr After Ypres Rd",
+    "lat": -32.1145145,
+    "lon": 115.9986096
+  },
+  {
+    "stopid": "13004323572",
+    "stopname": "Braemore St Before Toorak Rd",
+    "lat": -32.1401556,
+    "lon": 115.9978708
+  },
+  {
+    "stopid": "13006299341",
+    "stopname": "Braemore St After Cobar St",
+    "lat": -32.1436922,
+    "lon": 115.9938342
+  },
+  {
+    "stopid": "13008813364",
+    "stopname": "Hesketh Av After Westfield Rd",
+    "lat": -32.1321821,
+    "lon": 115.9870648
+  },
+  {
+    "stopid": "13008999094",
+    "stopname": "Church Av Before Seventh Rd",
+    "lat": -32.1586139,
+    "lon": 116.0100741
+  },
+  {
+    "stopid": "13011117738",
+    "stopname": "St Georges Tce Stand 7 - After William St",
+    "lat": -31.9552326,
+    "lon": 115.8583999
+  },
+  {
+    "stopid": "13011367200",
+    "stopname": "Kooyong Rd After Chamberlain Rd",
+    "lat": -31.9599567,
+    "lon": 115.9119029
+  },
+  {
+    "stopid": "13011527526",
+    "stopname": "Merilee Tce After Peter St",
+    "lat": -32.114869,
+    "lon": 116.0263661
+  },
+  {
+    "stopid": "13011581874",
+    "stopname": "Brookton Hwy Before Hill St",
+    "lat": -32.1302289,
+    "lon": 116.0281359
+  },
+  {
+    "stopid": "13011603892",
+    "stopname": "Raeburn Rd After Jarrah Rd",
+    "lat": -32.1039648,
+    "lon": 116.0701509
+  },
+  {
+    "stopid": "13011604016",
+    "stopname": "Brookton Hwy Before Old Coach Pl",
+    "lat": -32.1247414,
+    "lon": 116.0571227
+  },
+  {
+    "stopid": "13012983493",
+    "stopname": "Riseley St After Worthington Rd",
+    "lat": -32.0408889,
+    "lon": 115.8374591
+  },
+  {
+    "stopid": "13013433772",
+    "stopname": "Albany Hwy Before Lefroy Rd",
+    "lat": -32.1271769,
+    "lon": 116.0184875
+  },
+  {
+    "stopid": "13013558598",
+    "stopname": "Albany Hwy After Gerald St",
+    "lat": -32.0736262,
+    "lon": 116.0042447
+  },
+  {
+    "stopid": "13014821777",
+    "stopname": "Albany Hwy Before Peckham St",
+    "lat": -32.0285409,
+    "lon": 115.9575868
+  },
+  {
+    "stopid": "13015317749",
+    "stopname": "Albany Hwy After Lake Rd",
+    "lat": -32.0985682,
+    "lon": 116.0129022
+  },
+  {
+    "stopid": "13015492236",
+    "stopname": "Rowley Rd Before Hopkinson Rd",
+    "lat": -32.1817335,
+    "lon": 115.9741921
+  },
+  {
+    "stopid": "13017063759",
+    "stopname": "Avonlee Rd After Anton St",
+    "lat": -32.160413,
+    "lon": 116.0081114
+  },
+  {
+    "stopid": "13017232015",
+    "stopname": "South Western Hwy Before Burndale Rd",
+    "lat": -32.1617035,
+    "lon": 116.0173572
+  },
+  {
+    "stopid": "13017264758",
+    "stopname": "Clondyke Dr After Benalla Cr",
+    "lat": -32.2375583,
+    "lon": 116.007578
+  },
+  {
+    "stopid": "13018950020",
+    "stopname": "South Western Hwy After Talus Dr",
+    "lat": -32.1653001,
+    "lon": 116.0162063
+  },
+  {
+    "stopid": "13020741113",
+    "stopname": "Soldiers Rd After Norman Rd",
+    "lat": -32.2639934,
+    "lon": 115.994434
+  },
+  {
+    "stopid": "13022842466",
+    "stopname": "Marginata Pde After Yarri Mews",
+    "lat": -32.3413301,
+    "lon": 116.0527049
+  },
+  {
+    "stopid": "13025970418",
+    "stopname": "Plaistowe Bvd After Blackberry Rmbl",
+    "lat": -32.2072034,
+    "lon": 116.0013406
+  },
+  {
+    "stopid": "13026265290",
+    "stopname": "Mead St After Gordin Way",
+    "lat": -32.225299,
+    "lon": 116.0028413
+  },
+  {
+    "stopid": "13026360018",
+    "stopname": "Larsen Rd Before Calneggia Dr",
+    "lat": -32.2115136,
+    "lon": 116.0019787
+  },
+  {
+    "stopid": "13026627910",
+    "stopname": "Mill Point Rd After Roseberry Av",
+    "lat": -31.9773061,
+    "lon": 115.8716246
+  },
+  {
+    "stopid": "13027471961",
+    "stopname": "Second Av Before Berwick St",
+    "lat": -31.9759816,
+    "lon": 115.8847278
+  },
+  {
+    "stopid": "13028371612",
+    "stopname": "Alfred Rd Before Lantana Av",
+    "lat": -31.9690873,
+    "lon": 115.7885875
+  },
+  {
+    "stopid": "13030760096",
+    "stopname": "Asquith St Before Olearia L",
+    "lat": -31.9661721,
+    "lon": 115.7744486
+  },
+  {
+    "stopid": "13031345036",
+    "stopname": "Camelia Av After Brockway Rd",
+    "lat": -31.9662506,
+    "lon": 115.7905012
+  },
+  {
+    "stopid": "13033746157",
+    "stopname": "Hay St After Ellen St",
+    "lat": -31.9471339,
+    "lon": 115.8294287
+  },
+  {
+    "stopid": "13033850899",
+    "stopname": "Brookdale St Before Salvado Rd",
+    "lat": -31.9422951,
+    "lon": 115.7916801
+  },
+  {
+    "stopid": "13037207064",
+    "stopname": "Davy St Before Clements Rd",
+    "lat": -32.0335341,
+    "lon": 115.8259162
+  },
+  {
+    "stopid": "13040551706",
+    "stopname": "Bennewith St After Tonkin Rd",
+    "lat": -32.0674749,
+    "lon": 115.790545
+  },
+  {
+    "stopid": "13041335573",
+    "stopname": "Lucas St After Boon St",
+    "lat": -32.0526424,
+    "lon": 115.7959972
+  },
+  {
+    "stopid": "13042328188",
+    "stopname": "Reynolds Rd After Emerald Av",
+    "lat": -32.0297186,
+    "lon": 115.848397
+  },
+  {
+    "stopid": "13042362085",
+    "stopname": "Canning Av After Edgar Wy",
+    "lat": -32.0367212,
+    "lon": 115.8479416
+  },
+  {
+    "stopid": "13042475476",
+    "stopname": "Winterfold Rd After Davon St",
+    "lat": -32.0747715,
+    "lon": 115.7867001
+  },
+  {
+    "stopid": "13042671695",
+    "stopname": "Hamilton Rd After Spearwood Ave",
+    "lat": -32.1016732,
+    "lon": 115.7754375
+  },
+  {
+    "stopid": "13042945404",
+    "stopname": "North Lake Rd After South St",
+    "lat": -32.0715704,
+    "lon": 115.8150743
+  },
+  {
+    "stopid": "13043054746",
+    "stopname": "Coolbellup Av Before Emilia St",
+    "lat": -32.0783511,
+    "lon": 115.8063415
+  },
+  {
+    "stopid": "13045185373",
+    "stopname": "Watkins St After Carrington St",
+    "lat": -32.0596372,
+    "lon": 115.7787946
+  },
+  {
+    "stopid": "13047579454",
+    "stopname": "Roberts Rd Before Wichmann Rd",
+    "lat": -32.0233558,
+    "lon": 115.7954527
+  },
+  {
+    "stopid": "13047845012",
+    "stopname": "Preston Point Rd After Fraser St",
+    "lat": -32.0194818,
+    "lon": 115.8333415
+  },
+  {
+    "stopid": "13047885283",
+    "stopname": "Preston Point Rd After Bolton St",
+    "lat": -32.0400279,
+    "lon": 115.7643071
+  },
+  {
+    "stopid": "13051918574",
+    "stopname": "Cambridge St After Gregory St",
+    "lat": -31.9406759,
+    "lon": 115.8219488
+  },
+  {
+    "stopid": "13052254207",
+    "stopname": "The Boulevard After Linden Gdns",
+    "lat": -31.9363344,
+    "lon": 115.7979063
+  },
+  {
+    "stopid": "13056188505",
+    "stopname": "Grantham St Before Linden Gdns",
+    "lat": -31.9342977,
+    "lon": 115.7977942
+  },
+  {
+    "stopid": "13057232608",
+    "stopname": "Empire Av After Weaponess Rd",
+    "lat": -31.921968,
+    "lon": 115.7800768
+  },
+  {
+    "stopid": "13057347739",
+    "stopname": "Hale Rd After Weaponess Rd",
+    "lat": -31.9134329,
+    "lon": 115.7712533
+  },
+  {
+    "stopid": "13057613809",
+    "stopname": "Herdsman Pde After Drew St",
+    "lat": -31.9271114,
+    "lon": 115.8160081
+  },
+  {
+    "stopid": "13057671186",
+    "stopname": "Bruce St Before Princess Rd",
+    "lat": -31.9867629,
+    "lon": 115.8110844
+  },
+  {
+    "stopid": "13058080623",
+    "stopname": "Waratah Av After Curlew Rd",
+    "lat": -31.994848,
+    "lon": 115.8011978
+  },
+  {
+    "stopid": "13059075366",
+    "stopname": "Smyth Rd After Park Rd",
+    "lat": -31.9741616,
+    "lon": 115.8057358
+  },
+  {
+    "stopid": "13059274983",
+    "stopname": "Gilbertson Rd After Williamson Rd",
+    "lat": -32.0665057,
+    "lon": 115.8193613
+  },
+  {
+    "stopid": "13059510225",
+    "stopname": "Winthrop Dr Before Aitken Dr",
+    "lat": -32.0502963,
+    "lon": 115.8249524
+  },
+  {
+    "stopid": "13061460295",
+    "stopname": "Basinghall St After Berwick St",
+    "lat": -31.9876315,
+    "lon": 115.8995383
+  },
+  {
+    "stopid": "13061606661",
+    "stopname": "Braibrise Rd After Waldon St",
+    "lat": -32.015577,
+    "lon": 115.9136931
+  },
+  {
+    "stopid": "13062898311",
+    "stopname": "Montebello Bvd After Archipelago Wy",
+    "lat": -31.5080169,
+    "lon": 115.6013422
+  },
+  {
+    "stopid": "13065086091",
+    "stopname": "Odin Rd After Cloates St",
+    "lat": -31.900099,
+    "lon": 115.7960149
+  },
+  {
+    "stopid": "13068545682",
+    "stopname": "Cedric St Before Ellen Stirling Bvd",
+    "lat": -31.8942814,
+    "lon": 115.7995387
+  },
+  {
+    "stopid": "13070684754",
+    "stopname": "Hastings St After Cobb St",
+    "lat": -31.906846,
+    "lon": 115.7599862
+  },
+  {
+    "stopid": "13070839015",
+    "stopname": "Karrinyup Rd After Dennis St",
+    "lat": -31.8833033,
+    "lon": 115.8053952
+  },
+  {
+    "stopid": "13071965468",
+    "stopname": "Wilby St Before Sedgeford Rd",
+    "lat": -31.8626798,
+    "lon": 115.7653282
+  },
+  {
+    "stopid": "13072227444",
+    "stopname": "North Beach Rd Before Okely Rd",
+    "lat": -31.859413,
+    "lon": 115.7820233
+  },
+  {
+    "stopid": "13072332795",
+    "stopname": "Hugo St After Civic Pl",
+    "lat": -31.8874953,
+    "lon": 115.8069578
+  },
+  {
+    "stopid": "13073496326",
+    "stopname": "West Coast Hwy After Pearl Pde",
+    "lat": -31.8899073,
+    "lon": 115.7577178
+  },
+  {
+    "stopid": "13073867477",
+    "stopname": "Jeanes Rd Before Prisk St",
+    "lat": -31.8793853,
+    "lon": 115.7739045
+  },
+  {
+    "stopid": "13073979660",
+    "stopname": "King George St Before Grant St",
+    "lat": -31.8973855,
+    "lon": 115.7898795
+  },
+  {
+    "stopid": "13073982553",
+    "stopname": "Newborough St Before Menner Ct",
+    "lat": -31.885062,
+    "lon": 115.7642889
+  },
+  {
+    "stopid": "13074251963",
+    "stopname": "Flora Tce Before Lawley St",
+    "lat": -31.8541162,
+    "lon": 115.7541835
+  },
+  {
+    "stopid": "13075318876",
+    "stopname": "Karrinyup Rd After Francis Av",
+    "lat": -31.8785963,
+    "lon": 115.7817846
+  },
+  {
+    "stopid": "13075376254",
+    "stopname": "Okely Rd Before Osmaston Rd",
+    "lat": -31.8485654,
+    "lon": 115.7842608
+  },
+  {
+    "stopid": "13075875513",
+    "stopname": "Endeavour Rd Before Whitfords Av",
+    "lat": -31.7972991,
+    "lon": 115.7451503
+  },
+  {
+    "stopid": "13091777503",
+    "stopname": "Woodvale Dr After Fallbrook Av",
+    "lat": -31.7973606,
+    "lon": 115.7970086
+  },
+  {
+    "stopid": "13093848228",
+    "stopname": "Marmion Av After Anchorage Dr",
+    "lat": -31.6928829,
+    "lon": 115.715728
+  },
+  {
+    "stopid": "13094005188",
+    "stopname": "Havana Way After Peaceful Vw",
+    "lat": -31.7001844,
+    "lon": 115.7107449
+  },
+  {
+    "stopid": "13094034233",
+    "stopname": "Rothesay Hts After The Rise",
+    "lat": -31.6867625,
+    "lon": 115.7081172
+  },
+  {
+    "stopid": "13094256187",
+    "stopname": "Robinson Av After Hazel Av",
+    "lat": -31.6649207,
+    "lon": 115.6913449
+  },
+  {
+    "stopid": "13094372266",
+    "stopname": "Joondalup Dr After Pinjar Rd",
+    "lat": -31.7060056,
+    "lon": 115.8034036
+  },
+  {
+    "stopid": "13094410451",
+    "stopname": "Elderiana Link After Monticola L",
+    "lat": -31.6931972,
+    "lon": 115.8093007
+  },
+  {
+    "stopid": "13095707601",
+    "stopname": "Houghton Dr After Staunton Vale",
+    "lat": -31.7088575,
+    "lon": 115.7812097
+  },
+  {
+    "stopid": "13095889692",
+    "stopname": "Ghost Gum Bvd After Kurrajong Bvd",
+    "lat": -31.6980695,
+    "lon": 115.80206
+  },
+  {
+    "stopid": "13098221027",
+    "stopname": "Waldburg Dr Before Galileo Av",
+    "lat": -31.7221676,
+    "lon": 115.7971224
+  },
+  {
+    "stopid": "13103651725",
+    "stopname": "Scott Rd After High Rd",
+    "lat": -31.7549906,
+    "lon": 115.8165443
+  },
+  {
+    "stopid": "13105177440",
+    "stopname": "Kemp St After Archer St",
+    "lat": -31.7820641,
+    "lon": 115.8141779
+  },
+  {
+    "stopid": "13105507278",
+    "stopname": "Carosa Rd Before Siena Link",
+    "lat": -31.7341327,
+    "lon": 115.7991911
+  },
+  {
+    "stopid": "13105872595",
+    "stopname": "Wanneroo Rd After Ocean Reef Rd",
+    "lat": -31.7864753,
+    "lon": 115.8103009
+  },
+  {
+    "stopid": "13108064925",
+    "stopname": "Marmion Av After Hester Av",
+    "lat": -31.6791121,
+    "lon": 115.7134821
+  },
+  {
+    "stopid": "13108230079",
+    "stopname": "Santa Barbara Pde After Morialta Av",
+    "lat": -31.663755,
+    "lon": 115.6998224
+  },
+  {
+    "stopid": "13108541205",
+    "stopname": "Marmion Av After Hughie Edwards Dr",
+    "lat": -31.6584502,
+    "lon": 115.7050019
+  },
+  {
+    "stopid": "13109444278",
+    "stopname": "Baltimore Pde After Greyhound Dr",
+    "lat": -31.6679446,
+    "lon": 115.7138452
+  },
+  {
+    "stopid": "13109581010",
+    "stopname": "Bradman Dr After Tetbury Rd",
+    "lat": -31.6529747,
+    "lon": 115.7067868
+  },
+  {
+    "stopid": "13110112984",
+    "stopname": "Shepperton Dr After Kahana Pwy",
+    "lat": -31.6490267,
+    "lon": 115.7139072
+  },
+  {
+    "stopid": "13110161314",
+    "stopname": "Landbeach Bvd Before Randstone Pde",
+    "lat": -31.6358362,
+    "lon": 115.7084314
+  },
+  {
+    "stopid": "13110374569",
+    "stopname": "Leatherback Bvd After Quokka Rd",
+    "lat": -31.6261261,
+    "lon": 115.678095
+  },
+  {
+    "stopid": "13112267919",
+    "stopname": "Hollington Bvd After Halesworth Pde",
+    "lat": -31.6323738,
+    "lon": 115.6927342
+  },
+  {
+    "stopid": "13114305002",
+    "stopname": "Benenden Av After Alford Wy",
+    "lat": -31.6298772,
+    "lon": 115.7045799
+  },
+  {
+    "stopid": "13123193883",
+    "stopname": "Marmion Av Before Pipidinny Rd",
+    "lat": -31.5876411,
+    "lon": 115.6671138
+  },
+  {
+    "stopid": "13133839344",
+    "stopname": "Lagoon Dr After Primary Rd",
+    "lat": -31.5518179,
+    "lon": 115.6368698
+  },
+  {
+    "stopid": "13135720932",
+    "stopname": "Brazier Rd Before Anchors Wy",
+    "lat": -31.5570495,
+    "lon": 115.6341389
+  },
+  {
+    "stopid": "13138065248",
+    "stopname": "Yanchep Beach Rd Before Mapleton Dr",
+    "lat": -31.5475701,
+    "lon": 115.6506078
+  },
+  {
+    "stopid": "13140683493",
+    "stopname": "Wooloomooloo Rd After Damascus Dr",
+    "lat": -31.8963632,
+    "lon": 116.0501822
+  },
+  {
+    "stopid": "13140712892",
+    "stopname": "Swan View Rd After Pimelia Ct",
+    "lat": -31.8900743,
+    "lon": 116.0611747
+  },
+  {
+    "stopid": "13142401604",
+    "stopname": "Washington St After King George St",
+    "lat": -31.9759505,
+    "lon": 115.8918785
+  },
+  {
+    "stopid": "13144364726",
+    "stopname": "Belmont Av Before Scott St",
+    "lat": -31.9726886,
+    "lon": 115.9417533
+  },
+  {
+    "stopid": "13146999821",
+    "stopname": "Valentine St After Hazelhurst St",
+    "lat": -31.9716816,
+    "lon": 115.9575415
+  },
+  {
+    "stopid": "13147044388",
+    "stopname": "Hazelhurst St After Mackay St",
+    "lat": -31.9746593,
+    "lon": 115.9533739
+  },
+  {
+    "stopid": "13154760085",
+    "stopname": "Fulham St After Arlunya Av",
+    "lat": -31.9618362,
+    "lon": 115.9410177
+  },
+  {
+    "stopid": "13155250587",
+    "stopname": "Acton Av Before Keane St",
+    "lat": -31.9735118,
+    "lon": 115.9360548
+  },
+  {
+    "stopid": "13157178993",
+    "stopname": "Lesmurdie Rd Before Brady Rd",
+    "lat": -32.0102722,
+    "lon": 116.0467384
+  },
+  {
+    "stopid": "13157189230",
+    "stopname": "Lesmurdie Rd Before Catherine Pl",
+    "lat": -31.9946203,
+    "lon": 116.052301
+  },
+  {
+    "stopid": "13157736871",
+    "stopname": "Welshpool Rd After Tonkin Hwy",
+    "lat": -32.0086876,
+    "lon": 116.00014
+  },
+  {
+    "stopid": "13157795324",
+    "stopname": "Welshpool Rd Before Banksia Gdns",
+    "lat": -31.9985963,
+    "lon": 115.9583378
+  },
+  {
+    "stopid": "13158012852",
+    "stopname": "Grove Rd After Hunter Dr",
+    "lat": -32.0005467,
+    "lon": 116.0663772
+  },
+  {
+    "stopid": "13158017647",
+    "stopname": "Welshpool Rd After Pilbara St",
+    "lat": -31.9956348,
+    "lon": 115.9371485
+  },
+  {
+    "stopid": "13158993110",
+    "stopname": "Old York Rd Before Stirling Rd",
+    "lat": -31.8988367,
+    "lon": 116.057376
+  },
+  {
+    "stopid": "13159073428",
+    "stopname": "Great Eastern Hwy After Tomlinson Rd",
+    "lat": -31.8991576,
+    "lon": 116.1246802
+  },
+  {
+    "stopid": "13159073624",
+    "stopname": "Railway Tce After Lee Rd",
+    "lat": -31.901199,
+    "lon": 116.193177
+  },
+  {
+    "stopid": "13159113301",
+    "stopname": "Great Eastern Hwy After Marri Rd",
+    "lat": -31.8993957,
+    "lon": 116.1212337
+  },
+  {
+    "stopid": "13159276958",
+    "stopname": "Fischer Rd After Mayhew Rd",
+    "lat": -31.9080423,
+    "lon": 116.0802187
+  },
+  {
+    "stopid": "13159311809",
+    "stopname": "Marnie Rd After Springside Cr",
+    "lat": -31.9072189,
+    "lon": 116.0968242
+  },
+  {
+    "stopid": "13159377998",
+    "stopname": "Lionel Rd After Hillsden Rd",
+    "lat": -31.9116313,
+    "lon": 116.0817156
+  },
+  {
+    "stopid": "13159489594",
+    "stopname": "Coulston Rd After Saw Dr",
+    "lat": -31.915289,
+    "lon": 116.0700324
+  },
+  {
+    "stopid": "13159637512",
+    "stopname": "Seaborne St After Hallet Rd",
+    "lat": -31.8924196,
+    "lon": 116.1381393
+  },
+  {
+    "stopid": "13161993080",
+    "stopname": "Stoneville Rd After Grenville Rd",
+    "lat": -31.8735196,
+    "lon": 116.1723792
+  },
+  {
+    "stopid": "13164858275",
+    "stopname": "Richardson Rd After Stoneville Rd",
+    "lat": -31.8774009,
+    "lon": 116.1692825
+  },
+  {
+    "stopid": "13195276597",
+    "stopname": "Pearson St After Granich Gdns",
+    "lat": -31.9128664,
+    "lon": 115.7958789
+  },
+  {
+    "stopid": "13310083022",
+    "stopname": "Kokoda Boulevard after Kinsella Avenue",
+    "lat": -32.2273506,
+    "lon": 115.9819872
+  }
+]

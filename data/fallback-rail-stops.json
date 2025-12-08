@@ -1,0 +1,596 @@
+[
+  {
+    "stopid": "32522353",
+    "stopname": "Success Hill",
+    "lat": -31.9001853,
+    "lon": 115.9558721
+  },
+  {
+    "stopid": "32523458",
+    "stopname": "Burswood",
+    "lat": -31.9599043,
+    "lon": 115.8999547
+  },
+  {
+    "stopid": "32523486",
+    "stopname": "Carlisle",
+    "lat": -31.9798827,
+    "lon": 115.9100391
+  },
+  {
+    "stopid": "32523702",
+    "stopname": "Queens Park",
+    "lat": -32.0065762,
+    "lon": 115.9378802
+  },
+  {
+    "stopid": "32523706",
+    "stopname": "Cannington",
+    "lat": -32.0134373,
+    "lon": 115.9449495
+  },
+  {
+    "stopid": "32523710",
+    "stopname": "Beckenham",
+    "lat": -32.0224724,
+    "lon": 115.9542272
+  },
+  {
+    "stopid": "32523750",
+    "stopname": "Maddington",
+    "lat": -32.0493729,
+    "lon": 115.982936
+  },
+  {
+    "stopid": "32524151",
+    "stopname": "Gosnells",
+    "lat": -32.0712793,
+    "lon": 115.9996758
+  },
+  {
+    "stopid": "32524411",
+    "stopname": "Seaforth",
+    "lat": -32.0847527,
+    "lon": 116.0111271
+  },
+  {
+    "stopid": "32524460",
+    "stopname": "Sherwood",
+    "lat": -32.1378735,
+    "lon": 116.0104287
+  },
+  {
+    "stopid": "32525254",
+    "stopname": "North Fremantle",
+    "lat": -32.0295158,
+    "lon": 115.7518458
+  },
+  {
+    "stopid": "59961753",
+    "stopname": "Kelmscott",
+    "lat": -32.1131779,
+    "lon": 116.0132345
+  },
+  {
+    "stopid": "63153004",
+    "stopname": "Zamia",
+    "lat": -31.8309513,
+    "lon": 115.9287564
+  },
+  {
+    "stopid": "78417427",
+    "stopname": "Wilson Park",
+    "lat": -32.0204878,
+    "lon": 115.9192795
+  },
+  {
+    "stopid": "78418930",
+    "stopname": "Niana Station",
+    "lat": -32.0229586,
+    "lon": 115.9152182
+  },
+  {
+    "stopid": "276584417",
+    "stopname": "Oliver Hill",
+    "lat": -32.0073377,
+    "lon": 115.5169802
+  },
+  {
+    "stopid": "302192812",
+    "stopname": "East Perth",
+    "lat": -31.9439495,
+    "lon": 115.8770742
+  },
+  {
+    "stopid": "534679760",
+    "stopname": "Armadale",
+    "lat": -32.1536894,
+    "lon": 116.0129625
+  },
+  {
+    "stopid": "571514328",
+    "stopname": "Cottesloe",
+    "lat": -31.9968157,
+    "lon": 115.7609528
+  },
+  {
+    "stopid": "583312258",
+    "stopname": "Showgrounds",
+    "lat": -31.9770638,
+    "lon": 115.7868832
+  },
+  {
+    "stopid": "619195274",
+    "stopname": "Clarkson",
+    "lat": -31.6906707,
+    "lon": 115.7380776
+  },
+  {
+    "stopid": "632610021",
+    "stopname": "Joondalup",
+    "lat": -31.745117,
+    "lon": 115.7674623
+  },
+  {
+    "stopid": "632623415",
+    "stopname": "Edgewater",
+    "lat": -31.7721376,
+    "lon": 115.778741
+  },
+  {
+    "stopid": "632638063",
+    "stopname": "Whitfords",
+    "lat": -31.7993807,
+    "lon": 115.7823378
+  },
+  {
+    "stopid": "632658051",
+    "stopname": "Greenwood",
+    "lat": -31.818598,
+    "lon": 115.7832431
+  },
+  {
+    "stopid": "632658057",
+    "stopname": "Warwick",
+    "lat": -31.8448271,
+    "lon": 115.7963953
+  },
+  {
+    "stopid": "632710504",
+    "stopname": "Leederville",
+    "lat": -31.9390124,
+    "lon": 115.8403245
+  },
+  {
+    "stopid": "632710510",
+    "stopname": "Perth Underground",
+    "lat": -31.9519389,
+    "lon": 115.8580047
+  },
+  {
+    "stopid": "632710516",
+    "stopname": "Elizabeth Quay",
+    "lat": -31.9570924,
+    "lon": 115.8552188
+  },
+  {
+    "stopid": "662852799",
+    "stopname": "Cockburn Central",
+    "lat": -32.1253324,
+    "lon": 115.8583575
+  },
+  {
+    "stopid": "697317602",
+    "stopname": "Thornlie",
+    "lat": -32.0473367,
+    "lon": 115.9523821
+  },
+  {
+    "stopid": "703282696",
+    "stopname": "Victoria Street",
+    "lat": -32.0119878,
+    "lon": 115.7549676
+  },
+  {
+    "stopid": "703282697",
+    "stopname": "Mosman Park",
+    "lat": -32.0069488,
+    "lon": 115.7574017
+  },
+  {
+    "stopid": "703289059",
+    "stopname": "Grant Street",
+    "lat": -31.9870428,
+    "lon": 115.7647403
+  },
+  {
+    "stopid": "703289064",
+    "stopname": "Swanbourne",
+    "lat": -31.9827521,
+    "lon": 115.7706183
+  },
+  {
+    "stopid": "703301450",
+    "stopname": "Loch Street",
+    "lat": -31.9717094,
+    "lon": 115.791612
+  },
+  {
+    "stopid": "703301461",
+    "stopname": "Karrakatta",
+    "lat": -31.9683896,
+    "lon": 115.7962415
+  },
+  {
+    "stopid": "703319615",
+    "stopname": "Shenton Park",
+    "lat": -31.959639,
+    "lon": 115.8054615
+  },
+  {
+    "stopid": "703319617",
+    "stopname": "Daglish",
+    "lat": -31.9517991,
+    "lon": 115.8134022
+  },
+  {
+    "stopid": "703319618",
+    "stopname": "Subiaco",
+    "lat": -31.9446986,
+    "lon": 115.8240044
+  },
+  {
+    "stopid": "703319620",
+    "stopname": "West Leederville",
+    "lat": -31.9426816,
+    "lon": 115.833201
+  },
+  {
+    "stopid": "703329460",
+    "stopname": "Fremantle",
+    "lat": -32.0520228,
+    "lon": 115.7452187
+  },
+  {
+    "stopid": "703740421",
+    "stopname": "City West",
+    "lat": -31.9446801,
+    "lon": 115.8450538
+  },
+  {
+    "stopid": "703745581",
+    "stopname": "Canning Bridge",
+    "lat": -32.0097373,
+    "lon": 115.8561307
+  },
+  {
+    "stopid": "706923437",
+    "stopname": "Kwinana",
+    "lat": -32.2349358,
+    "lon": 115.8426639
+  },
+  {
+    "stopid": "718677884",
+    "stopname": "Wellard",
+    "lat": -32.2639959,
+    "lon": 115.8170976
+  },
+  {
+    "stopid": "718694049",
+    "stopname": "Rockingham",
+    "lat": -32.290152,
+    "lon": 115.7612755
+  },
+  {
+    "stopid": "718694050",
+    "stopname": "Warnbro",
+    "lat": -32.3265299,
+    "lon": 115.767922
+  },
+  {
+    "stopid": "798461358",
+    "stopname": "Midland",
+    "lat": -31.8917547,
+    "lon": 116.0016582
+  },
+  {
+    "stopid": "910564245",
+    "stopname": "Victoria Park",
+    "lat": -31.9716144,
+    "lon": 115.9022179
+  },
+  {
+    "stopid": "1101710681",
+    "stopname": "Challis",
+    "lat": -32.126855,
+    "lon": 116.0125474
+  },
+  {
+    "stopid": "1764783032",
+    "stopname": "Claisebrook",
+    "lat": -31.9494024,
+    "lon": 115.8725124
+  },
+  {
+    "stopid": "1768322553",
+    "stopname": "McIver",
+    "lat": -31.9517794,
+    "lon": 115.8663954
+  },
+  {
+    "stopid": "1779965975",
+    "stopname": "Mandurah",
+    "lat": -32.5270662,
+    "lon": 115.7466333
+  },
+  {
+    "stopid": "1793989744",
+    "stopname": "Mundijong",
+    "lat": -32.2946747,
+    "lon": 115.9866373
+  },
+  {
+    "stopid": "1793989746",
+    "stopname": "North Dandalup",
+    "lat": -32.5178891,
+    "lon": 115.9686766
+  },
+  {
+    "stopid": "1793989749",
+    "stopname": "Serpentine",
+    "lat": -32.36374,
+    "lon": 115.9761821
+  },
+  {
+    "stopid": "1875097931",
+    "stopname": "Ashfield",
+    "lat": -31.9127941,
+    "lon": 115.9360896
+  },
+  {
+    "stopid": "1875097932",
+    "stopname": "Bassendean",
+    "lat": -31.9037199,
+    "lon": 115.9469973
+  },
+  {
+    "stopid": "1875097933",
+    "stopname": "Bayswater",
+    "lat": -31.9184008,
+    "lon": 115.9118699
+  },
+  {
+    "stopid": "1875097934",
+    "stopname": "Bull Creek",
+    "lat": -32.047092,
+    "lon": 115.8541087
+  },
+  {
+    "stopid": "1875097935",
+    "stopname": "Claremont",
+    "lat": -31.9807252,
+    "lon": 115.7814486
+  },
+  {
+    "stopid": "1875097937",
+    "stopname": "East Guildford",
+    "lat": -31.8964484,
+    "lon": 115.9799914
+  },
+  {
+    "stopid": "1875097938",
+    "stopname": "Guildford",
+    "lat": -31.898949,
+    "lon": 115.9657928
+  },
+  {
+    "stopid": "1875097939",
+    "stopname": "Kenwick",
+    "lat": -32.0363799,
+    "lon": 115.9697212
+  },
+  {
+    "stopid": "1875097940",
+    "stopname": "Maylands",
+    "lat": -31.9283061,
+    "lon": 115.8917195
+  },
+  {
+    "stopid": "1875097941",
+    "stopname": "Meltham",
+    "lat": -31.9224658,
+    "lon": 115.9003208
+  },
+  {
+    "stopid": "1875097942",
+    "stopname": "Mount Lawley",
+    "lat": -31.9347687,
+    "lon": 115.8808712
+  },
+  {
+    "stopid": "1875097943",
+    "stopname": "Oats Street",
+    "lat": -31.9878994,
+    "lon": 115.9163301
+  },
+  {
+    "stopid": "1875097945",
+    "stopname": "Stirling",
+    "lat": -31.894558,
+    "lon": 115.8050873
+  },
+  {
+    "stopid": "1875097947",
+    "stopname": "Woodbridge",
+    "lat": -31.8915181,
+    "lon": 115.992868
+  },
+  {
+    "stopid": "5600581102",
+    "stopname": "Perth Stadium",
+    "lat": -31.9502818,
+    "lon": 115.8929019
+  },
+  {
+    "stopid": "5601025492",
+    "stopname": "Redcliffe",
+    "lat": -31.93359,
+    "lon": 115.9497086
+  },
+  {
+    "stopid": "5601025495",
+    "stopname": "Airport Central",
+    "lat": -31.9439611,
+    "lon": 115.9748456
+  },
+  {
+    "stopid": "5601025496",
+    "stopname": "High Wycombe",
+    "lat": -31.954628,
+    "lon": 115.9921995
+  },
+  {
+    "stopid": "5732043852",
+    "stopname": "Village Junction",
+    "lat": -31.8345342,
+    "lon": 115.9442014
+  },
+  {
+    "stopid": "6040715014",
+    "stopname": "Jumperkine",
+    "lat": -31.7155164,
+    "lon": 116.0812245
+  },
+  {
+    "stopid": "6205410527",
+    "stopname": "Cardup",
+    "lat": -32.2436738,
+    "lon": 116.0011614
+  },
+  {
+    "stopid": "7967971112",
+    "stopname": "Ellenbrook",
+    "lat": -31.7816019,
+    "lon": 115.96339
+  },
+  {
+    "stopid": "7967971113",
+    "stopname": "Whiteman Park",
+    "lat": -31.8358973,
+    "lon": 115.9645383
+  },
+  {
+    "stopid": "7967971114",
+    "stopname": "Ballajura",
+    "lat": -31.8494104,
+    "lon": 115.9221151
+  },
+  {
+    "stopid": "7967971115",
+    "stopname": "Noranda",
+    "lat": -31.8745262,
+    "lon": 115.9177788
+  },
+  {
+    "stopid": "7967971116",
+    "stopname": "Morley",
+    "lat": -31.8960322,
+    "lon": 115.9200177
+  },
+  {
+    "stopid": "7976328392",
+    "stopname": "Nicholson Road",
+    "lat": -32.0615899,
+    "lon": 115.9346776
+  },
+  {
+    "stopid": "9081696528",
+    "stopname": "Byford Station",
+    "lat": -32.2164603,
+    "lon": 116.0073809
+  },
+  {
+    "stopid": "9878595567",
+    "stopname": "Lakelands",
+    "lat": -32.4736812,
+    "lon": 115.7705224
+  },
+  {
+    "stopid": "9937075869",
+    "stopname": "Station",
+    "lat": -31.8311575,
+    "lon": 115.9289644
+  },
+  {
+    "stopid": "10086635093",
+    "stopname": "Perth",
+    "lat": -31.951428,
+    "lon": 115.8604156
+  },
+  {
+    "stopid": "10089698411",
+    "stopname": "Aubin Grove",
+    "lat": -32.1549359,
+    "lon": 115.85795
+  },
+  {
+    "stopid": "10090422300",
+    "stopname": "Murdoch",
+    "lat": -32.0664255,
+    "lon": 115.8504737
+  },
+  {
+    "stopid": "10096420008",
+    "stopname": "Glendalough",
+    "lat": -31.9151316,
+    "lon": 115.8231889
+  },
+  {
+    "stopid": "10096420009",
+    "stopname": "Butler",
+    "lat": -31.6356944,
+    "lon": 115.7003262
+  },
+  {
+    "stopid": "10096420013",
+    "stopname": "Currambine",
+    "lat": -31.7249406,
+    "lon": 115.7505595
+  },
+  {
+    "stopid": "11215854258",
+    "stopname": "Station",
+    "lat": -31.8289279,
+    "lon": 115.9390299
+  },
+  {
+    "stopid": "12055630225",
+    "stopname": "Yanchep",
+    "lat": -31.5318742,
+    "lon": 115.6438253
+  },
+  {
+    "stopid": "12055630226",
+    "stopname": "Eglinton",
+    "lat": -31.5836681,
+    "lon": 115.6725389
+  },
+  {
+    "stopid": "12055630227",
+    "stopname": "Alkimos",
+    "lat": -31.6154224,
+    "lon": 115.6926511
+  },
+  {
+    "stopid": "12131238718",
+    "stopname": "Settlement",
+    "lat": -31.9996158,
+    "lon": 115.5415151
+  },
+  {
+    "stopid": "12870144929",
+    "stopname": "Ranford Road",
+    "lat": -32.0753778,
+    "lon": 115.8965786
+  }
+]
