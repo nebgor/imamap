@@ -1312,6 +1312,7 @@
       const railGraph = buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
 
       function pathFromGraph(graph, src, dst) {
+        if (!graph || !graph.nodes || graph.nodes.size === 0) return [];
         const p = shortestPath(graph, src, dst);
         return p || [];
       }
