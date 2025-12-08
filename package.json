@@ -7,13 +7,15 @@
     "lint": "eslint .",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "e2e": "node test/smoke.js"
+    "e2e": "node test/smoke.js",
+    "live-debug": "node test/live-debug.js"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.4",
     "eslint": "^8.57.1",
     "eslint-plugin-html": "^8.1.1",
     "jsdom": "^24.0.0",
+    "playwright-chromium": "^1.57.0",
     "vitest": "^2.1.4"
   }
 }
