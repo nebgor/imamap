@@ -453,6 +453,7 @@
     let HEADWAY_MIN = 10;
     let RANDOM_WAIT = true;
     let DATA_READY = false;
+    let ERROR_COUNT = 0;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -1572,8 +1573,10 @@
         document.getElementById("status").textContent = `Click at ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
         animateTravel(e.latlng);
       } catch (err) {
+        ERROR_COUNT += 1;
         console.error(err);
         document.getElementById("status").textContent = "Error during simulation";
+        document.getElementById("debug-path").textContent = `Errors: ${ERROR_COUNT}`;
       }
     });
   </script>
