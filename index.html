@@ -391,7 +391,7 @@
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
     const STOP_CACHE_MAX_AGE_HRS = 6;
-    const ROUTE_CACHE_KEY = "routesCacheV1";
+    const ROUTE_CACHE_KEY = "routesCacheV2";
     const ROUTE_CACHE_MAX_AGE_HRS = 12;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
@@ -825,55 +825,87 @@
       localStorage.setItem(STOP_CACHE_KEY, JSON.stringify({ ts: Date.now(), stops }));
     }
 
+    function routeTileKey(tile) {
+      return `${tile.minLat.toFixed(2)}_${tile.minLon.toFixed(2)}_${tile.maxLat.toFixed(2)}_${tile.maxLon.toFixed(2)}`;
+    }
+
+    function routeTilesForBbox(bbox) {
+      const [minLat, minLon, maxLat, maxLon] = bbox;
+      const size = 0.35;
+      const tiles = [];
+      for (let lat = Math.floor(minLat / size) * size; lat < maxLat; lat += size) {
+        for (let lon = Math.floor(minLon / size) * size; lon < maxLon; lon += size) {
+          tiles.push({ minLat: lat, minLon: lon, maxLat: lat + size, maxLon: lon + size });
+        }
+      }
+      return tiles;
+    }
+
     function readRouteCache() {
       const cached = localStorage.getItem(ROUTE_CACHE_KEY);
-      if (!cached) return null;
+      if (!cached) return { tiles: {} };
       try {
         const parsed = JSON.parse(cached);
-        const ageHours = (Date.now() - parsed.ts) / 36e5;
-        if (ageHours > ROUTE_CACHE_MAX_AGE_HRS) return null;
-        return parsed.routes;
+        return parsed && parsed.tiles ? parsed : { tiles: {} };
       } catch {
-        return null;
+        return { tiles: {} };
       }
     }
 
-    function writeRouteCache(routes) {
-      localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify({ ts: Date.now(), routes }));
+    function writeRouteCache(cache) {
+      localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify(cache));
     }
 
     async function fetchRoutes(bbox) {
       const status = document.getElementById("status");
-      const cached = readRouteCache();
-      if (cached) {
-        return cached;
+      const cache = readRouteCache();
+      const tiles = routeTilesForBbox(bbox);
+      const now = Date.now();
+      const expired = (ts) => (now - ts) / 36e5 > ROUTE_CACHE_MAX_AGE_HRS;
+      const toFetch = tiles.filter((t) => {
+        const k = routeTileKey(t);
+        const entry = cache.tiles[k];
+        return !entry || expired(entry.ts);
+      });
+
+      const mergedRoutes = [];
+      tiles.forEach((t) => {
+        const k = routeTileKey(t);
+        if (cache.tiles[k] && cache.tiles[k].routes) {
+          mergedRoutes.push(...cache.tiles[k].routes);
+        }
+      });
+
+      for (const tile of toFetch) {
+        status.textContent = "Fetching routes…";
+        const url =
+          "https://services.slip.wa.gov.au/public/rest/services/SLIP_Public_Services/Transport/MapServer/15/query" +
+          "?where=1%3D1" +
+          "&outFields=route_name,route_number" +
+          `&geometry=${tile.minLon},${tile.minLat},${tile.maxLon},${tile.maxLat}` +
+          "&geometryType=esriGeometryEnvelope" +
+          "&inSR=4326&spatialRel=esriSpatialRelIntersects" +
+          "&outSR=4326&f=json";
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`routes ${res.status}`);
+          const data = await res.json();
+          const routes = (data.features || [])
+            .map((f) => ({
+              name: f.attributes.route_name || f.attributes.route_number || "route",
+              paths: f.geometry.paths || []
+            }))
+            .filter((r) => r.paths.length > 0);
+          cache.tiles[routeTileKey(tile)] = { routes, ts: now };
+          mergedRoutes.push(...routes);
+        } catch (err) {
+          console.error(err);
+        }
       }
-      const [minLat, minLon, maxLat, maxLon] = bbox;
-      status.textContent = "Fetching routes…";
-      const url =
-        "https://services.slip.wa.gov.au/public/rest/services/SLIP_Public_Services/Transport/MapServer/15/query" +
-        "?where=1%3D1" +
-        "&outFields=route_name,route_number" +
-        `&geometry=${minLon},${minLat},${maxLon},${maxLat}` +
-        "&geometryType=esriGeometryEnvelope" +
-        "&inSR=4326&spatialRel=esriSpatialRelIntersects" +
-        "&outSR=4326&f=json";
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch routes: ${res.status}`);
-      }
-      const data = await res.json();
-      const routes = (data.features || [])
-        .map((f) => ({
-          name: f.attributes.route_name || f.attributes.route_number || "route",
-          paths: f.geometry.paths || []
-        }))
-        .filter((r) => r.paths.length > 0);
-      if (routes.length) {
-        writeRouteCache(routes);
-      }
-      status.textContent = `Routes loaded (${routes.length})`;
-      return routes;
+
+      writeRouteCache(cache);
+      status.textContent = `Routes ready (${mergedRoutes.length})`;
+      return mergedRoutes;
     }
 
     async function fetchStops() {
