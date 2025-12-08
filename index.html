@@ -1303,13 +1303,12 @@
       for (let i = 0; i < count; i++) {
         const lat = bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
         const lon = bounds.minLon + Math.random() * (bounds.maxLon - bounds.minLon);
-        const travel = buildTravelPath({ lat, lng: lon });
-        if (travel) {
-          const base = Number(baseWait.value);
-          const speed = Number(netSpeed.value);
-          const commute = computeCommute(travel.near.stop, base, speed);
-          addHeatPath(travel.path, commute);
-        }
+        const travel = graphRouteToCBD({ lat, lng: lon }) || buildTravelPath({ lat, lng: lon });
+        if (!travel) continue;
+        const base = Number(baseWait.value);
+        const speed = Number(netSpeed.value);
+        const commute = computeCommute(travel.near.stop, base, speed);
+        addHeatPath(travel.path, commute);
       }
     }
 
@@ -1512,6 +1511,19 @@
       return d;
     }
 
+    function graphRouteToCBD(start) {
+      if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0) return null;
+      const p = shortestPath(busGraph, { lat: start.lat, lon: start.lng }, target);
+      if (p && p.length > 1) {
+        return {
+          path: p,
+          near: { stop: { stopname: "graph", stopid: "graph", lat: start.lat, lon: start.lng } },
+          mode: "graph"
+        };
+      }
+      return null;
+    }
+
     function buildTravelPathLegacy(clickLatLng) {
       if (!window.__stops) return null;
       const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
@@ -1555,6 +1567,8 @@
       const allow = document.getElementById("allowTransfer").value === "true";
       MODE_PREF = pref;
       ALLOW_TRANSFER = allow;
+      const graphPath = graphRouteToCBD(clickLatLng);
+      if (graphPath) return graphPath;
       const multi = multimodalPath(clickLatLng, pref, allow);
       if (multi && multi.path && multi.path.length > 1) return multi;
       // fallback to legacy corridor-based routing
