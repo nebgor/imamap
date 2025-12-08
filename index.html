@@ -83,6 +83,15 @@
       color: var(--panel-text);
       font-size: 14px;
     }
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--panel-text);
+      font-size: 14px;
+    }
     .controls {
       display: flex;
       align-items: center;
@@ -243,6 +252,47 @@
         Show rail lines
       </label>
     </div>
+    <div class="row">
+      <label>Mode
+        <select id="modePref">
+          <option value="mixed">mixed</option>
+          <option value="bus">bus only</option>
+          <option value="rail">rail only</option>
+        </select>
+      </label>
+      <label>Transfer
+        <select id="allowTransfer">
+          <option value="true">enabled</option>
+          <option value="false">disabled</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label>Bus speed (km/h)
+        <input type="number" id="busSpeed" value="40" min="5" step="5" />
+      </label>
+      <label>Rail speed (km/h)
+        <input type="number" id="railSpeed" value="65" min="10" step="5" />
+      </label>
+    </div>
+    <div class="row">
+      <label>Headway (min)
+        <select id="headway">
+          <option value="6">peak 6</option>
+          <option value="10" selected>interpeak 10</option>
+          <option value="15">off-peak 15</option>
+        </select>
+      </label>
+      <label>Random wait
+        <select id="randomWait">
+          <option value="true" selected>on</option>
+          <option value="false">off</option>
+        </select>
+      </label>
+    </div>
+    <div class="controls" style="margin-top:4px;">
+      <button id="clearCaches">Clear caches</button>
+    </div>
     <div class="legend">
       Commute minutes
       <div class="legend-bar"></div>
@@ -393,6 +443,12 @@
     const STOP_CACHE_MAX_AGE_HRS = 6;
     const ROUTE_CACHE_KEY = "routesCacheV2";
     const ROUTE_CACHE_MAX_AGE_HRS = 12;
+    let MODE_PREF = "mixed";
+    let ALLOW_TRANSFER = true;
+    let BUS_SPEED = 40;
+    let RAIL_SPEED = 65;
+    let HEADWAY_MIN = 10;
+    let RANDOM_WAIT = true;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -748,6 +804,14 @@
       const effectiveSpeed = netSpeed * (1 / corridor);
       const rideMins = (distanceKm / Math.max(effectiveSpeed, 1)) * 60;
       return baseWait + rideMins;
+    }
+
+    function computeWait() {
+      const base = Number(baseWait.value);
+      const headway = Number(document.getElementById("headway").value || HEADWAY_MIN);
+      const randomize = document.getElementById("randomWait").value === "true";
+      if (!randomize) return base + headway / 2;
+      return base + Math.random() * headway;
     }
 
     function renderRailLines(show) {
@@ -1129,6 +1193,34 @@
       simulateRandom(25);
     });
 
+    document.getElementById("modePref").addEventListener("change", (e) => {
+      MODE_PREF = e.target.value;
+    });
+    document.getElementById("allowTransfer").addEventListener("change", (e) => {
+      ALLOW_TRANSFER = e.target.value === "true";
+    });
+    document.getElementById("busSpeed").addEventListener("change", (e) => {
+      BUS_SPEED = Number(e.target.value);
+    });
+    document.getElementById("railSpeed").addEventListener("change", (e) => {
+      RAIL_SPEED = Number(e.target.value);
+    });
+    document.getElementById("headway").addEventListener("change", (e) => {
+      HEADWAY_MIN = Number(e.target.value);
+    });
+    document.getElementById("randomWait").addEventListener("change", (e) => {
+      RANDOM_WAIT = e.target.value === "true";
+    });
+    document.getElementById("clearCaches").addEventListener("click", () => {
+      localStorage.removeItem(STOP_CACHE_KEY);
+      localStorage.removeItem(ROUTE_CACHE_KEY);
+      localStorage.removeItem("simHeatV1");
+      routeGraph = null;
+      heatLineLayer.clearLayers();
+      heatVisLayer.setLatLngs([]);
+      document.getElementById("status").textContent = "Caches cleared";
+    });
+
     renderSnapshots();
     renderHeat();
     init().then(() => {
@@ -1211,7 +1303,76 @@
       return winner;
     }
 
-    function buildTravelPath(clickLatLng) {
+    function multimodalPath(startLatLng, modePref, allowTransfer) {
+      const start = { lat: startLatLng.lat, lon: startLatLng.lng };
+      const stopInfo = nearestStop(start.lat, start.lon);
+      if (!stopInfo || !stopInfo.stop) return null;
+      const near = stopInfo.stop;
+      const busGraph = routeGraph;
+      const railGraph = buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
+
+      function pathFromGraph(graph, src, dst) {
+        const p = shortestPath(graph, src, dst);
+        return p || [];
+      }
+
+      const path = [];
+      path.push([start.lat, start.lon]);
+      path.push([near.lat, near.lon]);
+
+      if (modePref === "rail") {
+        const railPath = pathFromGraph(railGraph, { lat: near.lat, lon: near.lon }, target);
+        path.push(...railPath);
+        return { path, near, mode: "rail" };
+      }
+
+      if (modePref === "bus" && busGraph) {
+        const busPath = pathFromGraph(busGraph, { lat: near.lat, lon: near.lon }, target);
+        if (busPath.length) {
+          path.push(...busPath);
+          return { path, near, mode: "bus" };
+        }
+      }
+
+      if (modePref === "mixed" && allowTransfer && busGraph) {
+        // find best rail anchor
+        let bestRail = null;
+        railStations.forEach((st) => {
+          const busPart = pathFromGraph(busGraph, { lat: near.lat, lon: near.lon }, { lat: st.lat, lon: st.lon });
+          if (busPart && busPart.length) {
+            const railPart = pathFromGraph(railGraph, { lat: st.lat, lon: st.lon }, target);
+            if (railPart && railPart.length) {
+              const totalLen = pathLength(busPart) + pathLength(railPart);
+              if (!bestRail || totalLen < bestRail.len) {
+                bestRail = { busPart, railPart, len: totalLen, anchor: st };
+              }
+            }
+          }
+        });
+        if (bestRail) {
+          path.push(...bestRail.busPart);
+          // ensure transfer node
+          path.push([bestRail.anchor.lat, bestRail.anchor.lon]);
+          path.push(...bestRail.railPart);
+          return { path, near, mode: "mixed-transfer" };
+        }
+      }
+
+      // fallback: nearest bus/rail corridor heuristic
+      const alt = buildTravelPathLegacy(startLatLng);
+      if (alt) return alt;
+      return null;
+    }
+
+    function pathLength(path) {
+      let d = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        d += haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+      }
+      return d;
+    }
+
+    function buildTravelPathLegacy(clickLatLng) {
       if (!window.__stops) return null;
       const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
       if (!near.stop) return null;
@@ -1249,6 +1410,14 @@
       return { path, near, railChoice, busChoice };
     }
 
+    function buildTravelPath(clickLatLng) {
+      const pref = document.getElementById("modePref").value || MODE_PREF;
+      const allow = document.getElementById("allowTransfer").value === "true";
+      MODE_PREF = pref;
+      ALLOW_TRANSFER = allow;
+      return multimodalPath(clickLatLng, pref, allow);
+    }
+
     function animateTravel(clickLatLng) {
       if (!window.__stops) return;
       simLayer.clearLayers();
@@ -1261,7 +1430,7 @@
       if (!travel) return;
       const { path, near } = travel;
       // persist heat contribution for this click
-      const base = Number(baseWait.value);
+      const base = computeWait();
       const speed = Number(netSpeed.value);
       const commute = computeCommute(near.stop, base, speed);
       addHeatPath(path, commute);
