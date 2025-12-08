@@ -312,6 +312,7 @@
     <div><strong>Debug</strong> — ready</div>
     <div id="debug-meta"></div>
     <div id="debug-corridor"></div>
+    <div id="debug-path"></div>
   </div>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -1468,6 +1469,13 @@
       const speed = Number(netSpeed.value);
       const commute = computeCommute(near.stop, base, speed);
       addHeatPath(path, commute);
+
+      const totalLen = pathLength(path);
+      const debugPath = document.getElementById("debug-path");
+      debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
+        1
+      )}m · mode ${travel.mode || "auto"}`;
+      console.log("Sim path", { mode: travel.mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
 
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
