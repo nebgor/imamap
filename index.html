@@ -455,6 +455,7 @@
     let DATA_READY = false;
     let ERROR_COUNT = 0;
     let busGraph = null;
+    let railGraph = null;
     const rand = () => {
       if (crypto && crypto.getRandomValues) {
         const buf = new Uint32Array(1);
@@ -1142,10 +1143,12 @@
           routeGraph = buildRouteGraph(routes);
           const combined = routes.concat(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
           busGraph = buildRouteGraph(combined);
+          railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         } catch (err) {
           console.error("Route fetch failed, using corridors only", err);
           routeGraph = { nodes: new Map(), routes: [] };
           busGraph = buildRouteGraph(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
+          railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         }
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
@@ -1462,7 +1465,7 @@
       if (!stopInfo || !stopInfo.stop) return null;
       const near = stopInfo.stop;
       const localBusGraph = busGraph || routeGraph;
-      const railGraph = buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
+      const localRailGraph = railGraph || buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
 
       function pathFromGraph(graph, src, dst) {
         if (!graph || !graph.nodes || graph.nodes.size === 0) return [];
@@ -1475,7 +1478,7 @@
       path.push([near.lat, near.lon]);
 
       if (modePref === "rail") {
-        const railPath = pathFromGraph(railGraph, { lat: near.lat, lon: near.lon }, target);
+        const railPath = pathFromGraph(localRailGraph, { lat: near.lat, lon: near.lon }, target);
         path.push(...railPath);
         return { path, near, mode: "rail" };
       }
@@ -1494,7 +1497,7 @@
         railStations.forEach((st) => {
           const busPart = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, { lat: st.lat, lon: st.lon });
           if (busPart && busPart.length) {
-            const railPart = pathFromGraph(railGraph, { lat: st.lat, lon: st.lon }, target);
+            const railPart = pathFromGraph(localRailGraph, { lat: st.lat, lon: st.lon }, target);
             if (railPart && railPart.length) {
               const totalLen = pathLength(busPart) + pathLength(railPart);
               if (!bestRail || totalLen < bestRail.len) {
@@ -1527,13 +1530,19 @@
     }
 
     function graphRouteToCBD(start) {
-      if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0) return null;
-      const p = shortestPath(busGraph, { lat: start.lat, lon: start.lng }, target);
+      if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
+      const near = nearestStop(start.lat, start.lon);
+      if (!near.stop) return null;
+      const walkLeg = [
+        [start.lat, start.lng],
+        [near.stop.lat, near.stop.lon]
+      ];
+      const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target);
       if (p && p.length > 1) {
         return {
-          path: p,
-          near: { stop: { stopname: "graph", stopid: "graph", lat: start.lat, lon: start.lng } },
-          mode: "graph"
+          path: walkLeg.concat(p),
+          near,
+          mode: "bus-graph"
         };
       }
       return null;
