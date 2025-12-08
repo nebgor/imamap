@@ -1443,14 +1443,8 @@
       ALLOW_TRANSFER = allow;
       const multi = multimodalPath(clickLatLng, pref, allow);
       if (multi && multi.path && multi.path.length > 1) return multi;
-      // fallback straight-to-CBD to avoid silent failures
-      return {
-        path: [
-          [clickLatLng.lat, clickLatLng.lng],
-          [target.lat, target.lon]
-        ],
-        near: { stop: { stopname: "direct", stopid: "direct", lat: clickLatLng.lat, lon: clickLatLng.lng } }
-      };
+      // fallback to legacy corridor-based routing
+      return buildTravelPathLegacy(clickLatLng);
     }
 
     function animateTravel(clickLatLng) {
