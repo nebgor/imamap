@@ -348,10 +348,10 @@
       return { nodes, routes };
     }
 
-    function shortestPath(graph, start, goal) {
+    function shortestPath(graph, start, goal, goalOverrideKey) {
       const nodes = graph.nodes;
       const startKey = nearestNodeKey(nodes, start.lat, start.lon);
-      const goalKey = nearestNodeKey(nodes, goal.lat, goal.lon);
+      const goalKey = goalOverrideKey || nearestNodeKey(nodes, goal.lat, goal.lon);
       if (!startKey || !goalKey) return null;
       const dist = new Map();
       const prev = new Map();
@@ -1529,15 +1529,18 @@
       return d;
     }
 
+    let busTargetKey = null;
+
     function graphRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
       if (!near.stop) return null;
+      if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
       const walkLeg = [
         [start.lat, start.lng],
         [near.stop.lat, near.stop.lon]
       ];
-      const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target);
+      const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, busTargetKey);
       if (p && p.length > 1) {
         return {
           path: walkLeg.concat(p),
