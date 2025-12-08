@@ -23,5 +23,6 @@ describe("index.html basics", () => {
   it("renders legend and debug overlay", () => {
     expect(html).toContain("legend-bar");
     expect(html).toContain("Debug");
+    expect(html).toContain("debug-path");
   });
 });
