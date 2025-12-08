@@ -292,6 +292,7 @@
     </div>
     <div class="controls" style="margin-top:4px;">
       <button id="clearCaches">Clear caches</button>
+      <button id="demoRun">Demo run</button>
     </div>
     <div class="legend">
       Commute minutes
@@ -449,6 +450,7 @@
     let RAIL_SPEED = 65;
     let HEADWAY_MIN = 10;
     let RANDOM_WAIT = true;
+    let DATA_READY = false;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -1029,6 +1031,8 @@
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
         document.getElementById("debug").firstElementChild.textContent = "Debug — ok";
+        DATA_READY = true;
+        document.getElementById("status").textContent = "Ready (click map to simulate)";
       } catch (e) {
         document.getElementById("status").textContent = e.message;
         document.getElementById("debug").firstElementChild.textContent = `Debug — ${e.message}`;
@@ -1224,6 +1228,9 @@
       heatLineLayer.clearLayers();
       heatVisLayer.setLatLngs([]);
       document.getElementById("status").textContent = "Caches cleared";
+    });
+    document.getElementById("demoRun").addEventListener("click", () => {
+      animateTravel({ lat: -31.98, lng: 115.85 });
     });
 
     renderSnapshots();
@@ -1434,7 +1441,14 @@
     }
 
     function animateTravel(clickLatLng) {
-      if (!window.__stops) return;
+      if (!window.__stops) {
+        document.getElementById("status").textContent = "Stops not loaded yet";
+        return;
+      }
+      if (!DATA_READY) {
+        document.getElementById("status").textContent = "Still loading data…";
+        return;
+      }
       simLayer.clearLayers();
       if (simTimer) {
         clearInterval(simTimer);
@@ -1542,7 +1556,13 @@
     }
 
     map.on("click", (e) => {
-      animateTravel(e.latlng);
+      try {
+        document.getElementById("status").textContent = `Click at ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+        animateTravel(e.latlng);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("status").textContent = "Error during simulation";
+      }
     });
   </script>
 </body>
