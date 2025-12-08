@@ -1186,6 +1186,9 @@
 
     let metaState = { stops: 0, baseWait: Number(baseWait.value), speed: Number(netSpeed.value), data: "unknown" };
     let lastError = "";
+    function sanitizeStops(list) {
+      return (list || []).filter((s) => s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon)));
+    }
 
     function updateDebugMeta(overrides = {}) {
       metaState = { ...metaState, ...overrides };
@@ -1226,7 +1229,7 @@
         const parsed = JSON.parse(cached);
         const ageHours = (Date.now() - parsed.ts) / 36e5;
         if (ageHours > STOP_CACHE_MAX_AGE_HRS) return null;
-        return parsed.stops;
+        return sanitizeStops(parsed.stops);
       } catch {
         return null;
       }
@@ -1346,14 +1349,15 @@
           throw new Error(`Failed to fetch stops: ${res.status}`);
         }
         const data = await res.json();
-        const stops = (data.features || [])
+        const stops = sanitizeStops(
+          (data.features || [])
           .map((f) => ({
             stopid: f.attributes.stopid,
             stopname: f.attributes.stopname,
             lat: f.geometry.y,
             lon: f.geometry.x
           }))
-          .filter((s) => s.lat && s.lon);
+        );
         if (!stops.length) throw new Error("No stops fetched");
         DATA_SOURCE = "live";
         status.textContent = `Loaded ${stops.length} stops`;
@@ -1363,13 +1367,14 @@
         console.warn("Stop fetch failed, using fallback sample stops", err);
         lastError = err.message || "stop fetch failed";
         const local = await loadLocalFallbackStops();
-        if (local && local.length) {
+        const localClean = sanitizeStops(local);
+        if (localClean && localClean.length) {
           DATA_SOURCE = "local-fallback";
-          status.textContent = `Using local fallback stops (${local.length})`;
-          writeStopCache(local);
-          return local;
+          status.textContent = `Using local fallback stops (${localClean.length})`;
+          writeStopCache(localClean);
+          return localClean;
         }
-        const fallbacks = [...SAMPLE_STOPS, ...FALLBACK_STOPS.busStops, ...FALLBACK_STOPS.railStops];
+        const fallbacks = sanitizeStops([...SAMPLE_STOPS, ...FALLBACK_STOPS.busStops, ...FALLBACK_STOPS.railStops]);
         DATA_SOURCE = "generated-fallback";
         status.textContent = `Using generated fallback stops (${fallbacks.length})`;
         writeStopCache(fallbacks);
@@ -1646,7 +1651,7 @@
     renderHeat();
     init().then(() => {
       // seed a small batch if no heat is cached
-      if (!loadHeat().length) {
+      if (!loadHeat().length && window.__stops && window.__stops.length > 0) {
         simulateRandom(15);
       }
     });
@@ -1911,6 +1916,11 @@
       const allow = document.getElementById("allowTransfer").value === "true";
       MODE_PREF = pref;
       ALLOW_TRANSFER = allow;
+      if (!window.__stops || !window.__stops.length) {
+        lastError = "Stops not loaded";
+        updateDebugMeta();
+        return null;
+      }
       const attempts = [
         pref !== "rail" ? () => busToRailRoute(clickLatLng) : null,
         () => graphRouteToCBD(clickLatLng),
