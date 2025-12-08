@@ -31,6 +31,10 @@ describe("index.html basics", () => {
     expect(html).toContain("Scarborough Beach Rd");
   });
 
+  it("enforces multipoint travel paths (3+ points)", () => {
+    expect(html).toContain("travel.path.length > 2");
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });
