@@ -1467,9 +1467,9 @@
       const localBusGraph = busGraph || routeGraph;
       const localRailGraph = railGraph || buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
 
-      function pathFromGraph(graph, src, dst) {
+      function pathFromGraph(graph, src, dst, goalKey) {
         if (!graph || !graph.nodes || graph.nodes.size === 0) return [];
-        const p = shortestPath(graph, src, dst);
+        const p = shortestPath(graph, src, dst, goalKey);
         return p || [];
       }
 
@@ -1478,13 +1478,15 @@
       path.push([near.lat, near.lon]);
 
       if (modePref === "rail") {
-        const railPath = pathFromGraph(localRailGraph, { lat: near.lat, lon: near.lon }, target);
+        if (!railTargetKey) railTargetKey = nearestNodeKey(localRailGraph.nodes, target.lat, target.lon);
+        const railPath = pathFromGraph(localRailGraph, { lat: near.lat, lon: near.lon }, target, railTargetKey);
         path.push(...railPath);
         return { path, near, mode: "rail" };
       }
 
       if (modePref === "bus" && localBusGraph) {
-        const busPath = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, target);
+        if (!busTargetKey) busTargetKey = nearestNodeKey(localBusGraph.nodes, target.lat, target.lon);
+        const busPath = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, target, busTargetKey);
         if (busPath.length) {
           path.push(...busPath);
           return { path, near, mode: "bus" };
@@ -1492,12 +1494,27 @@
       }
 
       if (modePref === "mixed" && allowTransfer && localBusGraph) {
+        if (!railTargetKey && localRailGraph && localRailGraph.nodes.size > 0) {
+          railTargetKey = nearestNodeKey(localRailGraph.nodes, target.lat, target.lon);
+        }
         // find best rail anchor
         let bestRail = null;
         railStations.forEach((st) => {
-          const busPart = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, { lat: st.lat, lon: st.lon });
-          if (busPart && busPart.length) {
-            const railPart = pathFromGraph(localRailGraph, { lat: st.lat, lon: st.lon }, target);
+          const stBusKey = nearestNodeKey(localBusGraph.nodes, st.lat, st.lon);
+          const stRailKey = localRailGraph ? nearestNodeKey(localRailGraph.nodes, st.lat, st.lon) : null;
+          const busPart = pathFromGraph(
+            localBusGraph,
+            { lat: near.lat, lon: near.lon },
+            { lat: st.lat, lon: st.lon },
+            stBusKey
+          );
+          if (busPart && busPart.length && localRailGraph) {
+            const railPart = pathFromGraph(
+              localRailGraph,
+              { lat: st.lat, lon: st.lon },
+              target,
+              railTargetKey || stRailKey
+            );
             if (railPart && railPart.length) {
               const totalLen = pathLength(busPart) + pathLength(railPart);
               if (!bestRail || totalLen < bestRail.len) {
