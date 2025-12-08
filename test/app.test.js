@@ -20,6 +20,22 @@ describe("index.html basics", () => {
     expect(html).toMatch(/hillsZone/);
   });
 
+  it("preloads major road corridors into the bus graph", () => {
+    expect(html).toContain("const majorRoads");
+    expect(html).toContain("Kwinana Fwy BUS");
+    expect(html).toContain("Mitchell Fwy BUS");
+  });
+
+  it("surfaces graph metadata in the debug panel", () => {
+    expect(html).toContain("Graphs: bus");
+  });
+
+  it("routes via bus/rail graphs instead of straight lines", () => {
+    expect(html).toContain("graphRouteToCBD");
+    expect(html).toContain("shortestPath(graph, src, dst, goalKey)");
+    expect(html).toContain("pathFromGraph(localBusGraph");
+  });
+
   it("renders legend and debug overlay", () => {
     expect(html).toContain("legend-bar");
     expect(html).toContain("Debug");

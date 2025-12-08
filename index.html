@@ -962,6 +962,17 @@
       });
     }
 
+    let metaState = { stops: 0, baseWait: Number(baseWait.value), speed: Number(netSpeed.value) };
+
+    function updateDebugMeta(overrides = {}) {
+      metaState = { ...metaState, ...overrides };
+      const busNodes = busGraph && busGraph.nodes ? busGraph.nodes.size : 0;
+      const busRoutes = busGraph && busGraph.routes ? busGraph.routes.length : 0;
+      const railNodes = railGraph && railGraph.nodes ? railGraph.nodes.size : 0;
+      const meta = document.getElementById("debug-meta");
+      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes`;
+    }
+
     function renderStops(stops, baseWait, netSpeed) {
       stopsLayer.clearLayers();
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
@@ -982,8 +993,7 @@
           .addTo(stopsLayer);
       });
       document.getElementById("status").textContent = `Rendered ${stops.length} stops`;
-      const debugMeta = document.getElementById("debug-meta");
-      debugMeta.textContent = `Stops: ${stops.length} · Base wait: ${baseWait} min · Speed: ${netSpeed} km/h`;
+      updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed });
     }
 
     function readStopCache() {
@@ -1150,6 +1160,7 @@
           busGraph = buildRouteGraph(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
           railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         }
+        updateDebugMeta();
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
         document.getElementById("debug").firstElementChild.textContent = "Debug — ok";
