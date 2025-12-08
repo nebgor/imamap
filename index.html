@@ -465,6 +465,11 @@
           timestamp: new Date().toISOString(),
           heatCount: heatLen,
           stopCacheCount: stopLen,
+          dataSource: typeof DATA_SOURCE === "undefined" ? "unknown" : DATA_SOURCE,
+          fallbackStops:
+            typeof FALLBACK_STOPS === "undefined"
+              ? 0
+              : (FALLBACK_STOPS.busStops.length || 0) + (FALLBACK_STOPS.railStops.length || 0),
           note: "status-only mode; map not initialized"
         },
         null,
@@ -474,6 +479,7 @@
     }
 
     const target = { lat: -31.9523, lon: 115.8590 };
+    let DATA_SOURCE = "unknown";
     const MODE_COLORS = {
       "bus-graph": "#22c55e",
       "bus-rail": "#0ea5e9",
@@ -1050,11 +1056,11 @@
         else busStops.push(stop);
       }
       railLines.forEach((line) => {
-        const dense = densifyLine(line.points, 1);
+        const dense = densifyLine(line.points, 0.5);
         dense.forEach((p, idx) => addStop(`${line.name} rail ${idx}`, p[0], p[1], "rail"));
       });
       [...majorRoads, ...busRoutes].forEach((route) => {
-        const dense = densifyLine(route.points, 0.6);
+        const dense = densifyLine(route.points, 0.3);
         dense.forEach((p, idx) => addStop(`${route.name} ${idx}`, p[0], p[1], "bus"));
       });
       return { busStops, railStops };
@@ -1162,7 +1168,8 @@
       });
     }
 
-    let metaState = { stops: 0, baseWait: Number(baseWait.value), speed: Number(netSpeed.value) };
+    let metaState = { stops: 0, baseWait: Number(baseWait.value), speed: Number(netSpeed.value), data: "unknown" };
+    let lastError = "";
 
     function updateDebugMeta(overrides = {}) {
       metaState = { ...metaState, ...overrides };
@@ -1170,7 +1177,7 @@
       const busRoutes = busGraph && busGraph.routes ? busGraph.routes.length : 0;
       const railNodes = railGraph && railGraph.nodes ? railGraph.nodes.size : 0;
       const meta = document.getElementById("debug-meta");
-      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes`;
+      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}`;
     }
 
     function renderStops(stops, baseWait, netSpeed) {
@@ -1193,7 +1200,7 @@
           .addTo(stopsLayer);
       });
       document.getElementById("status").textContent = `Rendered ${stops.length} stops`;
-      updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed });
+      updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed, data: DATA_SOURCE });
     }
 
     function readStopCache() {
@@ -1332,12 +1339,14 @@
           }))
           .filter((s) => s.lat && s.lon);
         if (!stops.length) throw new Error("No stops fetched");
+        DATA_SOURCE = "live";
         status.textContent = `Loaded ${stops.length} stops`;
         writeStopCache(stops);
         return stops;
       } catch (err) {
         console.warn("Stop fetch failed, using fallback sample stops", err);
         const fallbacks = [...SAMPLE_STOPS, ...FALLBACK_STOPS.busStops, ...FALLBACK_STOPS.railStops];
+        DATA_SOURCE = "fallback";
         status.textContent = `Using fallback stops (${fallbacks.length})`;
         writeStopCache(fallbacks);
         return fallbacks;
@@ -2021,9 +2030,11 @@
         animateTravel(e.latlng);
       } catch (err) {
         ERROR_COUNT += 1;
+        lastError = err.message || String(err);
         console.error(err);
         document.getElementById("status").textContent = "Error during simulation";
-        document.getElementById("debug-path").textContent = `Errors: ${ERROR_COUNT}`;
+        document.getElementById("debug-path").textContent = `Errors: ${ERROR_COUNT} (last: ${lastError})`;
+        updateDebugMeta();
       }
     });
   </script>
