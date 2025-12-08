@@ -1653,6 +1653,7 @@
         return;
       }
       const { path, near } = travel;
+      const mode = travel.mode || "auto";
       // persist heat contribution for this click
       const base = computeWait();
       const speed = Number(netSpeed.value);
@@ -1663,8 +1664,8 @@
       const debugPath = document.getElementById("debug-path");
       debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
         1
-      )}m · mode ${travel.mode || "auto"}`;
-      console.log("Sim path", { mode: travel.mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
+      )}m · mode ${mode}`;
+      console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
 
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
@@ -1678,14 +1679,20 @@
       }
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
-      const maxDist = haversine(path[0][0], path[0][1], target.lat, target.lon) || 1;
+      const modeColor =
+        mode === "bus-graph"
+          ? "#22c55e"
+          : mode === "mixed-transfer"
+            ? "#10b981"
+            : mode === "rail"
+              ? "#38bdf8"
+              : mode === "bus"
+                ? "#f59e0b"
+                : "#ef4444";
       for (let i = 0; i < path.length - 1; i++) {
         const start = path[i];
         const end = path[i + 1];
-        const distToTarget = haversine(start[0], start[1], target.lat, target.lon);
-        const ratio = 1 - Math.min(1, distToTarget / maxDist);
-        const color = `hsl(${120 * ratio}, 80%, 52%)`; // green near CBD, warmer far
-        L.polyline([start, end], { color, weight: 3, opacity: 0.7 }).addTo(simLayer);
+        L.polyline([start, end], { color: modeColor, weight: 3, opacity: 0.8 }).addTo(simLayer);
       }
 
       const startMarker = L.circleMarker(path[0], { radius: 5, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
