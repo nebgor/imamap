@@ -748,6 +748,101 @@
 
     const hillsZone = { latMin: -32.05, latMax: -31.75, lonMin: 116.0, lonMax: 116.2 };
 
+    // Preloaded major-road bus corridors (approximated)
+    const majorRoads = [
+      {
+        name: "Kwinana Fwy BUS",
+        points: [
+          [-32.25, 115.84],
+          [-32.2, 115.84],
+          [-32.15, 115.84],
+          [-32.1, 115.84],
+          [-32.05, 115.85],
+          [-32.0, 115.86],
+          [-31.97, 115.86],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Mitchell Fwy BUS",
+        points: [
+          [-31.48, 115.7],
+          [-31.6, 115.71],
+          [-31.65, 115.71],
+          [-31.7, 115.72],
+          [-31.75, 115.74],
+          [-31.8, 115.76],
+          [-31.85, 115.78],
+          [-31.9, 115.82],
+          [-31.93, 115.84],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Albany Hwy",
+        points: [
+          [-32.15, 116.02],
+          [-32.12, 116.0],
+          [-32.08, 115.98],
+          [-32.04, 115.95],
+          [-32.0, 115.92],
+          [-31.98, 115.9],
+          [-31.96, 115.89],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Wanneroo Rd",
+        points: [
+          [-31.72, 115.78],
+          [-31.78, 115.79],
+          [-31.82, 115.81],
+          [-31.86, 115.82],
+          [-31.9, 115.84],
+          [-31.93, 115.85],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Great Eastern Hwy",
+        points: [
+          [-31.94, 116.01],
+          [-31.92, 115.99],
+          [-31.9, 115.96],
+          [-31.9, 115.93],
+          [-31.92, 115.89],
+          [-31.93, 115.87],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Canning Hwy",
+        points: [
+          [-32.05, 115.84],
+          [-32.04, 115.85],
+          [-32.02, 115.85],
+          [-31.99, 115.85],
+          [-31.97, 115.855],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Marmion/West Coast",
+        points: [
+          [-31.55, 115.74],
+          [-31.6, 115.75],
+          [-31.65, 115.76],
+          [-31.7, 115.77],
+          [-31.75, 115.78],
+          [-31.8, 115.79],
+          [-31.84, 115.8],
+          [-31.88, 115.81],
+          [-31.92, 115.83],
+          [-31.95, 115.86]
+        ]
+      }
+    ];
+
     function haversine(lat1, lon1, lat2, lon2) {
       const toRad = (d) => (d * Math.PI) / 180;
       const R = 6371;
@@ -805,11 +900,14 @@
     }
 
     function computeCommute(stop, baseWait, netSpeed) {
+      // estimate walk to stop (roughly 10 min per km)
+      const walkKm = haversine(stop.lat, stop.lon, target.lat, target.lon) * 0.1;
+      const walkPenalty = walkKm * 10;
       const distanceKm = haversine(stop.lat, stop.lon, target.lat, target.lon);
       const corridor = corridorFactor(stop.lat, stop.lon);
       const effectiveSpeed = netSpeed * (1 / corridor);
       const rideMins = (distanceKm / Math.max(effectiveSpeed, 1)) * 60;
-      return baseWait + rideMins;
+      return baseWait + rideMins + walkPenalty;
     }
 
     function computeWait() {
@@ -1314,6 +1412,7 @@
         routeGraph.routes.forEach((r) => sources.push({ dynamic: true, route: r }));
       }
       busRoutes.forEach((r) => sources.push({ dynamic: false, route: { name: r.name, paths: [r.points] } }));
+      majorRoads.forEach((r) => sources.push({ dynamic: false, route: { name: r.name, paths: [r.points] } }));
       sources.forEach((src) => {
         src.route.paths.forEach((pts) => {
           const nearStop = nearestPointIndex(pts, stop.lat, stop.lon);
