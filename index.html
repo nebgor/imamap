@@ -1132,6 +1132,7 @@
     }
 
     function computeCommute(stop, baseWait, netSpeed) {
+      if (!isValidStop(stop)) return Infinity;
       // estimate walk to stop (roughly 10 min per km)
       const walkKm = haversine(stop.lat, stop.lon, target.lat, target.lon) * 0.1;
       const walkPenalty = walkKm * 10;
@@ -1186,8 +1187,11 @@
 
     let metaState = { stops: 0, baseWait: Number(baseWait.value), speed: Number(netSpeed.value), data: "unknown" };
     let lastError = "";
+    function isValidStop(s) {
+      return s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon));
+    }
     function sanitizeStops(list) {
-      return (list || []).filter((s) => s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon)));
+      return (list || []).filter((s) => isValidStop(s));
     }
 
     function updateDebugMeta(overrides = {}) {
@@ -1587,7 +1591,7 @@
         const lat = bounds.minLat + rand() * (bounds.maxLat - bounds.minLat);
         const lon = bounds.minLon + rand() * (bounds.maxLon - bounds.minLon);
         const travel = randomTravelPlan(lat, lon);
-        if (!travel) continue;
+        if (!travel || !travel.near || !isValidStop(travel.near.stop)) continue;
         const base = Number(baseWait.value);
         const speed = Number(netSpeed.value);
         const commute = computeCommute(travel.near.stop, base, speed);
@@ -1944,7 +1948,7 @@
       }
 
       const travel = buildTravelPath(clickLatLng);
-      if (!travel || !travel.path || travel.path.length < 3) {
+      if (!travel || !travel.path || travel.path.length < 3 || !travel.near || !isValidStop(travel.near.stop)) {
         document.getElementById("status").textContent = "No path found for click (need bus/rail data)";
         return;
       }
