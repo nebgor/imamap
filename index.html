@@ -455,6 +455,14 @@
     let DATA_READY = false;
     let ERROR_COUNT = 0;
     let busGraph = null;
+    const rand = () => {
+      if (crypto && crypto.getRandomValues) {
+        const buf = new Uint32Array(1);
+        crypto.getRandomValues(buf);
+        return buf[0] / 2 ** 32;
+      }
+      return Math.random();
+    };
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -1301,8 +1309,8 @@
       }
       const bounds = { minLat: -32.6, maxLat: -31.4, minLon: 115.5, maxLon: 116.2 };
       for (let i = 0; i < count; i++) {
-        const lat = bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
-        const lon = bounds.minLon + Math.random() * (bounds.maxLon - bounds.minLon);
+        const lat = bounds.minLat + rand() * (bounds.maxLat - bounds.minLat);
+        const lon = bounds.minLon + rand() * (bounds.maxLon - bounds.minLon);
         const travel = graphRouteToCBD({ lat, lng: lon }) || buildTravelPath({ lat, lng: lon });
         if (!travel) continue;
         const base = Number(baseWait.value);
@@ -1623,7 +1631,15 @@
       }
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
-      const routeLine = L.polyline(path, { color: "#94a3b8", weight: 3, opacity: 0.6 }).addTo(simLayer);
+      const maxDist = haversine(path[0][0], path[0][1], target.lat, target.lon) || 1;
+      for (let i = 0; i < path.length - 1; i++) {
+        const start = path[i];
+        const end = path[i + 1];
+        const distToTarget = haversine(start[0], start[1], target.lat, target.lon);
+        const ratio = 1 - Math.min(1, distToTarget / maxDist);
+        const color = `hsl(${120 * ratio}, 80%, 52%)`; // green near CBD, warmer far
+        L.polyline([start, end], { color, weight: 3, opacity: 0.7 }).addTo(simLayer);
+      }
 
       const startMarker = L.circleMarker(path[0], { radius: 5, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
       startMarker.bindTooltip("Clicked origin", { direction: "top", offset: [0, -4], permanent: false });
