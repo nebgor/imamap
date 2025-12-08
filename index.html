@@ -328,6 +328,7 @@
     </div>
     <div class="mode-legend" aria-label="Routing mode colors">
       <span class="mode-chip"><span class="mode-swatch" style="background:#22c55e"></span>Bus graph</span>
+      <span class="mode-chip"><span class="mode-swatch" style="background:#0ea5e9"></span>Bus → rail</span>
       <span class="mode-chip"><span class="mode-swatch" style="background:#10b981"></span>Mixed transfer</span>
       <span class="mode-chip"><span class="mode-swatch" style="background:#38bdf8"></span>Rail</span>
       <span class="mode-chip"><span class="mode-swatch" style="background:#f59e0b"></span>Bus direct</span>
@@ -474,6 +475,7 @@
     const target = { lat: -31.9523, lon: 115.8590 };
     const MODE_COLORS = {
       "bus-graph": "#22c55e",
+      "bus-rail": "#0ea5e9",
       "mixed-transfer": "#10b981",
       rail: "#38bdf8",
       bus: "#f59e0b",
@@ -1371,7 +1373,8 @@
       for (let i = 0; i < count; i++) {
         const lat = bounds.minLat + rand() * (bounds.maxLat - bounds.minLat);
         const lon = bounds.minLon + rand() * (bounds.maxLon - bounds.minLon);
-        const travel = graphRouteToCBD({ lat, lng: lon }) || buildTravelPath({ lat, lng: lon });
+      const travel =
+        busToRailRoute({ lat, lng: lon }) || graphRouteToCBD({ lat, lng: lon }) || buildTravelPath({ lat, lng: lon });
         if (!travel) continue;
         const base = Number(baseWait.value);
         const speed = Number(netSpeed.value);
@@ -1597,6 +1600,40 @@
     }
 
     let busTargetKey = null;
+    let railTargetKey = null;
+
+    function busToRailRoute(start) {
+      if (!busGraph || !railGraph || !window.__stops) return null;
+      const near = nearestStop(start.lat, start.lon);
+      if (!near.stop) return null;
+      if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
+      if (!railTargetKey) railTargetKey = nearestNodeKey(railGraph.nodes, target.lat, target.lon);
+      const walkLeg = [
+        [start.lat, start.lng],
+        [near.stop.lat, near.stop.lon]
+      ];
+      let best = null;
+      railStations.forEach((st) => {
+        const stBusKey = nearestNodeKey(busGraph.nodes, st.lat, st.lon);
+        const stRailKey = nearestNodeKey(railGraph.nodes, st.lat, st.lon);
+        const busPart = shortestPath(
+          busGraph,
+          { lat: near.stop.lat, lon: near.stop.lon },
+          { lat: st.lat, lon: st.lon },
+          stBusKey
+        );
+        const railPart = shortestPath(railGraph, { lat: st.lat, lon: st.lon }, target, railTargetKey || stRailKey);
+        if (busPart && busPart.length && railPart && railPart.length) {
+          const len = pathLength(busPart) + pathLength(railPart);
+          if (!best || len < best.len) {
+            best = { busPart, railPart, station: st, len };
+          }
+        }
+      });
+      if (!best) return null;
+      const path = walkLeg.concat(best.busPart, [[best.station.lat, best.station.lon]], best.railPart);
+      return { path, near, mode: "bus-rail" };
+    }
 
     function graphRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
