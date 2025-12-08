@@ -1482,11 +1482,11 @@
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
 
       const segLengths = [];
-      let totalLen = 0;
+      let totalSegLen = 0;
       for (let i = 0; i < path.length - 1; i++) {
         const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
         segLengths.push(seg);
-        totalLen += seg;
+        totalSegLen += seg;
       }
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
