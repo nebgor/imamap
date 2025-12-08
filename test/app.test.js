@@ -26,6 +26,11 @@ describe("index.html basics", () => {
     expect(html).toContain("Mitchell Fwy BUS");
   });
 
+  it("includes Scarborough fallback data and corridor", () => {
+    expect(html).toContain("Scarborough Beach");
+    expect(html).toContain("Scarborough Beach Rd");
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });

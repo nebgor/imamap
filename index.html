@@ -318,6 +318,7 @@
       <button id="clearCaches">Clear caches</button>
       <button id="demoRun">Demo run</button>
       <button id="clearVisuals">Clear visuals</button>
+      <button id="scarboroughDemo">Scarborough test</button>
     </div>
     <div class="legend">
       Commute minutes
@@ -492,7 +493,8 @@
       { stopid: "SUBI", stopname: "Subiaco", lat: -31.95, lon: 115.817 },
       { stopid: "BAY", stopname: "Bayswater", lat: -31.9147, lon: 115.9136 },
       { stopid: "GOS", stopname: "Gosnells", lat: -32.079, lon: 115.999 },
-      { stopid: "FREO", stopname: "Fremantle", lat: -32.053, lon: 115.748 }
+      { stopid: "FREO", stopname: "Fremantle", lat: -32.053, lon: 115.748 },
+      { stopid: "SCA", stopname: "Scarborough Beach", lat: -31.894, lon: 115.751 }
     ];
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
@@ -754,6 +756,21 @@
           [-31.84, 115.8],
           [-31.88, 115.81],
           [-31.92, 115.83],
+          [-31.95, 115.86]
+        ]
+      },
+      {
+        name: "Scarborough Beach Rd",
+        points: [
+          [-31.894, 115.751],
+          [-31.9, 115.77],
+          [-31.905, 115.79],
+          [-31.912, 115.81],
+          [-31.918, 115.83],
+          [-31.925, 115.85],
+          [-31.932, 115.865],
+          [-31.94, 115.88],
+          [-31.95, 115.895],
           [-31.95, 115.86]
         ]
       },
@@ -1477,6 +1494,12 @@
 
     document.getElementById("simulateRandom").addEventListener("click", () => {
       simulateRandom(25);
+    });
+
+    document.getElementById("scarboroughDemo").addEventListener("click", () => {
+      const scarb = { lat: -31.894, lng: 115.751 };
+      animateTravel(scarb);
+      map.setView([scarb.lat, scarb.lng], 12);
     });
 
     document.getElementById("modePref").addEventListener("change", (e) => {
