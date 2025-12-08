@@ -494,7 +494,12 @@
       { stopid: "BAY", stopname: "Bayswater", lat: -31.9147, lon: 115.9136 },
       { stopid: "GOS", stopname: "Gosnells", lat: -32.079, lon: 115.999 },
       { stopid: "FREO", stopname: "Fremantle", lat: -32.053, lon: 115.748 },
-      { stopid: "SCA", stopname: "Scarborough Beach", lat: -31.894, lon: 115.751 }
+      { stopid: "SCA", stopname: "Scarborough Beach", lat: -31.894, lon: 115.751 },
+      { stopid: "SCB", stopname: "Scarborough Beach Rd / West Coast", lat: -31.896, lon: 115.758 },
+      { stopid: "INN", stopname: "Innaloo Bus Station", lat: -31.892, lon: 115.793 },
+      { stopid: "GLD", stopname: "Glendalough Station", lat: -31.917, lon: 115.84 },
+      { stopid: "WARW", stopname: "Warwick Station", lat: -31.8592, lon: 115.807 },
+      { stopid: "JND", stopname: "Joondalup", lat: -31.744, lon: 115.768 }
     ];
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
@@ -1238,7 +1243,7 @@
     async function fetchStops() {
       const status = document.getElementById("status");
       const cached = readStopCache();
-      if (cached) {
+      if (cached && cached.length > 0) {
         status.textContent = `Loaded ${cached.length} stops from cache`;
         return cached;
       }
@@ -1265,12 +1270,10 @@
             lon: f.geometry.x
           }))
           .filter((s) => s.lat && s.lon);
-        if (stops.length) {
-          status.textContent = `Loaded ${stops.length} stops`;
-          writeStopCache(stops);
-          return stops;
-        }
-        throw new Error("No stops fetched");
+        if (!stops.length) throw new Error("No stops fetched");
+        status.textContent = `Loaded ${stops.length} stops`;
+        writeStopCache(stops);
+        return stops;
       } catch (err) {
         console.warn("Stop fetch failed, using fallback sample stops", err);
         status.textContent = `Using fallback sample stops (${SAMPLE_STOPS.length})`;
