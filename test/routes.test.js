@@ -26,6 +26,7 @@ describe("route tiling", () => {
   it("covers bbox with grid tiles", () => {
     const tiles = routeTilesForBbox([-32.6, 115.5, -32.0, 116.0]);
     expect(tiles.length).toBeGreaterThan(0);
+    expect(tiles.length).toBeLessThan(100); // guard against runaway tiling
     const keys = new Set(tiles.map(routeTileKey));
     expect(keys.size).toBe(tiles.length);
   });

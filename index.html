@@ -897,9 +897,14 @@
       const [minLat, minLon, maxLat, maxLon] = bbox;
       const size = 0.35;
       const tiles = [];
-      for (let lat = Math.floor(minLat / size) * size; lat < maxLat; lat += size) {
-        for (let lon = Math.floor(minLon / size) * size; lon < maxLon; lon += size) {
-          tiles.push({ minLat: lat, minLon: lon, maxLat: lat + size, maxLon: lon + size });
+      for (let lat = minLat; lat < maxLat; lat += size) {
+        for (let lon = minLon; lon < maxLon; lon += size) {
+          tiles.push({
+            minLat: lat,
+            minLon: lon,
+            maxLat: Math.min(maxLat, lat + size),
+            maxLon: Math.min(maxLon, lon + size)
+          });
         }
       }
       return tiles;
@@ -1416,7 +1421,16 @@
       const allow = document.getElementById("allowTransfer").value === "true";
       MODE_PREF = pref;
       ALLOW_TRANSFER = allow;
-      return multimodalPath(clickLatLng, pref, allow);
+      const multi = multimodalPath(clickLatLng, pref, allow);
+      if (multi && multi.path && multi.path.length > 1) return multi;
+      // fallback straight-to-CBD to avoid silent failures
+      return {
+        path: [
+          [clickLatLng.lat, clickLatLng.lng],
+          [target.lat, target.lon]
+        ],
+        near: { stop: { stopname: "direct", stopid: "direct", lat: clickLatLng.lat, lon: clickLatLng.lng } }
+      };
     }
 
     function animateTravel(clickLatLng) {
@@ -1428,7 +1442,10 @@
       }
 
       const travel = buildTravelPath(clickLatLng);
-      if (!travel) return;
+      if (!travel) {
+        document.getElementById("status").textContent = "No path found for click";
+        return;
+      }
       const { path, near } = travel;
       // persist heat contribution for this click
       const base = computeWait();
