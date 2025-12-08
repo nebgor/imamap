@@ -482,6 +482,18 @@
       fallback: "#ef4444",
       auto: "#22c55e"
     };
+    const SAMPLE_STOPS = [
+      { stopid: "CBD", stopname: "Perth Station", lat: -31.9516, lon: 115.8605 },
+      { stopid: "EQ", stopname: "Elizabeth Quay", lat: -31.9563, lon: 115.8543 },
+      { stopid: "MUR", stopname: "Murdoch", lat: -32.071, lon: 115.85 },
+      { stopid: "CBK", stopname: "Cockburn Central", lat: -32.1267, lon: 115.85 },
+      { stopid: "LEED", stopname: "Leederville", lat: -31.9361, lon: 115.8414 },
+      { stopid: "BUT", stopname: "Butler", lat: -31.639, lon: 115.71 },
+      { stopid: "SUBI", stopname: "Subiaco", lat: -31.95, lon: 115.817 },
+      { stopid: "BAY", stopname: "Bayswater", lat: -31.9147, lon: 115.9136 },
+      { stopid: "GOS", stopname: "Gosnells", lat: -32.079, lon: 115.999 },
+      { stopid: "FREO", stopname: "Fremantle", lat: -32.053, lon: 115.748 }
+    ];
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
     const STOP_CACHE_MAX_AGE_HRS = 6;
@@ -1158,25 +1170,32 @@
         "&geometryType=esriGeometryEnvelope" +
         "&inSR=4326&spatialRel=esriSpatialRelIntersects" +
         "&outSR=4326&f=json";
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch stops: ${res.status}`);
-      }
-      const data = await res.json();
-      const stops = (data.features || [])
-        .map((f) => ({
-          stopid: f.attributes.stopid,
-          stopname: f.attributes.stopname,
-          lat: f.geometry.y,
-          lon: f.geometry.x
-        }))
-        .filter((s) => s.lat && s.lon);
-      if (!stops.length) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch stops: ${res.status}`);
+        }
+        const data = await res.json();
+        const stops = (data.features || [])
+          .map((f) => ({
+            stopid: f.attributes.stopid,
+            stopname: f.attributes.stopname,
+            lat: f.geometry.y,
+            lon: f.geometry.x
+          }))
+          .filter((s) => s.lat && s.lon);
+        if (stops.length) {
+          status.textContent = `Loaded ${stops.length} stops`;
+          writeStopCache(stops);
+          return stops;
+        }
         throw new Error("No stops fetched");
+      } catch (err) {
+        console.warn("Stop fetch failed, using fallback sample stops", err);
+        status.textContent = `Using fallback sample stops (${SAMPLE_STOPS.length})`;
+        writeStopCache(SAMPLE_STOPS);
+        return SAMPLE_STOPS;
       }
-      status.textContent = `Loaded ${stops.length} stops`;
-      writeStopCache(stops);
-      return stops;
     }
 
     function sampleCorridorDebug(lat, lon) {
@@ -1707,13 +1726,16 @@
       const allow = document.getElementById("allowTransfer").value === "true";
       MODE_PREF = pref;
       ALLOW_TRANSFER = allow;
-      const graphPath = graphRouteToCBD(clickLatLng);
-      if (graphPath && graphPath.path && graphPath.path.length > 2) return graphPath;
-      const multi = multimodalPath(clickLatLng, pref, allow);
-      if (multi && multi.path && multi.path.length > 2) return multi;
-      // fallback to legacy corridor-based routing
-      const legacy = buildTravelPathLegacy(clickLatLng);
-      if (legacy && legacy.path && legacy.path.length > 2) return legacy;
+      const attempts = [
+        pref !== "rail" ? () => busToRailRoute(clickLatLng) : null,
+        () => graphRouteToCBD(clickLatLng),
+        () => multimodalPath(clickLatLng, pref, allow),
+        () => buildTravelPathLegacy(clickLatLng)
+      ].filter(Boolean);
+      for (const fn of attempts) {
+        const travel = fn();
+        if (travel && travel.path && travel.path.length > 2) return travel;
+      }
       return null;
     }
 
