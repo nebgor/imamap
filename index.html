@@ -1171,6 +1171,9 @@
           lon: f.geometry.x
         }))
         .filter((s) => s.lat && s.lon);
+      if (!stops.length) {
+        throw new Error("No stops fetched");
+      }
       status.textContent = `Loaded ${stops.length} stops`;
       writeStopCache(stops);
       return stops;
@@ -1705,19 +1708,13 @@
       MODE_PREF = pref;
       ALLOW_TRANSFER = allow;
       const graphPath = graphRouteToCBD(clickLatLng);
-      if (graphPath) return graphPath;
+      if (graphPath && graphPath.path && graphPath.path.length > 2) return graphPath;
       const multi = multimodalPath(clickLatLng, pref, allow);
-      if (multi && multi.path && multi.path.length > 1) return multi;
+      if (multi && multi.path && multi.path.length > 2) return multi;
       // fallback to legacy corridor-based routing
       const legacy = buildTravelPathLegacy(clickLatLng);
-      if (legacy && legacy.path && legacy.path.length > 1) return legacy;
-      return {
-        path: [
-          [clickLatLng.lat, clickLatLng.lng],
-          [target.lat, target.lon]
-        ],
-        near: { stop: { stopname: "direct", stopid: "direct", lat: clickLatLng.lat, lon: clickLatLng.lng } }
-      };
+      if (legacy && legacy.path && legacy.path.length > 2) return legacy;
+      return null;
     }
 
     function animateTravel(clickLatLng) {
@@ -1730,8 +1727,8 @@
       }
 
       const travel = buildTravelPath(clickLatLng);
-      if (!travel) {
-        document.getElementById("status").textContent = "No path found for click";
+      if (!travel || !travel.path || travel.path.length < 3) {
+        document.getElementById("status").textContent = "No path found for click (need bus/rail data)";
         return;
       }
       const { path, near } = travel;
