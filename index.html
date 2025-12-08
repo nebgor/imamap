@@ -1307,10 +1307,13 @@
         document.getElementById("status").textContent = "Still loading data…";
         return;
       }
-      // clear previous sim layers for fresh batch
+      // clear previous sim layers and heat for fresh batch
       simRootLayer.clearLayers();
       simTimers.forEach((t) => clearInterval(t));
       simTimers = [];
+      heatLineLayer.clearLayers();
+      heatVisLayer.setLatLngs([]);
+      saveHeat([]);
       const bounds = { minLat: -32.6, maxLat: -31.4, minLon: 115.5, maxLon: 116.2 };
       for (let i = 0; i < count; i++) {
         const lat = bounds.minLat + rand() * (bounds.maxLat - bounds.minLat);
