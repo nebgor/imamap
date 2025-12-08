@@ -842,6 +842,21 @@
           [-31.96, 115.84],
           [-31.95, 115.86]
         ]
+      },
+      {
+        name: "Scarborough Beach Rd",
+        points: [
+          [-31.894, 115.751],
+          [-31.9, 115.77],
+          [-31.905, 115.79],
+          [-31.912, 115.81],
+          [-31.918, 115.83],
+          [-31.925, 115.85],
+          [-31.932, 115.865],
+          [-31.94, 115.88],
+          [-31.95, 115.895],
+          [-31.95, 115.86]
+        ]
       }
     ];
 
@@ -1000,6 +1015,52 @@
       const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
       return 2 * R * Math.asin(Math.sqrt(a));
     }
+
+    function densifyLine(points, stepKm = 1) {
+      const dense = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        const a = points[i];
+        const b = points[i + 1];
+        const dist = haversine(a[0], a[1], b[0], b[1]);
+        const steps = Math.max(1, Math.round(dist / stepKm));
+        for (let s = 0; s < steps; s++) {
+          const t = s / steps;
+          dense.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      dense.push(points[points.length - 1]);
+      return dense;
+    }
+
+    function buildFallbackStops() {
+      const seen = new Set();
+      const busStops = [];
+      const railStops = [];
+      function addStop(name, lat, lon, type) {
+        const key = `${lat.toFixed(5)},${lon.toFixed(5)}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const stop = {
+          stopid: `${type}-${busStops.length + railStops.length}`,
+          stopname: name,
+          lat,
+          lon
+        };
+        if (type === "rail") railStops.push(stop);
+        else busStops.push(stop);
+      }
+      railLines.forEach((line) => {
+        const dense = densifyLine(line.points, 1);
+        dense.forEach((p, idx) => addStop(`${line.name} rail ${idx}`, p[0], p[1], "rail"));
+      });
+      [...majorRoads, ...busRoutes].forEach((route) => {
+        const dense = densifyLine(route.points, 0.6);
+        dense.forEach((p, idx) => addStop(`${route.name} ${idx}`, p[0], p[1], "bus"));
+      });
+      return { busStops, railStops };
+    }
+
+    const FALLBACK_STOPS = buildFallbackStops();
 
     function pointSegmentDistance(p, a, b) {
       const toRad = (d) => (d * Math.PI) / 180;
@@ -1276,9 +1337,10 @@
         return stops;
       } catch (err) {
         console.warn("Stop fetch failed, using fallback sample stops", err);
-        status.textContent = `Using fallback sample stops (${SAMPLE_STOPS.length})`;
-        writeStopCache(SAMPLE_STOPS);
-        return SAMPLE_STOPS;
+        const fallbacks = [...SAMPLE_STOPS, ...FALLBACK_STOPS.busStops, ...FALLBACK_STOPS.railStops];
+        status.textContent = `Using fallback stops (${fallbacks.length})`;
+        writeStopCache(fallbacks);
+        return fallbacks;
       }
     }
 
