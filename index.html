@@ -1357,6 +1357,13 @@
       renderHeat();
     }
 
+    function randomTravelPlan(lat, lon) {
+      const travel =
+        busToRailRoute({ lat, lng: lon }) || graphRouteToCBD({ lat, lng: lon }) || buildTravelPath({ lat, lng: lon });
+      if (!travel || !travel.path || travel.path.length < 3) return null;
+      return travel;
+    }
+
     function simulateRandom(count = 20) {
       if (!DATA_READY) {
         document.getElementById("status").textContent = "Still loading data…";
@@ -1373,8 +1380,7 @@
       for (let i = 0; i < count; i++) {
         const lat = bounds.minLat + rand() * (bounds.maxLat - bounds.minLat);
         const lon = bounds.minLon + rand() * (bounds.maxLon - bounds.minLon);
-      const travel =
-        busToRailRoute({ lat, lng: lon }) || graphRouteToCBD({ lat, lng: lon }) || buildTravelPath({ lat, lng: lon });
+        const travel = randomTravelPlan(lat, lon);
         if (!travel) continue;
         const base = Number(baseWait.value);
         const speed = Number(netSpeed.value);

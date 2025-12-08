@@ -36,6 +36,12 @@ describe("index.html basics", () => {
     expect(html).toContain("pathFromGraph(localBusGraph");
   });
 
+  it("random sims favor bus-to-rail paths with multi-point routes", () => {
+    expect(html).toContain("busToRailRoute");
+    expect(html).toContain("randomTravelPlan");
+    expect(html).toContain("travel.path.length < 3");
+  });
+
   it("renders legend and debug overlay", () => {
     expect(html).toContain("legend-bar");
     expect(html).toContain("Debug");
