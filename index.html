@@ -138,6 +138,30 @@
       font-size: 11px;
       color: var(--muted);
     }
+    .mode-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .mode-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .mode-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
     .status {
       font-size: 12px;
       color: var(--muted);
@@ -302,6 +326,13 @@
         <span>short</span><span>medium</span><span>long</span>
       </div>
     </div>
+    <div class="mode-legend" aria-label="Routing mode colors">
+      <span class="mode-chip"><span class="mode-swatch" style="background:#22c55e"></span>Bus graph</span>
+      <span class="mode-chip"><span class="mode-swatch" style="background:#10b981"></span>Mixed transfer</span>
+      <span class="mode-chip"><span class="mode-swatch" style="background:#38bdf8"></span>Rail</span>
+      <span class="mode-chip"><span class="mode-swatch" style="background:#f59e0b"></span>Bus direct</span>
+      <span class="mode-chip"><span class="mode-swatch" style="background:#ef4444"></span>Fallback</span>
+    </div>
     <div class="status" id="status">Fetching stops…</div>
     <div class="gallery">
       <h2>Snapshots (cached locally)</h2>
@@ -441,6 +472,14 @@
     }
 
     const target = { lat: -31.9523, lon: 115.8590 };
+    const MODE_COLORS = {
+      "bus-graph": "#22c55e",
+      "mixed-transfer": "#10b981",
+      rail: "#38bdf8",
+      bus: "#f59e0b",
+      fallback: "#ef4444",
+      auto: "#22c55e"
+    };
     const STOP_CACHE_KEY = "stopsCacheV1";
     const SNAPSHOT_CACHE_KEY = "snapshotsV1";
     const STOP_CACHE_MAX_AGE_HRS = 6;
@@ -1679,16 +1718,7 @@
       }
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
-      const modeColor =
-        mode === "bus-graph"
-          ? "#22c55e"
-          : mode === "mixed-transfer"
-            ? "#10b981"
-            : mode === "rail"
-              ? "#38bdf8"
-              : mode === "bus"
-                ? "#f59e0b"
-                : "#ef4444";
+      const modeColor = MODE_COLORS[mode] || MODE_COLORS.fallback;
       for (let i = 0; i < path.length - 1; i++) {
         const start = path[i];
         const end = path[i + 1];
