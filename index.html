@@ -1030,8 +1030,13 @@
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
         // prefetch metro routes
-        const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
-        routeGraph = buildRouteGraph(routes);
+        try {
+          const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
+          routeGraph = buildRouteGraph(routes);
+        } catch (err) {
+          console.error("Route fetch failed, using corridors only", err);
+          routeGraph = { nodes: new Map(), routes: [] };
+        }
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
         document.getElementById("debug").firstElementChild.textContent = "Debug — ok";
@@ -1446,7 +1451,15 @@
       const multi = multimodalPath(clickLatLng, pref, allow);
       if (multi && multi.path && multi.path.length > 1) return multi;
       // fallback to legacy corridor-based routing
-      return buildTravelPathLegacy(clickLatLng);
+      const legacy = buildTravelPathLegacy(clickLatLng);
+      if (legacy && legacy.path && legacy.path.length > 1) return legacy;
+      return {
+        path: [
+          [clickLatLng.lat, clickLatLng.lng],
+          [target.lat, target.lon]
+        ],
+        near: { stop: { stopname: "direct", stopid: "direct", lat: clickLatLng.lat, lon: clickLatLng.lng } }
+      };
     }
 
     function animateTravel(clickLatLng) {
@@ -1455,8 +1468,7 @@
         return;
       }
       if (!DATA_READY) {
-        document.getElementById("status").textContent = "Still loading data…";
-        return;
+        document.getElementById("status").textContent = "Still loading data… (using fallbacks)";
       }
 
       const travel = buildTravelPath(clickLatLng);
