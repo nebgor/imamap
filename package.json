@@ -5,11 +5,15 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "e2e": "node test/smoke.js"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.4",
     "eslint": "^8.57.1",
     "eslint-plugin-html": "^8.1.1",
+    "jsdom": "^24.0.0",
     "vitest": "^2.1.4"
   }
 }
