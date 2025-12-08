@@ -454,6 +454,7 @@
     let RANDOM_WAIT = true;
     let DATA_READY = false;
     let ERROR_COUNT = 0;
+    let busGraph = null;
     const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -1131,9 +1132,12 @@
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
           routeGraph = buildRouteGraph(routes);
+          const combined = routes.concat(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
+          busGraph = buildRouteGraph(combined);
         } catch (err) {
           console.error("Route fetch failed, using corridors only", err);
           routeGraph = { nodes: new Map(), routes: [] };
+          busGraph = buildRouteGraph(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
         }
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
@@ -1291,6 +1295,10 @@
     }
 
     function simulateRandom(count = 20) {
+      if (!DATA_READY) {
+        document.getElementById("status").textContent = "Still loading data…";
+        return;
+      }
       const bounds = { minLat: -32.6, maxLat: -31.4, minLon: 115.5, maxLon: 116.2 };
       for (let i = 0; i < count; i++) {
         const lat = bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
@@ -1408,8 +1416,8 @@
     function bestBusRouteForStop(stop) {
       let winner = null;
       const sources = [];
-      if (routeGraph && routeGraph.routes) {
-        routeGraph.routes.forEach((r) => sources.push({ dynamic: true, route: r }));
+      if (busGraph && busGraph.routes) {
+        busGraph.routes.forEach((r) => sources.push({ dynamic: true, route: r }));
       }
       busRoutes.forEach((r) => sources.push({ dynamic: false, route: { name: r.name, paths: [r.points] } }));
       majorRoads.forEach((r) => sources.push({ dynamic: false, route: { name: r.name, paths: [r.points] } }));
@@ -1439,7 +1447,7 @@
       const stopInfo = nearestStop(start.lat, start.lon);
       if (!stopInfo || !stopInfo.stop) return null;
       const near = stopInfo.stop;
-      const busGraph = routeGraph;
+      const localBusGraph = busGraph || routeGraph;
       const railGraph = buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
 
       function pathFromGraph(graph, src, dst) {
@@ -1458,19 +1466,19 @@
         return { path, near, mode: "rail" };
       }
 
-      if (modePref === "bus" && busGraph) {
-        const busPath = pathFromGraph(busGraph, { lat: near.lat, lon: near.lon }, target);
+      if (modePref === "bus" && localBusGraph) {
+        const busPath = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, target);
         if (busPath.length) {
           path.push(...busPath);
           return { path, near, mode: "bus" };
         }
       }
 
-      if (modePref === "mixed" && allowTransfer && busGraph) {
+      if (modePref === "mixed" && allowTransfer && localBusGraph) {
         // find best rail anchor
         let bestRail = null;
         railStations.forEach((st) => {
-          const busPart = pathFromGraph(busGraph, { lat: near.lat, lon: near.lon }, { lat: st.lat, lon: st.lon });
+          const busPart = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, { lat: st.lat, lon: st.lon });
           if (busPart && busPart.length) {
             const railPart = pathFromGraph(railGraph, { lat: st.lat, lon: st.lon }, target);
             if (railPart && railPart.length) {
