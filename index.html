@@ -293,6 +293,7 @@
     <div class="controls" style="margin-top:4px;">
       <button id="clearCaches">Clear caches</button>
       <button id="demoRun">Demo run</button>
+      <button id="clearVisuals">Clear visuals</button>
     </div>
     <div class="legend">
       Commute minutes
@@ -461,7 +462,8 @@
     const stopsLayer = L.layerGroup().addTo(map);
     const railLayer = L.layerGroup().addTo(map);
     const stationLayer = L.layerGroup().addTo(map);
-    const simLayer = L.layerGroup().addTo(map);
+    const simRootLayer = L.layerGroup().addTo(map);
+    let simTimers = [];
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
       radius: 18,
@@ -1227,10 +1229,21 @@
       routeGraph = null;
       heatLineLayer.clearLayers();
       heatVisLayer.setLatLngs([]);
-      document.getElementById("status").textContent = "Caches cleared";
+      simRootLayer.clearLayers();
+      simTimers.forEach((t) => clearInterval(t));
+      simTimers = [];
+      document.getElementById("status").textContent = "Caches/visuals cleared";
     });
     document.getElementById("demoRun").addEventListener("click", () => {
       animateTravel({ lat: -31.98, lng: 115.85 });
+    });
+    document.getElementById("clearVisuals").addEventListener("click", () => {
+      heatLineLayer.clearLayers();
+      heatVisLayer.setLatLngs([]);
+      simRootLayer.clearLayers();
+      simTimers.forEach((t) => clearInterval(t));
+      simTimers = [];
+      document.getElementById("status").textContent = "Visuals cleared";
     });
 
     renderSnapshots();
@@ -1449,11 +1462,6 @@
         document.getElementById("status").textContent = "Still loading data…";
         return;
       }
-      simLayer.clearLayers();
-      if (simTimer) {
-        clearInterval(simTimer);
-        simTimer = null;
-      }
 
       const travel = buildTravelPath(clickLatLng);
       if (!travel) {
@@ -1478,6 +1486,7 @@
         totalLen += seg;
       }
 
+      const simLayer = L.layerGroup().addTo(simRootLayer);
       const routeLine = L.polyline(path, { color: "#94a3b8", weight: 3, opacity: 0.6 }).addTo(simLayer);
 
       const startMarker = L.circleMarker(path[0], { radius: 5, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
@@ -1495,7 +1504,7 @@
       }).addTo(simLayer);
 
       const startTs = performance.now();
-      simTimer = setInterval(() => {
+      const timer = setInterval(() => {
         const elapsed = (performance.now() - startTs) / 1000;
         const progress = Math.min(1, elapsed / totalSec);
         const minutesUsed = progress * commute;
@@ -1542,8 +1551,8 @@
         }
 
         if (progress >= 1) {
-          clearInterval(simTimer);
-          simTimer = null;
+          clearInterval(timer);
+          simTimers = simTimers.filter((t) => t !== timer);
           label.setIcon(
             L.divIcon({
               className: "rail-label",
@@ -1553,6 +1562,7 @@
           );
         }
       }, 30);
+      simTimers.push(timer);
     }
 
     map.on("click", (e) => {

@@ -9,9 +9,14 @@ function routeTilesForBbox(bbox) {
   const [minLat, minLon, maxLat, maxLon] = bbox;
   const size = 0.35;
   const tiles = [];
-  for (let lat = Math.floor(minLat / size) * size; lat < maxLat; lat += size) {
-    for (let lon = Math.floor(minLon / size) * size; lon < maxLon; lon += size) {
-      tiles.push({ minLat: lat, minLon: lon, maxLat: lat + size, maxLon: lon + size });
+  for (let lat = minLat; lat < maxLat; lat += size) {
+    for (let lon = minLon; lon < maxLon; lon += size) {
+      tiles.push({
+        minLat: lat,
+        minLon: lon,
+        maxLat: Math.min(maxLat, lat + size),
+        maxLon: Math.min(maxLon, lon + size)
+      });
     }
   }
   return tiles;
