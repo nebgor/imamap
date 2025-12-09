@@ -2401,9 +2401,7 @@
         }
       }
 
-      // fallback: nearest bus/rail corridor heuristic
-      const alt = buildTravelPathLegacy(startLatLng);
-      if (alt) return alt;
+      if (pathHasLongSegment(path, 2.5) || path.length < 3) return null;
       return null;
     }
 
@@ -2414,7 +2412,7 @@
       }
       return d;
     }
-    function pathHasLongSegment(path, maxKm = 3) {
+    function pathHasLongSegment(path, maxKm = 2.5) {
       for (let i = 0; i < path.length - 1; i++) {
         const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
         if (seg > maxKm) return true;
@@ -2424,6 +2422,21 @@
 
     let busTargetKey = null;
     let railTargetKey = null;
+    const CBD_ANCHORS = [
+      { name: "Perth Station", lat: -31.9516, lon: 115.8605 },
+      { name: "Perth Underground", lat: -31.9524, lon: 115.8579 },
+      { name: "Elizabeth Quay", lat: -31.9563, lon: 115.8543 }
+    ];
+
+    function findCbdAnchor() {
+      if (!window.__stops) return null;
+      const candidates = [];
+      candidates.push(nearestStop(target.lat, target.lon));
+      CBD_ANCHORS.forEach((a) => candidates.push(nearestStop(a.lat, a.lon)));
+      return candidates
+        .filter((c) => c && c.stop && c.distKm <= MAX_WALK_KM)
+        .sort((a, b) => a.distKm - b.distKm)[0] || null;
+    }
 
     function busToRailRoute(start) {
       if (!busGraph || !railGraph || !window.__stops) return null;
@@ -2468,8 +2481,8 @@
     function graphRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      const cbdAnchor = nearestStop(target.lat, target.lon);
-      if (!near.stop || near.distKm > MAX_WALK_KM || !cbdAnchor.stop) return null;
+      const cbdAnchor = findCbdAnchor();
+      if (!near.stop || near.distKm > MAX_WALK_KM || !cbdAnchor || !cbdAnchor.stop) return null;
       if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, cbdAnchor.stop.lat, cbdAnchor.stop.lon);
       const walkLeg = [
         [start.lat, start.lng],
@@ -2567,13 +2580,15 @@
         pref === "car" ? () => carRouteToCBD(clickLatLng) : null,
         pref !== "rail" && pref !== "car" ? () => busToRailRoute(clickLatLng) : null,
         pref !== "car" ? () => graphRouteToCBD(clickLatLng) : null,
-        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null,
-        () => buildTravelPathLegacy(clickLatLng)
+        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null
       ].filter(Boolean);
       for (const fn of attempts) {
         const travel = fn();
-        if (travel && travel.path && travel.path.length > 2) return travel;
+        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 2.5)) {
+          return travel;
+        }
       }
+      lastError = "No routed path";
       return null;
     }
 
