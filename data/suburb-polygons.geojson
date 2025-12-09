@@ -1,0 +1,117 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Perth CBD", "priceK": 650 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.8535, -31.9545],
+            [115.8660, -31.9545],
+            [115.8660, -31.9445],
+            [115.8535, -31.9445],
+            [115.8535, -31.9545]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Scarborough", "priceK": 900 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.74, -31.91],
+            [115.78, -31.91],
+            [115.78, -31.88],
+            [115.74, -31.88],
+            [115.74, -31.91]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Joondalup", "priceK": 650 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.75, -31.77],
+            [115.79, -31.77],
+            [115.79, -31.71],
+            [115.75, -31.71],
+            [115.75, -31.77]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Fremantle", "priceK": 950 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.73, -32.07],
+            [115.76, -32.07],
+            [115.76, -32.04],
+            [115.73, -32.04],
+            [115.73, -32.07]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Midland", "priceK": 520 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [116.0, -31.91],
+            [116.02, -31.91],
+            [116.02, -31.88],
+            [116.0, -31.88],
+            [116.0, -31.91]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Armadale", "priceK": 480 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [116.0, -32.18],
+            [116.03, -32.18],
+            [116.03, -32.14],
+            [116.0, -32.14],
+            [116.0, -32.18]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Ellenbrook", "priceK": 600 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [115.94, -31.82],
+            [115.98, -31.82],
+            [115.98, -31.80],
+            [115.94, -31.80],
+            [115.94, -31.82]
+          ]
+        ]
+      }
+    }
+  ]
+}

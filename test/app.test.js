@@ -43,6 +43,22 @@ describe("index.html basics", () => {
     expect(html).toContain('id="netSpeed"');
   });
 
+  it("exposes property price overlays and data sources", () => {
+    expect(html).toContain('id="toggleProperty"');
+    expect(html).toContain('id="togglePropertyPins"');
+    expect(html).toContain("data/suburb-polygons.geojson");
+    expect(html).toContain("renderPropertyLayer");
+  });
+
+  it("sets willReadFrequently on heat canvas to avoid perf warnings", () => {
+    expect(html).toContain("willReadFrequently");
+  });
+
+  it("keeps a walk fallback when transfers/routes are missing", () => {
+    expect(html).toContain("buildWalkGraph");
+    expect(html).toContain("buildTravelPath");
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });

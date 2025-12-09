@@ -122,6 +122,9 @@
       font-size: 12px;
       color: var(--muted);
     }
+    .legend.price .legend-bar {
+      background: linear-gradient(90deg, #0ea5e9, #10b981, #84cc16, #f59e0b, #ef4444);
+    }
     .btn-compact {
       flex: 1 1 calc(50% - 8px);
       min-width: 140px;
@@ -418,6 +421,26 @@
       </div>
     </div>
     <div class="section">
+      <h2>Property insight</h2>
+      <div class="controls">
+        <label style="display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="toggleProperty" checked />
+          Suburb prices
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="togglePropertyPins" checked />
+          Price pins
+        </label>
+      </div>
+      <div class="legend price" id="propertyLegend">
+        Property price ($k)
+        <div class="legend-bar"></div>
+        <div class="legend-scale">
+          <span id="propertyMin">$—</span><span>higher</span><span id="propertyMax">$—</span>
+        </div>
+      </div>
+    </div>
+    <div class="section">
       <h2>Experiments</h2>
       <div class="row">
         <label>Suburb experiment
@@ -477,7 +500,17 @@
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
   <script>
-    function buildRouteGraph(routes) {
+    function buildWalkGraph(stops) {
+      const routes = [
+        {
+          name: "walk-grid",
+          paths: stopNeighborPaths(stops, 6, 0.6)
+        }
+      ];
+      return buildRouteGraph(routes, true);
+    }
+
+    function buildRouteGraph(routes, skipDensify = false) {
       const nodes = new Map();
       const key = (lat, lon) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
       function addEdge(a, b) {
@@ -491,8 +524,9 @@
       }
       routes.forEach((r) => {
         (r.paths || []).forEach((path) => {
-          for (let i = 0; i < path.length - 1; i++) {
-            addEdge(path[i], path[i + 1]);
+          const pts = skipDensify ? path : densifyLine(path, 0.2);
+          for (let i = 0; i < pts.length - 1; i++) {
+            addEdge(pts[i], pts[i + 1]);
           }
         });
       });
@@ -617,6 +651,7 @@
       ellenbrook: { name: "Ellenbrook", lat: -31.776, lon: 115.97 }
     };
     let PROPERTY_DATA = [];
+    let SUBURB_POLYGONS = null;
     async function loadLocalFallbackStops() {
       try {
         const [busRes, railRes] = await Promise.all([
@@ -656,6 +691,7 @@
     const STOP_CACHE_MAX_AGE_HRS = 6;
     const ROUTE_CACHE_KEY = "routesCacheV2";
     const ROUTE_CACHE_MAX_AGE_HRS = 12;
+    const MAX_WALK_KM = Infinity;
     let MODE_PREF = "mixed";
     let ALLOW_TRANSFER = true;
     let BUS_SPEED = 40;
@@ -687,6 +723,7 @@
     const stationLayer = L.layerGroup().addTo(map);
     const simRootLayer = L.layerGroup().addTo(map);
     const roadsLayer = L.layerGroup();
+    const propertyLayer = L.layerGroup();
     let stopsHiddenForZoom = false;
     let heatHiddenForZoom = false;
     let roadsHiddenForZoom = false;
@@ -702,6 +739,11 @@
       maxZoom: 17,
       gradient: { 0.1: "#1e3a8a", 0.4: "#22d3ee", 0.7: "#facc15", 1.0: "#ef4444" }
     }).addTo(map);
+    // Hint to the canvas to avoid getImageData perf warnings
+    setTimeout(() => {
+      const canvas = heatVisLayer._heat && heatVisLayer._heat._canvas;
+      if (canvas) canvas.willReadFrequently = true;
+    }, 0);
     let simTimer = null;
     let routeGraph = null;
 
@@ -1199,6 +1241,23 @@
       return dense;
     }
 
+    function densifyPathPoints(path, stepKm = 0.15) {
+      if (!Array.isArray(path) || path.length < 2) return path || [];
+      const dense = [];
+      for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i];
+        const b = path[i + 1];
+        const dist = haversine(a[0], a[1], b[0], b[1]);
+        const steps = Math.max(1, Math.ceil(dist / stepKm));
+        for (let s = 0; s < steps; s++) {
+          const t = s / steps;
+          dense.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      dense.push(path[path.length - 1]);
+      return dense;
+    }
+
     function buildFallbackStops() {
       const seen = new Set();
       const busStops = [];
@@ -1339,14 +1398,44 @@
       return TIME_COLORS[TIME_COLORS.length - 1].c;
     }
 
-    function computeCommute(stop, baseWait, netSpeed) {
+    function effectiveSpeedForMode(mode, netSpeed) {
+      if (mode === "rail") return Number(document.getElementById("railSpeed")?.value || RAIL_SPEED);
+      if (mode === "bus" || mode === "bus-graph") return Number(document.getElementById("busSpeed")?.value || BUS_SPEED);
+      if (mode === "car") return Number(document.getElementById("carSpeed")?.value || CAR_SPEED);
+      if (mode === "bus-rail" || mode === "mixed-transfer") {
+        const bus = Number(document.getElementById("busSpeed")?.value || BUS_SPEED);
+        const rail = Number(document.getElementById("railSpeed")?.value || RAIL_SPEED);
+        return (bus + rail) / 2;
+      }
+      return netSpeed;
+    }
+
+    function getHeadway() {
+      const h = Number(document.getElementById("headway")?.value || HEADWAY_MIN);
+      return Number.isFinite(h) ? h : HEADWAY_MIN;
+    }
+
+    function computeCommute(stop, baseWait, netSpeed, opts = {}) {
       if (!isValidStop(stop)) return Infinity;
-      // estimate walk to stop (roughly 10 min per km)
+      if (opts.path && Array.isArray(opts.path) && opts.path.length > 1) {
+        const walkKm = haversine(opts.path[0][0], opts.path[0][1], opts.path[1][0], opts.path[1][1]);
+        const rideKm = Math.max(0, pathLength(opts.path) - walkKm);
+        const walkMins = walkKm * 12; // ~5 km/h walking
+        const speed = effectiveSpeedForMode(opts.mode, netSpeed);
+        const headway = getHeadway();
+        let waits = baseWait;
+        if (opts.mode === "bus" || opts.mode === "bus-graph") waits += headway / 2;
+        if (opts.mode === "rail") waits += headway / 2;
+        if (opts.mode === "bus-rail" || opts.mode === "mixed-transfer") waits += headway + 3; // two legs + small transfer penalty
+        const rideMins = (rideKm / Math.max(speed, 1)) * 60;
+        return waits + walkMins + rideMins;
+      }
+      // fallback estimation when no path known
       const walkKm = haversine(stop.lat, stop.lon, target.lat, target.lon) * 0.1;
       const walkPenalty = walkKm * 10;
       const distanceKm = haversine(stop.lat, stop.lon, target.lat, target.lon);
-      const corridor = corridorFactor(stop.lat, stop.lon);
-      const effectiveSpeed = netSpeed * (1 / corridor);
+      const corridor = Math.max(1, corridorFactor(stop.lat, stop.lon));
+      const effectiveSpeed = netSpeed / corridor;
       const rideMins = (distanceKm / Math.max(effectiveSpeed, 1)) * 60;
       return baseWait + rideMins + walkPenalty;
     }
@@ -1394,16 +1483,100 @@
       }
     }
 
+    function priceColor(val, min, max) {
+      if (typeof val !== "number" || typeof min !== "number" || typeof max !== "number" || max <= min) {
+        return "#22c55e";
+      }
+      const t = Math.max(0, Math.min(1, (val - min) / (max - min)));
+      const hue = 180 - t * 180; // teal -> red
+      return `hsl(${hue}, 75%, 55%)`;
+    }
+
+    function updatePropertyLegend(min, max) {
+      const legend = document.getElementById("propertyLegend");
+      if (!legend) return;
+      const minEl = document.getElementById("propertyMin");
+      const maxEl = document.getElementById("propertyMax");
+      if (typeof min === "number" && typeof max === "number" && max > 0) {
+        minEl.textContent = `$${Math.round(min)}k`;
+        maxEl.textContent = `$${Math.round(max)}k`;
+        legend.classList.remove("hidden");
+      } else {
+        minEl.textContent = "$—";
+        maxEl.textContent = "$—";
+        legend.classList.add("hidden");
+      }
+    }
+
     async function loadPropertyData() {
       try {
-        const res = await fetch("data/property-prices.json");
-        if (!res.ok) throw new Error("property data fetch failed");
-        const data = await res.json();
+        const [priceRes, polyRes] = await Promise.all([
+          fetch("data/property-prices.json"),
+          fetch("data/suburb-polygons.geojson")
+        ]);
+        if (!priceRes.ok) throw new Error("property data fetch failed");
+        const data = await priceRes.json();
         PROPERTY_DATA = Array.isArray(data) ? data : [];
+        if (polyRes.ok) {
+          SUBURB_POLYGONS = await polyRes.json();
+        }
+        renderPropertyLayer(document.getElementById("toggleProperty")?.checked !== false);
+        updateDebugMeta();
       } catch (err) {
         console.warn("Property data load failed", err);
         lastError = err.message || "property load failed";
+        updatePropertyLegend();
       }
+    }
+
+    function renderPropertyLayer(show) {
+      propertyLayer.clearLayers();
+      if (!show) {
+        propertyLayer.remove();
+        updatePropertyLegend();
+        return;
+      }
+      if (!SUBURB_POLYGONS || !Array.isArray(SUBURB_POLYGONS.features)) {
+        updatePropertyLegend();
+        return;
+      }
+      const priceValues = SUBURB_POLYGONS.features
+        .map((f) => (f.properties ? Number(f.properties.priceK) : NaN))
+        .filter((v) => Number.isFinite(v));
+      const min = priceValues.length ? Math.min(...priceValues) : null;
+      const max = priceValues.length ? Math.max(...priceValues) : null;
+      updatePropertyLegend(min, max);
+      L.geoJSON(SUBURB_POLYGONS, {
+        style: (feature) => {
+          const v = feature.properties ? Number(feature.properties.priceK) : null;
+          const color = priceColor(v, min, max);
+          return { color, fillColor: color, weight: 1, opacity: 0.8, fillOpacity: 0.25 };
+        },
+        onEachFeature: (feature, layer) => {
+          const v = feature.properties ? feature.properties.priceK : null;
+          layer.bindTooltip(
+            `${feature.properties?.name || "Suburb"} · ${v ? `$${v}k` : "n/a"}`,
+            { sticky: true }
+          );
+        }
+      }).addTo(propertyLayer);
+
+      if (document.getElementById("togglePropertyPins")?.checked && PROPERTY_DATA && PROPERTY_DATA.length) {
+        PROPERTY_DATA.forEach((p) => {
+          if (!p.lat || !p.lon) return;
+          const color = priceColor(p.priceK, min, max);
+          L.circleMarker([p.lat, p.lon], {
+            radius: 5,
+            color: "#0b1228",
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.95
+          })
+            .bindTooltip(`${p.name} · $${p.priceK}k`, { sticky: true })
+            .addTo(propertyLayer);
+        });
+      }
+      propertyLayer.addTo(map);
     }
 
     function nearestProperty(lat, lon) {
@@ -1491,11 +1664,12 @@
       const busNodes = busGraph && busGraph.nodes ? busGraph.nodes.size : 0;
       const busRoutes = busGraph && busGraph.routes ? busGraph.routes.length : 0;
       const railNodes = railGraph && railGraph.nodes ? railGraph.nodes.size : 0;
+      const suburbAreas = SUBURB_POLYGONS && Array.isArray(SUBURB_POLYGONS.features) ? SUBURB_POLYGONS.features.length : 0;
       const meta = document.getElementById("debug-meta");
       const deckInfo = deckStats
         ? ` · Deck: on (${deckStats.stopCount} stops, ${deckStats.pathCount} paths, ${deckStats.renderMs.toFixed(1)}ms)`
         : " · Deck: off";
-      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}${deckInfo}`;
+      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Properties: ${PROPERTY_DATA.length} pts/${suburbAreas} areas · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}${deckInfo}`;
     }
 
     function renderStops(stops, baseWait, netSpeed) {
@@ -1839,28 +2013,29 @@
         window.__stops = stops;
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
-        loadRoads();
-        loadPropertyData();
+        await Promise.all([loadRoads(), loadPropertyData()]);
         ensureDeck();
         // prefetch metro routes
+        const stopPaths = stopNeighborPaths(window.__stops || [], 8, 0.6);
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
           routeGraph = buildRouteGraph(routes);
-          const stopPaths = stopNeighborPaths(window.__stops || []);
           const combined = routes
             .concat(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })))
             .concat([{ name: "stop-graph", paths: stopPaths }]);
           busGraph = buildRouteGraph(combined);
-          railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         } catch (err) {
           console.error("Route fetch failed, using corridors only", err);
           routeGraph = { nodes: new Map(), routes: [] };
-          const stopPaths = stopNeighborPaths(window.__stops || []);
           busGraph = buildRouteGraph(
             majorRoads.map((r) => ({ name: r.name, paths: [r.points] })).concat([{ name: "stop-graph", paths: stopPaths }])
           );
-          railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         }
+        // always provide a walkable fallback graph
+        if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0) {
+          busGraph = buildWalkGraph(window.__stops || []);
+        }
+        railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         updateDebugMeta();
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
@@ -1890,6 +2065,13 @@
       } else {
         roadsLayer.remove();
       }
+    });
+    document.getElementById("toggleProperty").addEventListener("change", (e) => {
+      renderPropertyLayer(e.target.checked);
+    });
+    document.getElementById("togglePropertyPins").addEventListener("change", () => {
+      const show = document.getElementById("toggleProperty").checked;
+      renderPropertyLayer(show);
     });
     document.getElementById("toggleStops").addEventListener("change", () => {
       if (window.__stops) renderStops(window.__stops, Number(baseWait.value), Number(netSpeed.value));
@@ -2329,7 +2511,7 @@
     function multimodalPath(startLatLng, modePref, allowTransfer) {
       const start = { lat: startLatLng.lat, lon: startLatLng.lng };
       const stopInfo = nearestStop(start.lat, start.lon);
-      if (!stopInfo || !stopInfo.stop) return null;
+      if (!stopInfo || !stopInfo.stop || stopInfo.distKm > MAX_WALK_KM) return null;
       const near = stopInfo.stop;
       const localBusGraph = busGraph || routeGraph;
       const localRailGraph = railGraph || buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
@@ -2347,16 +2529,17 @@
       if (modePref === "rail") {
         if (!railTargetKey) railTargetKey = nearestNodeKey(localRailGraph.nodes, target.lat, target.lon);
         const railPath = pathFromGraph(localRailGraph, { lat: near.lat, lon: near.lon }, target, railTargetKey);
-        path.push(...railPath);
-        return { path, near, mode: "rail" };
+        const dense = densifyPathPoints(path.concat(railPath), 0.35);
+        if (!railPath.length || dense.length < 4) return null;
+        return { path: dense, near, mode: "rail" };
       }
 
       if (modePref === "bus" && localBusGraph) {
         if (!busTargetKey) busTargetKey = nearestNodeKey(localBusGraph.nodes, target.lat, target.lon);
         const busPath = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, target, busTargetKey);
-        if (busPath.length) {
-          path.push(...busPath);
-          return { path, near, mode: "bus" };
+        const dense = densifyPathPoints(path.concat(busPath), 0.35);
+        if (busPath.length && dense.length >= 4) {
+          return { path: dense, near, mode: "bus" };
         }
       }
 
@@ -2395,13 +2578,13 @@
           // ensure transfer node
           path.push([bestRail.anchor.lat, bestRail.anchor.lon]);
           path.push(...bestRail.railPart);
-          return { path, near, mode: "mixed-transfer" };
+          const dense = densifyPathPoints(path, 0.35);
+          if (dense.length < 4) return null;
+          return { path: dense, near, mode: "mixed-transfer" };
         }
       }
 
-      // fallback: nearest bus/rail corridor heuristic
-      const alt = buildTravelPathLegacy(startLatLng);
-      if (alt) return alt;
+      if (path.length < 3) return null;
       return null;
     }
 
@@ -2412,14 +2595,65 @@
       }
       return d;
     }
+    function pathQuality(path, maxSegLimit = 999) {
+      const segLengths = [];
+      let totalSegLen = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+        segLengths.push(seg);
+        totalSegLen += seg;
+      }
+      const avgSeg = segLengths.length ? totalSegLen / segLengths.length : 0;
+      const maxSeg = segLengths.length ? Math.max(...segLengths) : 0;
+      const quality =
+        path.length < 6 || maxSeg > maxSegLimit || avgSeg > 1
+          ? "coarse"
+          : maxSeg > 1.5
+            ? "ok"
+            : "good";
+      return { quality, maxSeg, avgSeg };
+    }
+    function pathHasLongSegment(path, maxKm = Infinity, cityStrict = false) {
+      if (!Number.isFinite(maxKm) || maxKm === Infinity) return false;
+      for (let i = 0; i < path.length - 1; i++) {
+        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+        if (seg > maxKm) return true;
+        if (
+          cityStrict &&
+          path[i][0] < -31.5 &&
+          path[i][0] > -32.2 &&
+          path[i][1] > 115.6 &&
+          path[i][1] < 116.1 &&
+          seg > 1
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
 
     let busTargetKey = null;
     let railTargetKey = null;
+    const CBD_ANCHORS = [
+      { name: "Perth Station", lat: -31.9516, lon: 115.8605 },
+      { name: "Perth Underground", lat: -31.9524, lon: 115.8579 },
+      { name: "Elizabeth Quay", lat: -31.9563, lon: 115.8543 }
+    ];
+
+    function findCbdAnchor() {
+      if (!window.__stops) return null;
+      const candidates = [];
+      candidates.push(nearestStop(target.lat, target.lon));
+      CBD_ANCHORS.forEach((a) => candidates.push(nearestStop(a.lat, a.lon)));
+      return candidates
+        .filter((c) => c && c.stop && c.distKm <= MAX_WALK_KM)
+        .sort((a, b) => a.distKm - b.distKm)[0] || null;
+    }
 
     function busToRailRoute(start) {
       if (!busGraph || !railGraph || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      if (!near.stop) return null;
+      if (!near.stop || near.distKm > MAX_WALK_KM) return null;
       if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
       if (!railTargetKey) railTargetKey = nearestNodeKey(railGraph.nodes, target.lat, target.lon);
       const walkLeg = [
@@ -2437,7 +2671,14 @@
           stBusKey
         );
         const railPart = shortestPath(railGraph, { lat: st.lat, lon: st.lon }, target, railTargetKey || stRailKey);
-        if (busPart && busPart.length && railPart && railPart.length) {
+        if (
+          busPart &&
+          busPart.length > 2 &&
+          railPart &&
+          railPart.length > 2 &&
+          !pathHasLongSegment(busPart) &&
+          !pathHasLongSegment(railPart)
+        ) {
           const len = pathLength(busPart) + pathLength(railPart);
           if (!best || len < best.len) {
             best = { busPart, railPart, station: st, len };
@@ -2446,22 +2687,32 @@
       });
       if (!best) return null;
       const path = walkLeg.concat(best.busPart, [[best.station.lat, best.station.lon]], best.railPart);
-      return { path, near, mode: "bus-rail" };
+      const dense = densifyPathPoints(path, 0.35);
+      if (dense.length < 4) return null;
+      return { path: dense, near, mode: "bus-rail" };
     }
 
     function graphRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      if (!near.stop) return null;
-      if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
+      const cbdAnchor = findCbdAnchor();
+      if (!near.stop || near.distKm > MAX_WALK_KM || !cbdAnchor || !cbdAnchor.stop) return null;
+      if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, cbdAnchor.stop.lat, cbdAnchor.stop.lon);
       const walkLeg = [
         [start.lat, start.lng],
         [near.stop.lat, near.stop.lon]
       ];
-      const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, busTargetKey);
-      if (p && p.length > 1) {
+      const p = shortestPath(
+        busGraph,
+        { lat: near.stop.lat, lon: near.stop.lon },
+        { lat: cbdAnchor.stop.lat, lon: cbdAnchor.stop.lon },
+        busTargetKey
+      );
+      if (p && p.length > 2) {
+        const dense = densifyPathPoints(walkLeg.concat(p), 0.35);
+        if (dense.length < 4) return null;
         return {
-          path: walkLeg.concat(p),
+          path: dense,
           near,
           mode: "bus-graph"
         };
@@ -2480,6 +2731,7 @@
 
       const railChoice = bestLineForStop(near.stop);
       const busChoice = bestBusRouteForStop(near.stop);
+      if (!railChoice && !busChoice) return null;
 
       function buildCorridor(choice, points) {
         const linePoints = points;
@@ -2498,30 +2750,36 @@
       const busSpan = busChoice ? Math.abs(busChoice.stopIdx - busChoice.cbdIdx) : Infinity;
 
       if (busChoice && busSpan <= railSpan) {
-        buildCorridor(busChoice, busChoice.points);
+        buildCorridor(busChoice, densifyLine(busChoice.points, 0.3));
       } else if (railChoice) {
-        buildCorridor(railChoice, railChoice.line.points);
+        buildCorridor(railChoice, densifyLine(railChoice.line.points, 0.3));
       }
 
       path.push([target.lat, target.lon]);
-      return { path, near, railChoice, busChoice };
+      const dense = densifyLine(path, 0.3);
+      return { path: dense, near, railChoice, busChoice };
     }
 
     function carRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      if (!near.stop) return null;
+      if (!near.stop || near.distKm > MAX_WALK_KM) return null;
       const targetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
       const startKey = nearestNodeKey(busGraph.nodes, near.stop.lat, near.stop.lon);
       if (!startKey || !targetKey) return null;
       const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, targetKey);
       if (p && p.length > 1) {
-        return {
-          path: [
+        const dense = densifyPathPoints(
+          [
             [start.lat, start.lng],
             [near.stop.lat, near.stop.lon],
             ...p
           ],
+          0.35
+        );
+        if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+        return {
+          path: dense,
           near,
           mode: "car"
         };
@@ -2543,14 +2801,97 @@
         pref === "car" ? () => carRouteToCBD(clickLatLng) : null,
         pref !== "rail" && pref !== "car" ? () => busToRailRoute(clickLatLng) : null,
         pref !== "car" ? () => graphRouteToCBD(clickLatLng) : null,
-        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null,
-        () => buildTravelPathLegacy(clickLatLng)
+        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null
       ].filter(Boolean);
+      let best = null;
+      let bestScore = -1;
       for (const fn of attempts) {
         const travel = fn();
-        if (travel && travel.path && travel.path.length > 2) return travel;
+        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 2.5, true)) {
+          const pq = pathQuality(travel.path);
+          const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
+          if (score > bestScore) {
+            best = { ...travel, quality: pq.quality, maxSeg: pq.maxSeg };
+            bestScore = score;
+          }
+        }
       }
-      return null;
+      // try legacy as last resort if quality is poor or nothing found
+      if (bestScore < 1) {
+        const legacy = buildTravelPathLegacy(clickLatLng);
+        if (legacy && legacy.path && legacy.path.length > 2 && !pathHasLongSegment(legacy.path, 2.5, true)) {
+          const pq = pathQuality(legacy.path);
+          const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
+          if (score > bestScore) {
+            best = { ...legacy, quality: pq.quality, maxSeg: pq.maxSeg };
+            bestScore = score;
+          }
+        }
+      }
+      // last-resort: pure walk graph if everything else failed
+      if (!best && window.__stops && window.__stops.length) {
+        const walkGraph = buildWalkGraph(window.__stops);
+        const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
+        const cbd = nearestStop(target.lat, target.lon);
+        if (near.stop && cbd.stop) {
+          const p = shortestPath(
+            walkGraph,
+            { lat: near.stop.lat, lon: near.stop.lon },
+            { lat: cbd.stop.lat, lon: cbd.stop.lon }
+          );
+          if (p && p.length) {
+            best = {
+              path: densifyPathPoints(
+                [
+                  [clickLatLng.lat, clickLatLng.lng],
+                  [near.stop.lat, near.stop.lon],
+                  ...p
+                ],
+                0.2
+              ),
+              near,
+              mode: "walk-fallback",
+              quality: "coarse"
+            };
+          }
+        }
+      }
+      if (!best && window.__stops && window.__stops.length) {
+        const walkGraph = buildWalkGraph(window.__stops);
+        const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
+        const cbd = nearestStop(target.lat, target.lon);
+        if (near.stop && cbd.stop) {
+          const p = shortestPath(
+            walkGraph,
+            { lat: near.stop.lat, lon: near.stop.lon },
+            { lat: cbd.stop.lat, lon: cbd.stop.lon }
+          );
+          if (p && p.length) {
+            best = {
+              path: densifyPathPoints(
+                [
+                  [clickLatLng.lat, clickLatLng.lng],
+                  [near.stop.lat, near.stop.lon],
+                  ...p
+                ],
+                0.2
+              ),
+              near,
+              mode: "walk-fallback",
+              quality: "coarse"
+            };
+          }
+        }
+      }
+      if (!best) {
+        lastError = "No routed path";
+        return null;
+      }
+      const dense = densifyPathPoints(best.path, 0.15);
+      if (dense && dense.length >= 5) {
+        best.path = dense;
+      }
+      return best;
     }
 
     function animateTravel(clickLatLng) {
@@ -2573,14 +2914,15 @@
       // persist heat contribution for this click
       const base = mode === "car" ? 0 : computeWait();
       const speed = mode === "car" ? Number(document.getElementById("carSpeed").value || CAR_SPEED) : Number(netSpeed.value);
-      const commute = computeCommute(near.stop, base, speed);
+      const commute = computeCommute(near.stop, base, speed, { path, mode });
       addHeatPath(path, commute);
 
       const totalLen = pathLength(path);
+      const { quality, maxSeg } = pathQuality(path, 3);
       const debugPath = document.getElementById("debug-path");
       debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
         1
-      )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""}`;
+      )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""} · quality ${quality} (max seg ${maxSeg.toFixed(2)} km)`;
       const modeBadge = L.marker(path[path.length - 1], {
         icon: L.divIcon({
           className: "rail-label",
@@ -2590,9 +2932,6 @@
       }).addTo(simRootLayer);
       console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
 
-      const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
-      const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
-
       const segLengths = [];
       let totalSegLen = 0;
       for (let i = 0; i < path.length - 1; i++) {
@@ -2600,6 +2939,9 @@
         segLengths.push(seg);
         totalSegLen += seg;
       }
+
+      const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
+      const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
       const modeColor = colourForMinutes(commute);
