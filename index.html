@@ -1492,7 +1492,7 @@
       }
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
       const total = stops.length;
-      const step = total > 4000 ? Math.ceil(total / 4000) : 1;
+      const step = 1;
       let idx = 0;
       function processChunk(deadline) {
         let renderedCount = 0;
