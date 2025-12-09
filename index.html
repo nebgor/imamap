@@ -46,6 +46,8 @@
       top: 14px;
       left: 14px;
       width: 340px;
+      max-height: 90vh;
+      overflow-y: auto;
       background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -95,14 +97,15 @@
     .controls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 10px;
       font-size: 13px;
       color: var(--muted);
+      flex-wrap: wrap;
     }
     button {
-      padding: 9px 14px;
-      border-radius: 12px;
+      padding: 8px 12px;
+      border-radius: 10px;
       border: none;
       font-weight: 700;
       letter-spacing: 0.2px;
@@ -118,6 +121,14 @@
       margin-top: 4px;
       font-size: 12px;
       color: var(--muted);
+    }
+    .btn-compact {
+      flex: 1 1 calc(50% - 8px);
+      min-width: 140px;
+    }
+    .btn-tiny {
+      padding: 6px 10px;
+      font-size: 12px;
     }
     .legend-bar {
       height: 12px;
@@ -313,21 +324,21 @@
       </label>
     </div>
     <div class="controls" style="flex-wrap: wrap;">
-      <button id="simulateRandom">Random sim</button>
-      <button id="radialSim">Radial sims</button>
-      <button id="rushSim">CBD rush</button>
-      <button id="rainSim">Rain</button>
-      <button id="demoRun">Demo</button>
+      <button class="btn-compact" id="simulateRandom">Random sim</button>
+      <button class="btn-compact" id="radialSim">Radial sims</button>
+      <button class="btn-compact" id="rushSim">CBD rush</button>
+      <button class="btn-compact" id="rainSim">Rain</button>
+      <button class="btn-compact" id="demoRun">Demo</button>
       <label style="display:flex;align-items:center;gap:6px;">
         <input type="checkbox" id="keepVisuals" />
         Keep visuals
       </label>
     </div>
     <div class="controls">
-      <button id="recompute">Recompute</button>
-      <button id="saveSnapshot">Snapshot</button>
-      <button id="clearVisuals">Clear visuals</button>
-      <button id="clearCaches">Reset caches</button>
+      <button class="btn-compact btn-tiny" id="recompute">Recompute</button>
+      <button class="btn-compact btn-tiny" id="saveSnapshot">Snapshot</button>
+      <button class="btn-compact btn-tiny" id="clearVisuals">Clear visuals</button>
+      <button class="btn-compact btn-tiny" id="clearCaches">Reset caches</button>
     </div>
     <div class="controls">
       <label style="display:flex;align-items:center;gap:6px;">
