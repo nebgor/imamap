@@ -506,8 +506,9 @@
       }
       routes.forEach((r) => {
         (r.paths || []).forEach((path) => {
-          for (let i = 0; i < path.length - 1; i++) {
-            addEdge(path[i], path[i + 1]);
+          const dense = densifyLine(path, 0.5);
+          for (let i = 0; i < dense.length - 1; i++) {
+            addEdge(dense[i], dense[i + 1]);
           }
         });
       });
@@ -1387,6 +1388,11 @@
       return netSpeed;
     }
 
+    function getHeadway() {
+      const h = Number(document.getElementById("headway")?.value || HEADWAY_MIN);
+      return Number.isFinite(h) ? h : HEADWAY_MIN;
+    }
+
     function computeCommute(stop, baseWait, netSpeed, opts = {}) {
       if (!isValidStop(stop)) return Infinity;
       if (opts.path && Array.isArray(opts.path) && opts.path.length > 1) {
@@ -1394,8 +1400,13 @@
         const rideKm = Math.max(0, pathLength(opts.path) - walkKm);
         const walkMins = walkKm * 12; // ~5 km/h walking
         const speed = effectiveSpeedForMode(opts.mode, netSpeed);
+        const headway = getHeadway();
+        let waits = baseWait;
+        if (opts.mode === "bus" || opts.mode === "bus-graph") waits += headway / 2;
+        if (opts.mode === "rail") waits += headway / 2;
+        if (opts.mode === "bus-rail" || opts.mode === "mixed-transfer") waits += headway + 3; // two legs + small transfer penalty
         const rideMins = (rideKm / Math.max(speed, 1)) * 60;
-        return baseWait + walkMins + rideMins;
+        return waits + walkMins + rideMins;
       }
       // fallback estimation when no path known
       const walkKm = haversine(stop.lat, stop.lon, target.lat, target.lon) * 0.1;
