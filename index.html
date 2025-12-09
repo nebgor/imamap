@@ -1191,13 +1191,46 @@
       return factor;
     }
 
+    function hexToRgb(hex) {
+      const n = hex.replace("#", "");
+      const v = n.length === 3 ? n.split("").map((c) => c + c).join("") : n;
+      return {
+        r: parseInt(v.slice(0, 2), 16),
+        g: parseInt(v.slice(2, 4), 16),
+        b: parseInt(v.slice(4, 6), 16)
+      };
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    const TIME_COLORS = [
+      { t: 0, c: "#22c55e" },
+      { t: 15, c: "#84cc16" },
+      { t: 30, c: "#facc15" },
+      { t: 45, c: "#f97316" },
+      { t: 60, c: "#ef4444" },
+      { t: 90, c: "#be123c" },
+      { t: 120, c: "#7e22ce" }
+    ];
+
     function colourForMinutes(mins) {
-      const clamped = Math.max(0, Math.min(90, mins));
-      const ratio = clamped / 90;
-      const hue = 120 - ratio * 120;
-      const sat = 80;
-      const light = 50 + ratio * 5;
-      return `hsl(${hue}, ${sat}%, ${light}%)`;
+      const clamped = Math.max(0, Math.min(120, mins));
+      for (let i = 0; i < TIME_COLORS.length - 1; i++) {
+        const a = TIME_COLORS[i];
+        const b = TIME_COLORS[i + 1];
+        if (clamped >= a.t && clamped <= b.t) {
+          const t = (clamped - a.t) / (b.t - a.t || 1);
+          const ca = hexToRgb(a.c);
+          const cb = hexToRgb(b.c);
+          const r = Math.round(lerp(ca.r, cb.r, t));
+          const g = Math.round(lerp(ca.g, cb.g, t));
+          const bcol = Math.round(lerp(ca.b, cb.b, t));
+          return `rgb(${r}, ${g}, ${bcol})`;
+        }
+      }
+      return TIME_COLORS[TIME_COLORS.length - 1].c;
     }
 
     function computeCommute(stop, baseWait, netSpeed) {
@@ -1275,7 +1308,10 @@
     function renderStops(stops, baseWait, netSpeed) {
       stopsLayer.clearLayers();
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
-      stops.forEach((stop) => {
+      const total = stops.length;
+      const step = total > 4000 ? Math.ceil(total / 4000) : 1;
+      stops.forEach((stop, idx) => {
+        if (step > 1 && idx % step !== 0 && !majorPattern.test(stop.stopname || "")) return;
         const commute = computeCommute(stop, baseWait, netSpeed);
         const color = colourForMinutes(commute);
         const isMajor = majorPattern.test(stop.stopname || "");
@@ -1291,8 +1327,9 @@
           )
           .addTo(stopsLayer);
       });
-      document.getElementById("status").textContent = `Rendered ${stops.length} stops`;
-      updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed, data: DATA_SOURCE });
+      const rendered = step > 1 ? Math.ceil(total / step) : total;
+      document.getElementById("status").textContent = `Rendered ${rendered}/${total} stops`;
+      updateDebugMeta({ stops: total, baseWait, speed: netSpeed, data: DATA_SOURCE });
     }
 
     function readStopCache() {
