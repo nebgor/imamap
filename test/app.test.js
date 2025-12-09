@@ -43,6 +43,13 @@ describe("index.html basics", () => {
     expect(html).toContain('id="netSpeed"');
   });
 
+  it("exposes property price overlays and data sources", () => {
+    expect(html).toContain('id="toggleProperty"');
+    expect(html).toContain('id="togglePropertyPins"');
+    expect(html).toContain("data/suburb-polygons.geojson");
+    expect(html).toContain("renderPropertyLayer");
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });

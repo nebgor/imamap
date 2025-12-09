@@ -122,6 +122,9 @@
       font-size: 12px;
       color: var(--muted);
     }
+    .legend.price .legend-bar {
+      background: linear-gradient(90deg, #0ea5e9, #10b981, #84cc16, #f59e0b, #ef4444);
+    }
     .btn-compact {
       flex: 1 1 calc(50% - 8px);
       min-width: 140px;
@@ -411,6 +414,26 @@
       </div>
     </div>
     <div class="section">
+      <h2>Property insight</h2>
+      <div class="controls">
+        <label style="display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="toggleProperty" checked />
+          Suburb prices
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="togglePropertyPins" checked />
+          Price pins
+        </label>
+      </div>
+      <div class="legend price" id="propertyLegend">
+        Property price ($k)
+        <div class="legend-bar"></div>
+        <div class="legend-scale">
+          <span id="propertyMin">$—</span><span>higher</span><span id="propertyMax">$—</span>
+        </div>
+      </div>
+    </div>
+    <div class="section">
       <h2>Experiments</h2>
       <div class="row">
         <label>Suburb experiment
@@ -609,6 +632,7 @@
       ellenbrook: { name: "Ellenbrook", lat: -31.776, lon: 115.97 }
     };
     let PROPERTY_DATA = [];
+    let SUBURB_POLYGONS = null;
     async function loadLocalFallbackStops() {
       try {
         const [busRes, railRes] = await Promise.all([
@@ -648,6 +672,7 @@
     const STOP_CACHE_MAX_AGE_HRS = 6;
     const ROUTE_CACHE_KEY = "routesCacheV2";
     const ROUTE_CACHE_MAX_AGE_HRS = 12;
+    const MAX_WALK_KM = 3;
     let MODE_PREF = "mixed";
     let ALLOW_TRANSFER = true;
     let BUS_SPEED = 40;
@@ -679,6 +704,7 @@
     const stationLayer = L.layerGroup().addTo(map);
     const simRootLayer = L.layerGroup().addTo(map);
     const roadsLayer = L.layerGroup();
+    const propertyLayer = L.layerGroup();
     let stopsHiddenForZoom = false;
     let heatHiddenForZoom = false;
     let roadsHiddenForZoom = false;
@@ -1382,16 +1408,100 @@
       }
     }
 
+    function priceColor(val, min, max) {
+      if (typeof val !== "number" || typeof min !== "number" || typeof max !== "number" || max <= min) {
+        return "#22c55e";
+      }
+      const t = Math.max(0, Math.min(1, (val - min) / (max - min)));
+      const hue = 180 - t * 180; // teal -> red
+      return `hsl(${hue}, 75%, 55%)`;
+    }
+
+    function updatePropertyLegend(min, max) {
+      const legend = document.getElementById("propertyLegend");
+      if (!legend) return;
+      const minEl = document.getElementById("propertyMin");
+      const maxEl = document.getElementById("propertyMax");
+      if (typeof min === "number" && typeof max === "number" && max > 0) {
+        minEl.textContent = `$${Math.round(min)}k`;
+        maxEl.textContent = `$${Math.round(max)}k`;
+        legend.classList.remove("hidden");
+      } else {
+        minEl.textContent = "$—";
+        maxEl.textContent = "$—";
+        legend.classList.add("hidden");
+      }
+    }
+
     async function loadPropertyData() {
       try {
-        const res = await fetch("data/property-prices.json");
-        if (!res.ok) throw new Error("property data fetch failed");
-        const data = await res.json();
+        const [priceRes, polyRes] = await Promise.all([
+          fetch("data/property-prices.json"),
+          fetch("data/suburb-polygons.geojson")
+        ]);
+        if (!priceRes.ok) throw new Error("property data fetch failed");
+        const data = await priceRes.json();
         PROPERTY_DATA = Array.isArray(data) ? data : [];
+        if (polyRes.ok) {
+          SUBURB_POLYGONS = await polyRes.json();
+        }
+        renderPropertyLayer(document.getElementById("toggleProperty")?.checked !== false);
+        updateDebugMeta();
       } catch (err) {
         console.warn("Property data load failed", err);
         lastError = err.message || "property load failed";
+        updatePropertyLegend();
       }
+    }
+
+    function renderPropertyLayer(show) {
+      propertyLayer.clearLayers();
+      if (!show) {
+        propertyLayer.remove();
+        updatePropertyLegend();
+        return;
+      }
+      if (!SUBURB_POLYGONS || !Array.isArray(SUBURB_POLYGONS.features)) {
+        updatePropertyLegend();
+        return;
+      }
+      const priceValues = SUBURB_POLYGONS.features
+        .map((f) => (f.properties ? Number(f.properties.priceK) : NaN))
+        .filter((v) => Number.isFinite(v));
+      const min = priceValues.length ? Math.min(...priceValues) : null;
+      const max = priceValues.length ? Math.max(...priceValues) : null;
+      updatePropertyLegend(min, max);
+      L.geoJSON(SUBURB_POLYGONS, {
+        style: (feature) => {
+          const v = feature.properties ? Number(feature.properties.priceK) : null;
+          const color = priceColor(v, min, max);
+          return { color, fillColor: color, weight: 1, opacity: 0.8, fillOpacity: 0.25 };
+        },
+        onEachFeature: (feature, layer) => {
+          const v = feature.properties ? feature.properties.priceK : null;
+          layer.bindTooltip(
+            `${feature.properties?.name || "Suburb"} · ${v ? `$${v}k` : "n/a"}`,
+            { sticky: true }
+          );
+        }
+      }).addTo(propertyLayer);
+
+      if (document.getElementById("togglePropertyPins")?.checked && PROPERTY_DATA && PROPERTY_DATA.length) {
+        PROPERTY_DATA.forEach((p) => {
+          if (!p.lat || !p.lon) return;
+          const color = priceColor(p.priceK, min, max);
+          L.circleMarker([p.lat, p.lon], {
+            radius: 5,
+            color: "#0b1228",
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.95
+          })
+            .bindTooltip(`${p.name} · $${p.priceK}k`, { sticky: true })
+            .addTo(propertyLayer);
+        });
+      }
+      propertyLayer.addTo(map);
     }
 
     function nearestProperty(lat, lon) {
@@ -1479,8 +1589,9 @@
       const busNodes = busGraph && busGraph.nodes ? busGraph.nodes.size : 0;
       const busRoutes = busGraph && busGraph.routes ? busGraph.routes.length : 0;
       const railNodes = railGraph && railGraph.nodes ? railGraph.nodes.size : 0;
+      const suburbAreas = SUBURB_POLYGONS && Array.isArray(SUBURB_POLYGONS.features) ? SUBURB_POLYGONS.features.length : 0;
       const meta = document.getElementById("debug-meta");
-      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}`;
+      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Properties: ${PROPERTY_DATA.length} pts/${suburbAreas} areas · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}`;
     }
 
     function renderStops(stops, baseWait, netSpeed) {
@@ -1731,8 +1842,7 @@
         window.__stops = stops;
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
-        loadRoads();
-        loadPropertyData();
+        await Promise.all([loadRoads(), loadPropertyData()]);
         // prefetch metro routes
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
@@ -1781,6 +1891,13 @@
       } else {
         roadsLayer.remove();
       }
+    });
+    document.getElementById("toggleProperty").addEventListener("change", (e) => {
+      renderPropertyLayer(e.target.checked);
+    });
+    document.getElementById("togglePropertyPins").addEventListener("change", () => {
+      const show = document.getElementById("toggleProperty").checked;
+      renderPropertyLayer(show);
     });
     document.getElementById("toggleStops").addEventListener("change", () => {
       if (window.__stops) renderStops(window.__stops, Number(baseWait.value), Number(netSpeed.value));
@@ -2214,7 +2331,7 @@
     function multimodalPath(startLatLng, modePref, allowTransfer) {
       const start = { lat: startLatLng.lat, lon: startLatLng.lng };
       const stopInfo = nearestStop(start.lat, start.lon);
-      if (!stopInfo || !stopInfo.stop) return null;
+      if (!stopInfo || !stopInfo.stop || stopInfo.distKm > MAX_WALK_KM) return null;
       const near = stopInfo.stop;
       const localBusGraph = busGraph || routeGraph;
       const localRailGraph = railGraph || buildRouteGraph(railLines.map((r) => ({ paths: [r.points] })));
@@ -2311,7 +2428,7 @@
     function busToRailRoute(start) {
       if (!busGraph || !railGraph || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      if (!near.stop) return null;
+      if (!near.stop || near.distKm > MAX_WALK_KM) return null;
       if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
       if (!railTargetKey) railTargetKey = nearestNodeKey(railGraph.nodes, target.lat, target.lon);
       const walkLeg = [
@@ -2352,7 +2469,7 @@
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
       const cbdAnchor = nearestStop(target.lat, target.lon);
-      if (!near.stop || !cbdAnchor.stop) return null;
+      if (!near.stop || near.distKm > MAX_WALK_KM || !cbdAnchor.stop) return null;
       if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, cbdAnchor.stop.lat, cbdAnchor.stop.lon);
       const walkLeg = [
         [start.lat, start.lng],
@@ -2417,7 +2534,7 @@
     function carRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      if (!near.stop) return null;
+      if (!near.stop || near.distKm > MAX_WALK_KM) return null;
       const targetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
       const startKey = nearestNodeKey(busGraph.nodes, near.stop.lat, near.stop.lon);
       if (!startKey || !targetKey) return null;
