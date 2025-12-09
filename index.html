@@ -2682,10 +2682,25 @@
       addHeatPath(path, commute);
 
       const totalLen = pathLength(path);
+      const segLengths = [];
+      let totalSegLen = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+        segLengths.push(seg);
+        totalSegLen += seg;
+      }
+      const avgSeg = segLengths.length ? totalSegLen / segLengths.length : 0;
+      const maxSeg = segLengths.length ? Math.max(...segLengths) : 0;
+      const quality =
+        path.length < 6 || maxSeg > 2.5 || avgSeg > 1
+          ? "coarse"
+          : maxSeg > 1.5
+            ? "ok"
+            : "good";
       const debugPath = document.getElementById("debug-path");
       debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
         1
-      )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""}`;
+      )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""} · quality ${quality} (max seg ${maxSeg.toFixed(2)} km)`;
       const modeBadge = L.marker(path[path.length - 1], {
         icon: L.divIcon({
           className: "rail-label",
@@ -2697,14 +2712,6 @@
 
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
-
-      const segLengths = [];
-      let totalSegLen = 0;
-      for (let i = 0; i < path.length - 1; i++) {
-        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
-        segLengths.push(seg);
-        totalSegLen += seg;
-      }
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
       const modeColor = colourForMinutes(commute);
