@@ -323,6 +323,22 @@
       <button id="demoRun">Demo run</button>
       <button id="clearVisuals">Clear visuals</button>
       <button id="scarboroughDemo">Scarborough test</button>
+      <button id="radialSim">Radial sims</button>
+    </div>
+    <div class="row">
+      <label>Suburb experiment
+        <select id="presetSelect">
+          <option value="scarborough">Scarborough</option>
+          <option value="joondalup">Joondalup</option>
+          <option value="fremantle">Fremantle</option>
+          <option value="midland">Midland</option>
+          <option value="armadale">Armadale</option>
+          <option value="ellenbrook">Ellenbrook</option>
+        </select>
+      </label>
+      <label style="align-self:flex-end;">
+        <button id="runPreset">Run preset</button>
+      </label>
     </div>
     <div class="legend">
       Commute minutes
@@ -494,6 +510,14 @@
       car: "#a855f7",
       fallback: "#ef4444",
       auto: "#22c55e"
+    };
+    const PRESETS = {
+      scarborough: { name: "Scarborough", lat: -31.894, lon: 115.751 },
+      joondalup: { name: "Joondalup", lat: -31.744, lon: 115.768 },
+      fremantle: { name: "Fremantle", lat: -32.053, lon: 115.748 },
+      midland: { name: "Midland", lat: -31.889, lon: 116.005 },
+      armadale: { name: "Armadale", lat: -32.153, lon: 116.016 },
+      ellenbrook: { name: "Ellenbrook", lat: -31.776, lon: 115.97 }
     };
     async function loadLocalFallbackStops() {
       try {
@@ -1043,6 +1067,14 @@
       const dLon = toRad(lon2 - lon1);
       const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
       return 2 * R * Math.asin(Math.sqrt(a));
+    }
+
+    function kmToDegLat(km) {
+      return km / 111;
+    }
+
+    function kmToDegLon(km, lat) {
+      return km / (111 * Math.cos((lat * Math.PI) / 180));
     }
 
     function densifyLine(points, stepKm = 1) {
@@ -1617,6 +1649,16 @@
       return travel;
     }
 
+    function randomStopWithin(distMinKm = 0, distMaxKm = 120) {
+      if (!window.__stops || !window.__stops.length) return null;
+      const candidates = window.__stops.filter((s) => {
+        const d = haversine(s.lat, s.lon, target.lat, target.lon);
+        return d >= distMinKm && d <= distMaxKm;
+      });
+      if (!candidates.length) return window.__stops[Math.floor(rand() * window.__stops.length)];
+      return candidates[Math.floor(rand() * candidates.length)];
+    }
+
     function simulateRandom(count = 20) {
       if (!DATA_READY) {
         document.getElementById("status").textContent = "Still loading data…";
@@ -1631,15 +1673,40 @@
       saveHeat([]);
       const bounds = { minLat: -32.6, maxLat: -31.4, minLon: 115.5, maxLon: 116.2 };
       for (let i = 0; i < count; i++) {
-        const lat = bounds.minLat + rand() * (bounds.maxLat - bounds.minLat);
-        const lon = bounds.minLon + rand() * (bounds.maxLon - bounds.minLon);
-        const travel = randomTravelPlan(lat, lon);
+        const stop = randomStopWithin(0, 120);
+        if (!stop) continue;
+        const jitterLat = stop.lat + kmToDegLat((rand() - 0.5) * 0.8);
+        const jitterLon = stop.lon + kmToDegLon((rand() - 0.5) * 0.8, stop.lat);
+        const travel = randomTravelPlan(jitterLat, jitterLon);
         if (!travel || !travel.near || !isValidStop(travel.near.stop)) continue;
         const base = Number(baseWait.value);
         const speed = Number(netSpeed.value);
         const commute = computeCommute(travel.near.stop, base, speed);
         addHeatPath(travel.path, commute);
       }
+    }
+
+    function simulateRadial(rings = [5, 12, 25], perRing = 6) {
+      if (!DATA_READY) return;
+      simRootLayer.clearLayers();
+      const seeds = [];
+      rings.forEach((km) => {
+        for (let i = 0; i < perRing; i++) {
+          const bearing = (i / perRing) * 2 * Math.PI;
+          const lat = target.lat + kmToDegLat(km) * Math.cos(bearing);
+          const lon = target.lon + kmToDegLon(km, target.lat) * Math.sin(bearing);
+          seeds.push({ lat, lon });
+        }
+      });
+      seeds.forEach((s) => {
+        const travel = randomTravelPlan(s.lat, s.lon);
+        if (!travel || !travel.near || !isValidStop(travel.near.stop)) return;
+        const base = Number(baseWait.value);
+        const speed = Number(netSpeed.value);
+        const commute = computeCommute(travel.near.stop, base, speed);
+        addHeatPath(travel.path, commute);
+      });
+      document.getElementById("status").textContent = `Radial sims: ${seeds.length} seeds`;
     }
 
     document.getElementById("simulateRandom").addEventListener("click", () => {
@@ -1650,6 +1717,16 @@
       const scarb = { lat: -31.894, lng: 115.751 };
       animateTravel(scarb);
       map.setView([scarb.lat, scarb.lng], 12);
+    });
+    document.getElementById("radialSim").addEventListener("click", () => {
+      simulateRadial([6, 12, 24], 8);
+    });
+    document.getElementById("runPreset").addEventListener("click", () => {
+      const key = document.getElementById("presetSelect").value;
+      const preset = PRESETS[key];
+      if (!preset) return;
+      animateTravel({ lat: preset.lat, lng: preset.lon });
+      map.setView([preset.lat, preset.lon], 12);
     });
 
     document.getElementById("modePref").addEventListener("change", (e) => {
