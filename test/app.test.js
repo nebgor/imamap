@@ -50,6 +50,10 @@ describe("index.html basics", () => {
     expect(html).toContain("renderPropertyLayer");
   });
 
+  it("sets willReadFrequently on heat canvas to avoid perf warnings", () => {
+    expect(html).toContain("willReadFrequently");
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });
