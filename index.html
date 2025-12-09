@@ -310,6 +310,13 @@
   <div class="panel">
     <h1>Perth PT commute sketch</h1>
     <div class="section">
+      <h2>Rendering</h2>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleDeck" />
+        WebGL (deck.gl)
+      </label>
+    </div>
+    <div class="section">
       <h2>Scenario</h2>
       <div class="row">
         <label>Base wait (min)
@@ -468,6 +475,7 @@
     crossorigin=""
   ></script>
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
+  <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
   <script>
     function buildRouteGraph(routes) {
       const nodes = new Map();
@@ -682,6 +690,9 @@
     let stopsHiddenForZoom = false;
     let heatHiddenForZoom = false;
     let roadsHiddenForZoom = false;
+    let deckInstance = null;
+    let deckCanvas = null;
+    let USE_DECK = false;
     let simTimers = [];
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
@@ -1526,6 +1537,90 @@
         }
       }
       scheduleIdle(processChunk);
+    }
+
+    function hexToRgbArray(hex) {
+      const n = hex.replace("#", "");
+      const v = n.length === 3 ? n.split("").map((c) => c + c).join("") : n;
+      return [
+        parseInt(v.slice(0, 2), 16),
+        parseInt(v.slice(2, 4), 16),
+        parseInt(v.slice(4, 6), 16)
+      ];
+    }
+
+    function buildDeckLayers() {
+      if (!USE_DECK || !window.deck || !window.__stops) return [];
+      const stops = window.__stops || [];
+      const heat = loadHeat();
+      const stopLayer = new deck.ScatterplotLayer({
+        id: "stops-layer",
+        data: stops,
+        getPosition: (d) => [d.lon, d.lat],
+        getFillColor: (d) => hexToRgbArray(colourForMinutes(computeCommute(d, Number(baseWait.value), Number(netSpeed.value)))).concat(200),
+        getRadius: 60,
+        radiusUnits: "meters",
+        stroked: false,
+        pickable: true
+      });
+      const pathLayer = new deck.PathLayer({
+        id: "paths-layer",
+        data: heat,
+        getPath: (d) => d.path.map((p) => [p[1], p[0]]),
+        getColor: (d) => hexToRgbArray(d.color || "#4dd4a4"),
+        widthUnits: "pixels",
+        getWidth: 2,
+        opacity: 0.5
+      });
+      return [stopLayer, pathLayer];
+    }
+
+    function ensureDeck() {
+      if (!document.getElementById("toggleDeck") || !document.getElementById("toggleDeck").checked) {
+        USE_DECK = false;
+        if (deckInstance) {
+          deckInstance.finalize();
+          deckInstance = null;
+          if (deckCanvas) {
+            deckCanvas.remove();
+            deckCanvas = null;
+          }
+        }
+        return;
+      }
+      if (!window.deck) {
+        document.getElementById("status").textContent = "WebGL not available";
+        return;
+      }
+      USE_DECK = true;
+      if (!deckCanvas) {
+        deckCanvas = document.createElement("canvas");
+        deckCanvas.id = "deck-canvas";
+        deckCanvas.style.position = "absolute";
+        deckCanvas.style.inset = "0";
+        deckCanvas.style.zIndex = "800";
+        document.getElementById("map").appendChild(deckCanvas);
+      }
+      const size = map.getSize();
+      deckCanvas.width = size.x;
+      deckCanvas.height = size.y;
+      const center = map.getCenter();
+      const viewState = { longitude: center.lng, latitude: center.lat, zoom: map.getZoom() };
+      deckInstance =
+        deckInstance ||
+        new deck.DeckGL({
+          canvas: deckCanvas,
+          controller: false
+        });
+      deckInstance.setProps({
+        width: size.x,
+        height: size.y,
+        viewState,
+        layers: buildDeckLayers()
+      });
+      stopsLayer.remove();
+      heatLineLayer.clearLayers();
+      heatVisLayer.setLatLngs([]);
     }
 
     function pauseHeavyLayers() {
