@@ -1375,14 +1375,34 @@
       return TIME_COLORS[TIME_COLORS.length - 1].c;
     }
 
-    function computeCommute(stop, baseWait, netSpeed) {
+    function effectiveSpeedForMode(mode, netSpeed) {
+      if (mode === "rail") return Number(document.getElementById("railSpeed")?.value || RAIL_SPEED);
+      if (mode === "bus" || mode === "bus-graph") return Number(document.getElementById("busSpeed")?.value || BUS_SPEED);
+      if (mode === "car") return Number(document.getElementById("carSpeed")?.value || CAR_SPEED);
+      if (mode === "bus-rail" || mode === "mixed-transfer") {
+        const bus = Number(document.getElementById("busSpeed")?.value || BUS_SPEED);
+        const rail = Number(document.getElementById("railSpeed")?.value || RAIL_SPEED);
+        return (bus + rail) / 2;
+      }
+      return netSpeed;
+    }
+
+    function computeCommute(stop, baseWait, netSpeed, opts = {}) {
       if (!isValidStop(stop)) return Infinity;
-      // estimate walk to stop (roughly 10 min per km)
+      if (opts.path && Array.isArray(opts.path) && opts.path.length > 1) {
+        const walkKm = haversine(opts.path[0][0], opts.path[0][1], opts.path[1][0], opts.path[1][1]);
+        const rideKm = Math.max(0, pathLength(opts.path) - walkKm);
+        const walkMins = walkKm * 12; // ~5 km/h walking
+        const speed = effectiveSpeedForMode(opts.mode, netSpeed);
+        const rideMins = (rideKm / Math.max(speed, 1)) * 60;
+        return baseWait + walkMins + rideMins;
+      }
+      // fallback estimation when no path known
       const walkKm = haversine(stop.lat, stop.lon, target.lat, target.lon) * 0.1;
       const walkPenalty = walkKm * 10;
       const distanceKm = haversine(stop.lat, stop.lon, target.lat, target.lon);
-      const corridor = corridorFactor(stop.lat, stop.lon);
-      const effectiveSpeed = netSpeed * (1 / corridor);
+      const corridor = Math.max(1, corridorFactor(stop.lat, stop.lon));
+      const effectiveSpeed = netSpeed / corridor;
       const rideMins = (distanceKm / Math.max(effectiveSpeed, 1)) * 60;
       return baseWait + rideMins + walkPenalty;
     }
@@ -2647,7 +2667,7 @@
       // persist heat contribution for this click
       const base = mode === "car" ? 0 : computeWait();
       const speed = mode === "car" ? Number(document.getElementById("carSpeed").value || CAR_SPEED) : Number(netSpeed.value);
-      const commute = computeCommute(near.stop, base, speed);
+      const commute = computeCommute(near.stop, base, speed, { path, mode });
       addHeatPath(path, commute);
 
       const totalLen = pathLength(path);
