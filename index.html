@@ -1969,8 +1969,8 @@
           const speed = Number(netSpeed.value);
           const commute = computeCommute(travel.near.stop, base, speed);
           addHeatPath(travel.path, commute);
-        }
       }
+    }
       setBusy("", false);
     }
 
@@ -1978,17 +1978,29 @@
       if (!DATA_READY) return;
       const keep = document.getElementById("keepVisuals").checked;
       if (!keep) simRootLayer.clearLayers();
-      for (let i = 0; i < drops; i++) {
-        const stop = randomStopWithin(0, 80);
-        if (!stop) continue;
-        const jitterLat = stop.lat + kmToDegLat((rand() - 0.5) * 0.6);
-        const jitterLon = stop.lon + kmToDegLon((rand() - 0.5) * 0.6, stop.lat);
-        const travel = randomTravelPlan(jitterLat, jitterLon);
-        if (!travel || !travel.near || !isValidStop(travel.near.stop)) continue;
-        const modeColor = MODE_COLORS[travel.mode || "auto"] || MODE_COLORS.fallback;
-        L.polyline(travel.path, { color: modeColor, weight: 1.5, opacity: 0.4 }).addTo(simRootLayer);
+      let idx = 0;
+      function dropChunk() {
+        let processed = 0;
+        while (idx < drops && processed < 15) {
+          const stop = randomStopWithin(0, 80);
+          if (stop) {
+            const jitterLat = stop.lat + kmToDegLat((rand() - 0.5) * 0.6);
+            const jitterLon = stop.lon + kmToDegLon((rand() - 0.5) * 0.6, stop.lat);
+            const travel = randomTravelPlan(jitterLat, jitterLon);
+            if (travel && travel.near && isValidStop(travel.near.stop)) {
+              const modeColor = MODE_COLORS[travel.mode || "auto"] || MODE_COLORS.fallback;
+              L.polyline(travel.path, { color: modeColor, weight: 1.5, opacity: 0.4 }).addTo(simRootLayer);
+            }
+          }
+          idx += 1;
+          processed += 1;
+        }
+        document.getElementById("status").textContent = `Rain sim: ${Math.min(idx, drops)}/${drops}`;
+        if (idx < drops) {
+          requestAnimationFrame(dropChunk);
+        }
       }
-      document.getElementById("status").textContent = `Rain sim: ${drops} drops`;
+      requestAnimationFrame(dropChunk);
     }
 
     function simulateRadial(rings = [5, 12, 25], perRing = 6) {
@@ -2010,7 +2022,7 @@
       seeds.forEach((s, idx) => {
         const travel = randomTravelPlan(s.lat, s.lon);
         if (!travel || !travel.near || !isValidStop(travel.near.stop)) return;
-        if (idx < 6) {
+        if (idx < 4) {
           animateTravel({ lat: s.lat, lng: s.lon });
         } else {
           const base = Number(baseWait.value);
@@ -2045,21 +2057,21 @@
     document.getElementById("rushSim").addEventListener("click", () => {
       if (!window.__stops || !window.__stops.length) return;
       if (!document.getElementById("keepVisuals").checked) simRootLayer.clearLayers();
-      const batch = window.__stops.filter((_, i) => i % 15 === 0).slice(0, 300);
+      const batch = window.__stops.filter((_, i) => i % 25 === 0).slice(0, 150);
       batch.forEach((s, idx) => {
-        if (idx < 8) {
+        if (idx < 6) {
           animateTravel({ lat: s.lat, lng: s.lon });
           return;
         }
         const travel = buildTravelPath({ lat: s.lat, lng: s.lon });
         if (!travel || !travel.path || travel.path.length < 3) return;
         const modeColor = MODE_COLORS[travel.mode || "auto"] || MODE_COLORS.fallback;
-        L.polyline(travel.path, { color: modeColor, weight: 2, opacity: 0.6 }).addTo(simRootLayer);
+        L.polyline(travel.path, { color: modeColor, weight: 1.5, opacity: 0.45 }).addTo(simRootLayer);
       });
       document.getElementById("status").textContent = `Rush sim: ${batch.length} starts`;
     });
     document.getElementById("rainSim").addEventListener("click", () => {
-      rainSim(100);
+      rainSim(60);
     });
     document.getElementById("scenarioPreset").addEventListener("change", (e) => {
       const v = e.target.value;
