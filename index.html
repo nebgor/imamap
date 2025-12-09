@@ -321,6 +321,14 @@
           <option value="false">off</option>
         </select>
       </label>
+      <label>Scenario
+        <select id="scenarioPreset">
+          <option value="custom" selected>custom</option>
+          <option value="peak">peak</option>
+          <option value="interpeak">interpeak</option>
+          <option value="night">night</option>
+        </select>
+      </label>
     </div>
     <div class="controls" style="margin-top:4px;">
       <button id="clearCaches">Clear caches</button>
@@ -1268,6 +1276,23 @@
       return base + Math.random() * headway;
     }
 
+    function applyScenario(preset) {
+      const s = SCENARIOS[preset];
+      if (!s) return;
+      baseWait.value = s.baseWait;
+      document.getElementById("headway").value = String(s.headway);
+      document.getElementById("busSpeed").value = s.bus;
+      document.getElementById("railSpeed").value = s.rail;
+      document.getElementById("carSpeed").value = s.car;
+      document.getElementById("randomWait").value = s.random ? "true" : "false";
+      BUS_SPEED = s.bus;
+      RAIL_SPEED = s.rail;
+      CAR_SPEED = s.car;
+      HEADWAY_MIN = s.headway;
+      MODE_PREF = document.getElementById("modePref").value || MODE_PREF;
+      renderStops(window.__stops || [], Number(baseWait.value), Number(netSpeed.value));
+    }
+
     async function loadRoads() {
       try {
         const res = await fetch("data/roads-major.geojson");
@@ -1354,6 +1379,11 @@
     function sanitizeStops(list) {
       return (list || []).filter((s) => isValidStop(s));
     }
+    const SCENARIOS = {
+      peak: { baseWait: 6, headway: 6, bus: 50, rail: 70, car: 60, random: true },
+      interpeak: { baseWait: 8, headway: 10, bus: 40, rail: 65, car: 70, random: true },
+      night: { baseWait: 12, headway: 15, bus: 35, rail: 55, car: 80, random: false }
+    };
 
     function updateDebugMeta(overrides = {}) {
       metaState = { ...metaState, ...overrides };
@@ -1858,6 +1888,11 @@
         L.polyline(travel.path, { color: modeColor, weight: 2, opacity: 0.6 }).addTo(simRootLayer);
       });
       document.getElementById("status").textContent = `Rush sim: ${batch.length} starts`;
+    });
+    document.getElementById("scenarioPreset").addEventListener("change", (e) => {
+      const v = e.target.value;
+      if (v === "custom") return;
+      applyScenario(v);
     });
 
     document.getElementById("modePref").addEventListener("change", (e) => {
