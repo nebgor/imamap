@@ -2344,7 +2344,7 @@
         [near.stop.lat, near.stop.lon]
       ];
       const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, busTargetKey);
-      if (p && p.length > 1) {
+      if (p && p.length > 2) {
         return {
           path: walkLeg.concat(p),
           near,
