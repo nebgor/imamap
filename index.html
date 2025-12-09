@@ -263,21 +263,20 @@
       <label>Base wait (min)
         <input type="number" id="baseWait" value="8" min="0" step="1" />
       </label>
-      <label>Network speed (km/h)
-        <input type="number" id="netSpeed" value="40" min="1" step="1" />
+      <label>Headway (min)
+        <select id="headway">
+          <option value="6">peak 6</option>
+          <option value="10" selected>interpeak 10</option>
+          <option value="15">off-peak 15</option>
+        </select>
       </label>
-    </div>
-    <div class="controls">
-      <button id="recompute">Recompute</button>
-      <button id="saveSnapshot">Save snapshot</button>
-      <button id="simulateRandom">Simulate random</button>
-      <label style="display:flex;align-items:center;gap:6px;">
-        <input type="checkbox" id="toggleStops" checked />
-        Show stops
-      </label>
-      <label style="display:flex;align-items:center;gap:6px;">
-        <input type="checkbox" id="toggleRail" checked />
-        Show rail lines
+      <label>Scenario
+        <select id="scenarioPreset">
+          <option value="custom" selected>custom</option>
+          <option value="peak">peak</option>
+          <option value="interpeak">interpeak</option>
+          <option value="night">night</option>
+        </select>
       </label>
     </div>
     <div class="row">
@@ -295,6 +294,12 @@
           <option value="false">disabled</option>
         </select>
       </label>
+      <label>Random wait
+        <select id="randomWait">
+          <option value="true" selected>on</option>
+          <option value="false">off</option>
+        </select>
+      </label>
     </div>
     <div class="row">
       <label>Bus speed (km/h)
@@ -307,45 +312,36 @@
         <input type="number" id="carSpeed" value="70" min="10" step="5" />
       </label>
     </div>
-    <div class="row">
-      <label>Headway (min)
-        <select id="headway">
-          <option value="6">peak 6</option>
-          <option value="10" selected>interpeak 10</option>
-          <option value="15">off-peak 15</option>
-        </select>
-      </label>
-      <label>Random wait
-        <select id="randomWait">
-          <option value="true" selected>on</option>
-          <option value="false">off</option>
-        </select>
-      </label>
-      <label>Scenario
-        <select id="scenarioPreset">
-          <option value="custom" selected>custom</option>
-          <option value="peak">peak</option>
-          <option value="interpeak">interpeak</option>
-          <option value="night">night</option>
-        </select>
-      </label>
-    </div>
-    <div class="controls" style="margin-top:4px;">
-      <button id="clearCaches">Clear caches</button>
-      <button id="demoRun">Demo run</button>
-      <button id="clearVisuals">Clear visuals</button>
-      <button id="scarboroughDemo">Scarborough test</button>
+    <div class="controls">
+      <button id="simulateRandom">Random sim</button>
       <button id="radialSim">Radial sims</button>
-      <label style="display:flex;align-items:center;gap:6px;">
-        <input type="checkbox" id="toggleRoads" />
-        Roads
-      </label>
       <button id="rushSim">CBD rush</button>
+      <button id="rainSim">Rain</button>
       <label style="display:flex;align-items:center;gap:6px;">
         <input type="checkbox" id="keepVisuals" />
         Keep visuals
       </label>
-      <button id="rainSim">Rain</button>
+    </div>
+    <div class="controls">
+      <button id="recompute">Recompute</button>
+      <button id="saveSnapshot">Snapshot</button>
+      <button id="demoRun">Demo</button>
+      <button id="clearVisuals">Clear visuals</button>
+    </div>
+    <div class="controls">
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleStops" checked />
+        Stops
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleRail" checked />
+        Rail
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleRoads" />
+        Roads
+      </label>
+      <button id="clearCaches">Reset caches</button>
     </div>
     <div class="row">
       <label>Suburb experiment
