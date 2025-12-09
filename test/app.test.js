@@ -35,6 +35,14 @@ describe("index.html basics", () => {
     expect(html).toContain("travel.path.length > 2");
   });
 
+  it("exposes new controls for scenarios and sims", () => {
+    expect(html).toContain('id="scenarioPreset"');
+    expect(html).toContain('id="keepVisuals"');
+    expect(html).toContain('id="rainSim"');
+    expect(html).toContain('id="panelToggle"');
+    expect(html).toContain('id="netSpeed"');
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });
