@@ -333,6 +333,10 @@
         Roads
       </label>
       <button id="rushSim">CBD rush</button>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="keepVisuals" />
+        Keep visuals
+      </label>
     </div>
     <div class="row">
       <label>Suburb experiment
@@ -1773,13 +1777,16 @@
         document.getElementById("status").textContent = "Still loading data…";
         return;
       }
-      // clear previous sim layers and heat for fresh batch
-      simRootLayer.clearLayers();
-      simTimers.forEach((t) => clearInterval(t));
-      simTimers = [];
-      heatLineLayer.clearLayers();
-      heatVisLayer.setLatLngs([]);
-      saveHeat([]);
+      const keep = document.getElementById("keepVisuals").checked;
+      if (!keep) {
+        // clear previous sim layers and heat for fresh batch
+        simRootLayer.clearLayers();
+        simTimers.forEach((t) => clearInterval(t));
+        simTimers = [];
+        heatLineLayer.clearLayers();
+        heatVisLayer.setLatLngs([]);
+        saveHeat([]);
+      }
       const bounds = { minLat: -32.6, maxLat: -31.4, minLon: 115.5, maxLon: 116.2 };
       for (let i = 0; i < count; i++) {
         const stop = randomStopWithin(0, 120);
@@ -1797,7 +1804,10 @@
 
     function simulateRadial(rings = [5, 12, 25], perRing = 6) {
       if (!DATA_READY) return;
-      simRootLayer.clearLayers();
+      const keep = document.getElementById("keepVisuals").checked;
+      if (!keep) {
+        simRootLayer.clearLayers();
+      }
       const seeds = [];
       rings.forEach((km) => {
         for (let i = 0; i < perRing; i++) {
@@ -1839,7 +1849,7 @@
     });
     document.getElementById("rushSim").addEventListener("click", () => {
       if (!window.__stops || !window.__stops.length) return;
-      simRootLayer.clearLayers();
+      if (!document.getElementById("keepVisuals").checked) simRootLayer.clearLayers();
       const batch = window.__stops.filter((_, i) => i % 15 === 0).slice(0, 300);
       batch.forEach((s) => {
         const travel = buildTravelPath({ lat: s.lat, lng: s.lon });
