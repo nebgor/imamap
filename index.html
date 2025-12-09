@@ -272,6 +272,10 @@
       <button id="saveSnapshot">Save snapshot</button>
       <button id="simulateRandom">Simulate random</button>
       <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleStops" checked />
+        Show stops
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;">
         <input type="checkbox" id="toggleRail" checked />
         Show rail lines
       </label>
@@ -324,6 +328,10 @@
       <button id="clearVisuals">Clear visuals</button>
       <button id="scarboroughDemo">Scarborough test</button>
       <button id="radialSim">Radial sims</button>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="toggleRoads" />
+        Roads
+      </label>
     </div>
     <div class="row">
       <label>Suburb experiment
@@ -519,6 +527,7 @@
       armadale: { name: "Armadale", lat: -32.153, lon: 116.016 },
       ellenbrook: { name: "Ellenbrook", lat: -31.776, lon: 115.97 }
     };
+    let PROPERTY_DATA = [];
     async function loadLocalFallbackStops() {
       try {
         const [busRes, railRes] = await Promise.all([
@@ -588,6 +597,7 @@
     const railLayer = L.layerGroup().addTo(map);
     const stationLayer = L.layerGroup().addTo(map);
     const simRootLayer = L.layerGroup().addTo(map);
+    const roadsLayer = L.layerGroup();
     let simTimers = [];
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
@@ -1253,6 +1263,50 @@
       return base + Math.random() * headway;
     }
 
+    async function loadRoads() {
+      try {
+        const res = await fetch("data/roads-major.geojson");
+        if (!res.ok) throw new Error("roads fetch failed");
+        const geo = await res.json();
+        roadsLayer.clearLayers();
+        L.geoJSON(geo, {
+          style: () => ({ color: "#94a3b8", weight: 1, opacity: 0.5 })
+        }).addTo(roadsLayer);
+        if (document.getElementById("toggleRoads").checked) {
+          roadsLayer.addTo(map);
+        }
+      } catch (err) {
+        console.warn("Roads load failed", err);
+        lastError = err.message || "roads load failed";
+      }
+    }
+
+    async function loadPropertyData() {
+      try {
+        const res = await fetch("data/property-prices.json");
+        if (!res.ok) throw new Error("property data fetch failed");
+        const data = await res.json();
+        PROPERTY_DATA = Array.isArray(data) ? data : [];
+      } catch (err) {
+        console.warn("Property data load failed", err);
+        lastError = err.message || "property load failed";
+      }
+    }
+
+    function nearestProperty(lat, lon) {
+      if (!PROPERTY_DATA || !PROPERTY_DATA.length) return null;
+      let best = null;
+      let bestD = Infinity;
+      PROPERTY_DATA.forEach((p) => {
+        const d = haversine(lat, lon, p.lat, p.lon);
+        if (d < bestD) {
+          bestD = d;
+          best = p;
+        }
+      });
+      return best ? { property: best, distKm: bestD } : null;
+    }
+
     function renderRailLines(show) {
       railLayer.clearLayers();
       stationLayer.clearLayers();
@@ -1307,6 +1361,11 @@
 
     function renderStops(stops, baseWait, netSpeed) {
       stopsLayer.clearLayers();
+      if (!document.getElementById("toggleStops").checked) {
+        document.getElementById("status").textContent = "Stops hidden";
+        updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed, data: DATA_SOURCE });
+        return;
+      }
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
       const total = stops.length;
       const step = total > 4000 ? Math.ceil(total / 4000) : 1;
@@ -1504,6 +1563,8 @@
         window.__stops = stops;
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
+        loadRoads();
+        loadPropertyData();
         // prefetch metro routes
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
@@ -1542,6 +1603,16 @@
     });
     document.getElementById("toggleRail").addEventListener("change", (e) => {
       renderRailLines(e.target.checked);
+    });
+    document.getElementById("toggleRoads").addEventListener("change", (e) => {
+      if (e.target.checked) {
+        roadsLayer.addTo(map);
+      } else {
+        roadsLayer.remove();
+      }
+    });
+    document.getElementById("toggleStops").addEventListener("change", () => {
+      if (window.__stops) renderStops(window.__stops, Number(baseWait.value), Number(netSpeed.value));
     });
 
     function loadSnapshots() {
@@ -2137,6 +2208,7 @@
       }
       const { path, near } = travel;
       const mode = travel.mode || "auto";
+      const nearestProp = nearestProperty(path[0][0], path[0][1]);
       // persist heat contribution for this click
       const base = mode === "car" ? 0 : computeWait();
       const speed = mode === "car" ? Number(document.getElementById("carSpeed").value || CAR_SPEED) : Number(netSpeed.value);
@@ -2147,7 +2219,7 @@
       const debugPath = document.getElementById("debug-path");
       debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
         1
-      )}m · mode ${mode}`;
+      )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""}`;
       console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
 
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));

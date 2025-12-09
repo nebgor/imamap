@@ -1,0 +1,12 @@
+[
+  { "name": "Perth CBD", "lat": -31.9523, "lon": 115.8590, "priceK": 650 },
+  { "name": "Scarborough", "lat": -31.8940, "lon": 115.7510, "priceK": 900 },
+  { "name": "Joondalup", "lat": -31.7440, "lon": 115.7680, "priceK": 650 },
+  { "name": "Fremantle", "lat": -32.0530, "lon": 115.7480, "priceK": 950 },
+  { "name": "Midland", "lat": -31.8890, "lon": 116.0050, "priceK": 520 },
+  { "name": "Armadale", "lat": -32.1530, "lon": 116.0160, "priceK": 480 },
+  { "name": "Ellenbrook", "lat": -31.7760, "lon": 115.9700, "priceK": 600 },
+  { "name": "Bayswater", "lat": -31.9147, "lon": 115.9136, "priceK": 780 },
+  { "name": "Canning Vale", "lat": -32.0770, "lon": 115.9180, "priceK": 700 },
+  { "name": "Rockingham", "lat": -32.2745, "lon": 115.7300, "priceK": 520 }
+]
