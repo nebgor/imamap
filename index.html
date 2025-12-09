@@ -1218,6 +1218,23 @@
       return dense;
     }
 
+    function densifyPathPoints(path, stepKm = 0.35) {
+      if (!Array.isArray(path) || path.length < 2) return path || [];
+      const dense = [];
+      for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i];
+        const b = path[i + 1];
+        const dist = haversine(a[0], a[1], b[0], b[1]);
+        const steps = Math.max(1, Math.ceil(dist / stepKm));
+        for (let s = 0; s < steps; s++) {
+          const t = s / steps;
+          dense.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      dense.push(path[path.length - 1]);
+      return dense;
+    }
+
     function buildFallbackStops() {
       const seen = new Set();
       const busStops = [];
@@ -2354,16 +2371,17 @@
       if (modePref === "rail") {
         if (!railTargetKey) railTargetKey = nearestNodeKey(localRailGraph.nodes, target.lat, target.lon);
         const railPath = pathFromGraph(localRailGraph, { lat: near.lat, lon: near.lon }, target, railTargetKey);
-        path.push(...railPath);
-        return { path, near, mode: "rail" };
+        const dense = densifyPathPoints(path.concat(railPath), 0.35);
+        if (!railPath.length || dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+        return { path: dense, near, mode: "rail" };
       }
 
       if (modePref === "bus" && localBusGraph) {
         if (!busTargetKey) busTargetKey = nearestNodeKey(localBusGraph.nodes, target.lat, target.lon);
         const busPath = pathFromGraph(localBusGraph, { lat: near.lat, lon: near.lon }, target, busTargetKey);
-        if (busPath.length) {
-          path.push(...busPath);
-          return { path, near, mode: "bus" };
+        const dense = densifyPathPoints(path.concat(busPath), 0.35);
+        if (busPath.length && dense.length >= 4 && !pathHasLongSegment(dense, 2.5)) {
+          return { path: dense, near, mode: "bus" };
         }
       }
 
@@ -2376,12 +2394,12 @@
         railStations.forEach((st) => {
           const stBusKey = nearestNodeKey(localBusGraph.nodes, st.lat, st.lon);
           const stRailKey = localRailGraph ? nearestNodeKey(localRailGraph.nodes, st.lat, st.lon) : null;
-        const busPart = pathFromGraph(
-          localBusGraph,
-          { lat: near.lat, lon: near.lon },
-          { lat: st.lat, lon: st.lon },
-          stBusKey
-        );
+          const busPart = pathFromGraph(
+            localBusGraph,
+            { lat: near.lat, lon: near.lon },
+            { lat: st.lat, lon: st.lon },
+            stBusKey
+          );
           if (busPart && busPart.length && localRailGraph) {
             const railPart = pathFromGraph(
               localRailGraph,
@@ -2402,7 +2420,9 @@
           // ensure transfer node
           path.push([bestRail.anchor.lat, bestRail.anchor.lon]);
           path.push(...bestRail.railPart);
-          return { path, near, mode: "mixed-transfer" };
+          const dense = densifyPathPoints(path, 0.35);
+          if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+          return { path: dense, near, mode: "mixed-transfer" };
         }
       }
 
@@ -2480,7 +2500,9 @@
       });
       if (!best) return null;
       const path = walkLeg.concat(best.busPart, [[best.station.lat, best.station.lon]], best.railPart);
-      return { path, near, mode: "bus-rail" };
+      const dense = densifyPathPoints(path, 0.35);
+      if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+      return { path: dense, near, mode: "bus-rail" };
     }
 
     function graphRouteToCBD(start) {
@@ -2500,8 +2522,10 @@
         busTargetKey
       );
       if (p && p.length > 2 && !pathHasLongSegment(p)) {
+        const dense = densifyPathPoints(walkLeg.concat(p), 0.35);
+        if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
         return {
-          path: walkLeg.concat(p),
+          path: dense,
           near,
           mode: "bus-graph"
         };
@@ -2559,12 +2583,17 @@
       if (!startKey || !targetKey) return null;
       const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, targetKey);
       if (p && p.length > 1) {
-        return {
-          path: [
+        const dense = densifyPathPoints(
+          [
             [start.lat, start.lng],
             [near.stop.lat, near.stop.lon],
             ...p
           ],
+          0.35
+        );
+        if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+        return {
+          path: dense,
           near,
           mode: "car"
         };
