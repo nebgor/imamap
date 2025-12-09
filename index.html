@@ -299,6 +299,9 @@
       <label>Base wait (min)
         <input type="number" id="baseWait" value="8" min="0" step="1" />
       </label>
+      <label>Network speed (km/h)
+        <input type="number" id="netSpeed" value="40" min="10" step="5" />
+      </label>
       <label>Headway (min)
         <select id="headway">
           <option value="6">peak 6</option>
@@ -2026,6 +2029,10 @@
     });
     document.getElementById("carSpeed").addEventListener("change", (e) => {
       CAR_SPEED = Number(e.target.value);
+    });
+    document.getElementById("netSpeed").addEventListener("change", (e) => {
+      const v = Number(e.target.value);
+      metaState.speed = v;
     });
     document.getElementById("headway").addEventListener("change", (e) => {
       HEADWAY_MIN = Number(e.target.value);
