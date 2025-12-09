@@ -2468,7 +2468,7 @@
       }
       return d;
     }
-    function pathQuality(path, maxSegLimit = 2.5) {
+    function pathQuality(path, maxSegLimit = 3) {
       const segLengths = [];
       let totalSegLen = 0;
       for (let i = 0; i < path.length - 1; i++) {
@@ -2486,7 +2486,7 @@
             : "good";
       return { quality, maxSeg, avgSeg };
     }
-    function pathHasLongSegment(path, maxKm = 2.5) {
+    function pathHasLongSegment(path, maxKm = 3) {
       for (let i = 0; i < path.length - 1; i++) {
         const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
         if (seg > maxKm) return true;
@@ -2550,7 +2550,7 @@
       if (!best) return null;
       const path = walkLeg.concat(best.busPart, [[best.station.lat, best.station.lon]], best.railPart);
       const dense = densifyPathPoints(path, 0.35);
-      if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+      if (dense.length < 4 || pathHasLongSegment(dense, 3)) return null;
       return { path: dense, near, mode: "bus-rail" };
     }
 
@@ -2570,9 +2570,9 @@
         { lat: cbdAnchor.stop.lat, lon: cbdAnchor.stop.lon },
         busTargetKey
       );
-      if (p && p.length > 2 && !pathHasLongSegment(p)) {
+      if (p && p.length > 2 && !pathHasLongSegment(p, 3)) {
         const dense = densifyPathPoints(walkLeg.concat(p), 0.35);
-        if (dense.length < 4 || pathHasLongSegment(dense, 2.5)) return null;
+        if (dense.length < 4 || pathHasLongSegment(dense, 3)) return null;
         return {
           path: dense,
           near,
@@ -2619,7 +2619,7 @@
 
       path.push([target.lat, target.lon]);
       const dense = densifyLine(path, 0.6);
-      if (pathHasLongSegment(dense, 2.5)) return null;
+      if (pathHasLongSegment(dense, 3)) return null;
       return { path: dense, near, railChoice, busChoice };
     }
 
@@ -2670,7 +2670,7 @@
       let bestScore = -1;
       for (const fn of attempts) {
         const travel = fn();
-        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 2.5)) {
+        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 3)) {
           const pq = pathQuality(travel.path);
           const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
           if (score > bestScore) {
@@ -2682,7 +2682,7 @@
       // try legacy as last resort if quality is poor or nothing found
       if (bestScore < 1) {
         const legacy = buildTravelPathLegacy(clickLatLng);
-        if (legacy && legacy.path && legacy.path.length > 2 && !pathHasLongSegment(legacy.path, 2.5)) {
+        if (legacy && legacy.path && legacy.path.length > 2 && !pathHasLongSegment(legacy.path, 3)) {
           const pq = pathQuality(legacy.path);
           const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
           if (score > bestScore) {
@@ -2722,7 +2722,7 @@
       addHeatPath(path, commute);
 
       const totalLen = pathLength(path);
-      const { quality, maxSeg } = pathQuality(path, 2.5);
+      const { quality, maxSeg } = pathQuality(path, 3);
       const debugPath = document.getElementById("debug-path");
       debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
         1
@@ -2735,6 +2735,14 @@
         })
       }).addTo(simRootLayer);
       console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
+
+      const segLengths = [];
+      let totalSegLen = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+        segLengths.push(seg);
+        totalSegLen += seg;
+      }
 
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
       const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
