@@ -1833,10 +1833,14 @@
         const jitterLon = stop.lon + kmToDegLon((rand() - 0.5) * 0.8, stop.lat);
         const travel = randomTravelPlan(jitterLat, jitterLon);
         if (!travel || !travel.near || !isValidStop(travel.near.stop)) continue;
-        const base = Number(baseWait.value);
-        const speed = Number(netSpeed.value);
-        const commute = computeCommute(travel.near.stop, base, speed);
-        addHeatPath(travel.path, commute);
+        if (i < 5) {
+          animateTravel({ lat: jitterLat, lng: jitterLon });
+        } else {
+          const base = Number(baseWait.value);
+          const speed = Number(netSpeed.value);
+          const commute = computeCommute(travel.near.stop, base, speed);
+          addHeatPath(travel.path, commute);
+        }
       }
     }
 
@@ -1872,13 +1876,17 @@
           seeds.push({ lat, lon });
         }
       });
-      seeds.forEach((s) => {
+      seeds.forEach((s, idx) => {
         const travel = randomTravelPlan(s.lat, s.lon);
         if (!travel || !travel.near || !isValidStop(travel.near.stop)) return;
-        const base = Number(baseWait.value);
-        const speed = Number(netSpeed.value);
-        const commute = computeCommute(travel.near.stop, base, speed);
-        addHeatPath(travel.path, commute);
+        if (idx < 6) {
+          animateTravel({ lat: s.lat, lng: s.lon });
+        } else {
+          const base = Number(baseWait.value);
+          const speed = Number(netSpeed.value);
+          const commute = computeCommute(travel.near.stop, base, speed);
+          addHeatPath(travel.path, commute);
+        }
       });
       document.getElementById("status").textContent = `Radial sims: ${seeds.length} seeds`;
     }
@@ -1906,7 +1914,11 @@
       if (!window.__stops || !window.__stops.length) return;
       if (!document.getElementById("keepVisuals").checked) simRootLayer.clearLayers();
       const batch = window.__stops.filter((_, i) => i % 15 === 0).slice(0, 300);
-      batch.forEach((s) => {
+      batch.forEach((s, idx) => {
+        if (idx < 8) {
+          animateTravel({ lat: s.lat, lng: s.lon });
+          return;
+        }
         const travel = buildTravelPath({ lat: s.lat, lng: s.lon });
         if (!travel || !travel.path || travel.path.length < 3) return;
         const modeColor = MODE_COLORS[travel.mode || "auto"] || MODE_COLORS.fallback;
