@@ -2371,12 +2371,12 @@
         railStations.forEach((st) => {
           const stBusKey = nearestNodeKey(localBusGraph.nodes, st.lat, st.lon);
           const stRailKey = localRailGraph ? nearestNodeKey(localRailGraph.nodes, st.lat, st.lon) : null;
-          const busPart = pathFromGraph(
-            localBusGraph,
-            { lat: near.lat, lon: near.lon },
-            { lat: st.lat, lon: st.lon },
-            stBusKey
-          );
+        const busPart = pathFromGraph(
+          localBusGraph,
+          { lat: near.lat, lon: near.lon },
+          { lat: st.lat, lon: st.lon },
+          stBusKey
+        );
           if (busPart && busPart.length && localRailGraph) {
             const railPart = pathFromGraph(
               localRailGraph,
@@ -2412,7 +2412,7 @@
       }
       return d;
     }
-    function pathHasLongSegment(path, maxKm = 2.5) {
+    function pathHasLongSegment(path, maxKm = 4) {
       for (let i = 0; i < path.length - 1; i++) {
         const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
         if (seg > maxKm) return true;
@@ -2534,14 +2534,15 @@
       const busSpan = busChoice ? Math.abs(busChoice.stopIdx - busChoice.cbdIdx) : Infinity;
 
       if (busChoice && busSpan <= railSpan) {
-        buildCorridor(busChoice, busChoice.points);
+        buildCorridor(busChoice, densifyLine(busChoice.points, 0.8));
       } else if (railChoice) {
-        buildCorridor(railChoice, railChoice.line.points);
+        buildCorridor(railChoice, densifyLine(railChoice.line.points, 0.8));
       }
 
       path.push([target.lat, target.lon]);
-      if (pathHasLongSegment(path, 5)) return null;
-      return { path, near, railChoice, busChoice };
+      const dense = densifyLine(path, 0.8);
+      if (pathHasLongSegment(dense, 4)) return null;
+      return { path: dense, near, railChoice, busChoice };
     }
 
     function carRouteToCBD(start) {
@@ -2580,11 +2581,12 @@
         pref === "car" ? () => carRouteToCBD(clickLatLng) : null,
         pref !== "rail" && pref !== "car" ? () => busToRailRoute(clickLatLng) : null,
         pref !== "car" ? () => graphRouteToCBD(clickLatLng) : null,
-        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null
+        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null,
+        () => buildTravelPathLegacy(clickLatLng)
       ].filter(Boolean);
       for (const fn of attempts) {
         const travel = fn();
-        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 2.5)) {
+        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 4)) {
           return travel;
         }
       }
