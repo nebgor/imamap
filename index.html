@@ -2487,7 +2487,7 @@
       }
 
       const simLayer = L.layerGroup().addTo(simRootLayer);
-      const modeColor = MODE_COLORS[mode] || MODE_COLORS.fallback;
+      const modeColor = colourForMinutes(commute);
       for (let i = 0; i < path.length - 1; i++) {
         const start = path[i];
         const end = path[i + 1];
