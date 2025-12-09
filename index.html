@@ -2466,6 +2466,13 @@
       debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
         1
       )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""}`;
+      const modeBadge = L.marker(path[path.length - 1], {
+        icon: L.divIcon({
+          className: "rail-label",
+          html: mode,
+          iconSize: null
+        })
+      }).addTo(simRootLayer);
       console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
 
       const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
