@@ -173,6 +173,13 @@
     .hidden {
       display: none;
     }
+    @media (max-width: 700px) {
+      .panel {
+        width: calc(100% - 20px);
+        left: 10px;
+        right: 10px;
+      }
+    }
     .mode-chip {
       display: inline-flex;
       align-items: center;
@@ -285,6 +292,7 @@
 <body>
   <div id="map"></div>
   <div id="busyBanner" class="busy-banner hidden">Loading…</div>
+  <button id="panelToggle" class="busy-banner" style="left:14px; right:auto; top:auto; bottom:12px;">Toggle panel</button>
   <div class="panel">
     <h1>Perth PT commute sketch</h1>
     <div class="row">
@@ -624,7 +632,7 @@
       }
       return Math.random();
     };
-    const map = L.map("map", { zoomControl: false }).setView([target.lat, target.lon], 11);
+    const map = L.map("map", { zoomControl: false, preferCanvas: true }).setView([target.lat, target.lon], 11);
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors & Carto'
@@ -636,6 +644,8 @@
     const stationLayer = L.layerGroup().addTo(map);
     const simRootLayer = L.layerGroup().addTo(map);
     const roadsLayer = L.layerGroup();
+    let stopsHiddenForZoom = false;
+    let heatHiddenForZoom = false;
     let simTimers = [];
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
@@ -1409,6 +1419,7 @@
       interpeak: { baseWait: 8, headway: 10, bus: 40, rail: 65, car: 70, random: true },
       night: { baseWait: 12, headway: 15, bus: 35, rail: 55, car: 80, random: false }
     };
+    const panel = document.querySelector(".panel");
     function setBusy(msg, active = true) {
       const el = document.getElementById("busyBanner");
       if (!el) return;
@@ -1662,6 +1673,7 @@
         DATA_READY = true;
         document.getElementById("status").textContent = "Ready (click map to simulate)";
         setBusy("", false);
+        if (window.innerWidth < 720 && panel) panel.classList.add("hidden");
       } catch (e) {
         document.getElementById("status").textContent = e.message;
         document.getElementById("debug").firstElementChild.textContent = `Debug — ${e.message}`;
@@ -2461,6 +2473,10 @@
         document.getElementById("debug-path").textContent = `Errors: ${ERROR_COUNT} (last: ${lastError})`;
         updateDebugMeta();
       }
+    });
+    document.getElementById("panelToggle").addEventListener("click", () => {
+      const p = document.querySelector(".panel");
+      if (p) p.classList.toggle("hidden");
     });
   </script>
 </body>
