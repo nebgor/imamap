@@ -282,6 +282,7 @@
           <option value="mixed">mixed</option>
           <option value="bus">bus only</option>
           <option value="rail">rail only</option>
+          <option value="car">car</option>
         </select>
       </label>
       <label>Transfer
@@ -297,6 +298,9 @@
       </label>
       <label>Rail speed (km/h)
         <input type="number" id="railSpeed" value="65" min="10" step="5" />
+      </label>
+      <label>Car speed (km/h)
+        <input type="number" id="carSpeed" value="70" min="10" step="5" />
       </label>
     </div>
     <div class="row">
@@ -333,6 +337,7 @@
       <span class="mode-chip"><span class="mode-swatch" style="background:#10b981"></span>Mixed transfer</span>
       <span class="mode-chip"><span class="mode-swatch" style="background:#38bdf8"></span>Rail</span>
       <span class="mode-chip"><span class="mode-swatch" style="background:#f59e0b"></span>Bus direct</span>
+      <span class="mode-chip"><span class="mode-swatch" style="background:#a855f7"></span>Car</span>
       <span class="mode-chip"><span class="mode-swatch" style="background:#ef4444"></span>Fallback</span>
     </div>
     <div class="status" id="status">Fetching stops…</div>
@@ -486,6 +491,7 @@
       "mixed-transfer": "#10b981",
       rail: "#38bdf8",
       bus: "#f59e0b",
+      car: "#a855f7",
       fallback: "#ef4444",
       auto: "#22c55e"
     };
@@ -532,6 +538,7 @@
     let ALLOW_TRANSFER = true;
     let BUS_SPEED = 40;
     let RAIL_SPEED = 65;
+    let CAR_SPEED = 70;
     let HEADWAY_MIN = 10;
     let RANDOM_WAIT = true;
     let DATA_READY = false;
@@ -1657,6 +1664,9 @@
     document.getElementById("railSpeed").addEventListener("change", (e) => {
       RAIL_SPEED = Number(e.target.value);
     });
+    document.getElementById("carSpeed").addEventListener("change", (e) => {
+      CAR_SPEED = Number(e.target.value);
+    });
     document.getElementById("headway").addEventListener("change", (e) => {
       HEADWAY_MIN = Number(e.target.value);
     });
@@ -1951,6 +1961,28 @@
       return { path, near, railChoice, busChoice };
     }
 
+    function carRouteToCBD(start) {
+      if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
+      const near = nearestStop(start.lat, start.lon);
+      if (!near.stop) return null;
+      const targetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
+      const startKey = nearestNodeKey(busGraph.nodes, near.stop.lat, near.stop.lon);
+      if (!startKey || !targetKey) return null;
+      const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, targetKey);
+      if (p && p.length > 1) {
+        return {
+          path: [
+            [start.lat, start.lng],
+            [near.stop.lat, near.stop.lon],
+            ...p
+          ],
+          near,
+          mode: "car"
+        };
+      }
+      return null;
+    }
+
     function buildTravelPath(clickLatLng) {
       const pref = document.getElementById("modePref").value || MODE_PREF;
       const allow = document.getElementById("allowTransfer").value === "true";
@@ -1962,9 +1994,10 @@
         return null;
       }
       const attempts = [
-        pref !== "rail" ? () => busToRailRoute(clickLatLng) : null,
-        () => graphRouteToCBD(clickLatLng),
-        () => multimodalPath(clickLatLng, pref, allow),
+        pref === "car" ? () => carRouteToCBD(clickLatLng) : null,
+        pref !== "rail" && pref !== "car" ? () => busToRailRoute(clickLatLng) : null,
+        pref !== "car" ? () => graphRouteToCBD(clickLatLng) : null,
+        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null,
         () => buildTravelPathLegacy(clickLatLng)
       ].filter(Boolean);
       for (const fn of attempts) {
@@ -1991,8 +2024,8 @@
       const { path, near } = travel;
       const mode = travel.mode || "auto";
       // persist heat contribution for this click
-      const base = computeWait();
-      const speed = Number(netSpeed.value);
+      const base = mode === "car" ? 0 : computeWait();
+      const speed = mode === "car" ? Number(document.getElementById("carSpeed").value || CAR_SPEED) : Number(netSpeed.value);
       const commute = computeCommute(near.stop, base, speed);
       addHeatPath(path, commute);
 
