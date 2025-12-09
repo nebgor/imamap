@@ -2498,11 +2498,21 @@
             : "good";
       return { quality, maxSeg, avgSeg };
     }
-    function pathHasLongSegment(path, maxKm = Infinity) {
+    function pathHasLongSegment(path, maxKm = Infinity, cityStrict = false) {
       if (!Number.isFinite(maxKm) || maxKm === Infinity) return false;
       for (let i = 0; i < path.length - 1; i++) {
         const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
         if (seg > maxKm) return true;
+        if (
+          cityStrict &&
+          path[i][0] < -31.5 &&
+          path[i][0] > -32.2 &&
+          path[i][1] > 115.6 &&
+          path[i][1] < 116.1 &&
+          seg > 1
+        ) {
+          return true;
+        }
       }
       return false;
     }
@@ -2682,7 +2692,7 @@
       let bestScore = -1;
       for (const fn of attempts) {
         const travel = fn();
-        if (travel && travel.path && travel.path.length > 2) {
+        if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 2.5, true)) {
           const pq = pathQuality(travel.path);
           const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
           if (score > bestScore) {
@@ -2694,7 +2704,7 @@
       // try legacy as last resort if quality is poor or nothing found
       if (bestScore < 1) {
         const legacy = buildTravelPathLegacy(clickLatLng);
-        if (legacy && legacy.path && legacy.path.length > 2) {
+        if (legacy && legacy.path && legacy.path.length > 2 && !pathHasLongSegment(legacy.path, 2.5, true)) {
           const pq = pathQuality(legacy.path);
           const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
           if (score > bestScore) {
@@ -2704,6 +2714,33 @@
         }
       }
       // last-resort: pure walk graph if everything else failed
+      if (!best && window.__stops && window.__stops.length) {
+        const walkGraph = buildWalkGraph(window.__stops);
+        const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
+        const cbd = nearestStop(target.lat, target.lon);
+        if (near.stop && cbd.stop) {
+          const p = shortestPath(
+            walkGraph,
+            { lat: near.stop.lat, lon: near.stop.lon },
+            { lat: cbd.stop.lat, lon: cbd.stop.lon }
+          );
+          if (p && p.length) {
+            best = {
+              path: densifyPathPoints(
+                [
+                  [clickLatLng.lat, clickLatLng.lng],
+                  [near.stop.lat, near.stop.lon],
+                  ...p
+                ],
+                0.2
+              ),
+              near,
+              mode: "walk-fallback",
+              quality: "coarse"
+            };
+          }
+        }
+      }
       if (!best && window.__stops && window.__stops.length) {
         const walkGraph = buildWalkGraph(window.__stops);
         const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
