@@ -492,7 +492,17 @@
   ></script>
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script>
-    function buildRouteGraph(routes) {
+    function buildWalkGraph(stops) {
+      const routes = [
+        {
+          name: "walk-grid",
+          paths: stopNeighborPaths(stops, 6, 0.6)
+        }
+      ];
+      return buildRouteGraph(routes, true);
+    }
+
+    function buildRouteGraph(routes, skipDensify = false) {
       const nodes = new Map();
       const key = (lat, lon) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
       function addEdge(a, b) {
@@ -506,9 +516,9 @@
       }
       routes.forEach((r) => {
         (r.paths || []).forEach((path) => {
-          const dense = densifyLine(path, 0.2);
-          for (let i = 0; i < dense.length - 1; i++) {
-            addEdge(dense[i], dense[i + 1]);
+          const pts = skipDensify ? path : densifyLine(path, 0.2);
+          for (let i = 0; i < pts.length - 1; i++) {
+            addEdge(pts[i], pts[i + 1]);
           }
         });
       });
@@ -1897,24 +1907,26 @@
         renderRailLines(toggleRail.checked);
         await Promise.all([loadRoads(), loadPropertyData()]);
         // prefetch metro routes
+        const stopPaths = stopNeighborPaths(window.__stops || [], 8, 0.6);
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
           routeGraph = buildRouteGraph(routes);
-          const stopPaths = stopNeighborPaths(window.__stops || []);
           const combined = routes
             .concat(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })))
             .concat([{ name: "stop-graph", paths: stopPaths }]);
           busGraph = buildRouteGraph(combined);
-          railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         } catch (err) {
           console.error("Route fetch failed, using corridors only", err);
           routeGraph = { nodes: new Map(), routes: [] };
-          const stopPaths = stopNeighborPaths(window.__stops || []);
           busGraph = buildRouteGraph(
             majorRoads.map((r) => ({ name: r.name, paths: [r.points] })).concat([{ name: "stop-graph", paths: stopPaths }])
           );
-          railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         }
+        // always provide a walkable fallback graph
+        if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0) {
+          busGraph = buildWalkGraph(window.__stops || []);
+        }
+        railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         updateDebugMeta();
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
@@ -2688,6 +2700,34 @@
           if (score > bestScore) {
             best = { ...legacy, quality: pq.quality, maxSeg: pq.maxSeg };
             bestScore = score;
+          }
+        }
+      }
+      // last-resort: pure walk graph if everything else failed
+      if (!best && window.__stops && window.__stops.length) {
+        const walkGraph = buildWalkGraph(window.__stops);
+        const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
+        const cbd = nearestStop(target.lat, target.lon);
+        if (near.stop && cbd.stop) {
+          const p = shortestPath(
+            walkGraph,
+            { lat: near.stop.lat, lon: near.stop.lon },
+            { lat: cbd.stop.lat, lon: cbd.stop.lon }
+          );
+          if (p && p.length) {
+            best = {
+              path: densifyPathPoints(
+                [
+                  [clickLatLng.lat, clickLatLng.lng],
+                  [near.stop.lat, near.stop.lon],
+                  ...p
+                ],
+                0.2
+              ),
+              near,
+              mode: "walk-fallback",
+              quality: "coarse"
+            };
           }
         }
       }

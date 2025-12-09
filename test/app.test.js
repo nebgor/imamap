@@ -54,6 +54,11 @@ describe("index.html basics", () => {
     expect(html).toContain("willReadFrequently");
   });
 
+  it("keeps a walk fallback when transfers/routes are missing", () => {
+    expect(html).toContain("buildWalkGraph");
+    expect(html).toContain("buildTravelPath");
+  });
+
   it("surfaces graph metadata in the debug panel", () => {
     expect(html).toContain("Graphs: bus");
   });
