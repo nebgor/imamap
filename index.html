@@ -492,7 +492,7 @@
     async function loadLocalFallbackStops() {
       try {
         const [busRes, railRes] = await Promise.all([
-          fetch("data/fallback-bus-sample.json"),
+          fetch("data/fallback-bus-stops.json"),
           fetch("data/fallback-rail-stops.json")
         ]);
         if (!busRes.ok || !railRes.ok) throw new Error("fallback file missing");
@@ -1084,6 +1084,36 @@
 
     const FALLBACK_STOPS = buildFallbackStops();
 
+    function stopNeighborPaths(stops, k = 3, maxDistKm = 1.5) {
+      const paths = [];
+      const seen = new Set();
+      stops.forEach((s, idx) => {
+        const candidates = [];
+        stops.forEach((t, j) => {
+          if (idx === j) return;
+          const d = haversine(s.lat, s.lon, t.lat, t.lon);
+          if (d <= maxDistKm) candidates.push({ t, d });
+        });
+        candidates
+          .sort((a, b) => a.d - b.d)
+          .slice(0, k)
+          .forEach((c) => {
+            const key =
+              [s.lat, s.lon, c.t.lat, c.t.lon]
+                .map((v) => v.toFixed(5))
+                .sort()
+                .join("|");
+            if (seen.has(key)) return;
+            seen.add(key);
+            paths.push([
+              [s.lat, s.lon],
+              [c.t.lat, c.t.lon]
+            ]);
+          });
+      });
+      return paths;
+    }
+
     function pointSegmentDistance(p, a, b) {
       const toRad = (d) => (d * Math.PI) / 180;
       const latScale = 111;
@@ -1402,13 +1432,19 @@
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
           routeGraph = buildRouteGraph(routes);
-          const combined = routes.concat(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
+          const stopPaths = stopNeighborPaths(window.__stops || []);
+          const combined = routes
+            .concat(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })))
+            .concat([{ name: "stop-graph", paths: stopPaths }]);
           busGraph = buildRouteGraph(combined);
           railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         } catch (err) {
           console.error("Route fetch failed, using corridors only", err);
           routeGraph = { nodes: new Map(), routes: [] };
-          busGraph = buildRouteGraph(majorRoads.map((r) => ({ name: r.name, paths: [r.points] })));
+          const stopPaths = stopNeighborPaths(window.__stops || []);
+          busGraph = buildRouteGraph(
+            majorRoads.map((r) => ({ name: r.name, paths: [r.points] })).concat([{ name: "stop-graph", paths: stopPaths }])
+          );
           railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
         }
         updateDebugMeta();
