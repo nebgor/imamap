@@ -26,11 +26,7 @@ async function main() {
     if (/Stops: 0/.test(metaText || "")) {
       throw new Error("Stops still zero after load");
     }
-    const { x, y } = await page.$eval("#map", (el) => {
-      const rect = el.getBoundingClientRect();
-      return { x: rect.left + rect.width * 0.72, y: rect.top + rect.height * 0.42 };
-    });
-    await page.mouse.click(x, y);
+    await page.click("#demoRun");
     await page.waitForFunction(
       () => {
         const dp = document.getElementById("debug-path");
