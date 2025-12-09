@@ -2365,6 +2365,7 @@
 
       const railChoice = bestLineForStop(near.stop);
       const busChoice = bestBusRouteForStop(near.stop);
+      if (!railChoice && !busChoice) return null;
 
       function buildCorridor(choice, points) {
         const linePoints = points;
