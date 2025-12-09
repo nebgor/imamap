@@ -646,6 +646,7 @@
     const roadsLayer = L.layerGroup();
     let stopsHiddenForZoom = false;
     let heatHiddenForZoom = false;
+    let roadsHiddenForZoom = false;
     let simTimers = [];
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
@@ -1470,6 +1471,36 @@
       const rendered = step > 1 ? Math.ceil(total / step) : total;
       document.getElementById("status").textContent = `Rendered ${rendered}/${total} stops`;
       updateDebugMeta({ stops: total, baseWait, speed: netSpeed, data: DATA_SOURCE });
+    }
+
+    function pauseHeavyLayers() {
+      if (document.getElementById("toggleStops").checked && stopsLayer) {
+        stopsLayer.remove();
+        stopsHiddenForZoom = true;
+      }
+      if (heatVisLayer && heatVisLayer._map) {
+        heatVisLayer.setOptions({ opacity: 0 });
+        heatHiddenForZoom = true;
+      }
+      if (document.getElementById("toggleRoads").checked && roadsLayer && roadsLayer._map) {
+        roadsLayer.remove();
+        roadsHiddenForZoom = true;
+      }
+    }
+
+    function resumeHeavyLayers() {
+      if (stopsHiddenForZoom) {
+        stopsLayer.addTo(map);
+        stopsHiddenForZoom = false;
+      }
+      if (heatHiddenForZoom) {
+        heatVisLayer.setOptions({ opacity: 0.9 });
+        heatHiddenForZoom = false;
+      }
+      if (roadsHiddenForZoom) {
+        roadsLayer.addTo(map);
+        roadsHiddenForZoom = false;
+      }
     }
 
     function readStopCache() {
@@ -2473,6 +2504,14 @@
         document.getElementById("debug-path").textContent = `Errors: ${ERROR_COUNT} (last: ${lastError})`;
         updateDebugMeta();
       }
+    });
+    map.on("zoomstart", () => {
+      pauseHeavyLayers();
+      setBusy("Adjusting view…", true);
+    });
+    map.on("zoomend", () => {
+      resumeHeavyLayers();
+      setBusy("", false);
     });
     document.getElementById("panelToggle").addEventListener("click", () => {
       const p = document.querySelector(".panel");
