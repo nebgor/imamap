@@ -332,6 +332,7 @@
         <input type="checkbox" id="toggleRoads" />
         Roads
       </label>
+      <button id="rushSim">CBD rush</button>
     </div>
     <div class="row">
       <label>Suburb experiment
@@ -1835,6 +1836,18 @@
       if (!preset) return;
       animateTravel({ lat: preset.lat, lng: preset.lon });
       map.setView([preset.lat, preset.lon], 12);
+    });
+    document.getElementById("rushSim").addEventListener("click", () => {
+      if (!window.__stops || !window.__stops.length) return;
+      simRootLayer.clearLayers();
+      const batch = window.__stops.filter((_, i) => i % 15 === 0).slice(0, 300);
+      batch.forEach((s) => {
+        const travel = buildTravelPath({ lat: s.lat, lng: s.lon });
+        if (!travel || !travel.path || travel.path.length < 3) return;
+        const modeColor = MODE_COLORS[travel.mode || "auto"] || MODE_COLORS.fallback;
+        L.polyline(travel.path, { color: modeColor, weight: 2, opacity: 0.6 }).addTo(simRootLayer);
+      });
+      document.getElementById("status").textContent = `Rush sim: ${batch.length} starts`;
     });
 
     document.getElementById("modePref").addEventListener("change", (e) => {
