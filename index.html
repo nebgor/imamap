@@ -345,6 +345,7 @@
         <input type="checkbox" id="keepVisuals" />
         Keep visuals
       </label>
+      <button id="rainSim">Rain</button>
     </div>
     <div class="row">
       <label>Suburb experiment
@@ -1832,6 +1833,23 @@
       }
     }
 
+    function rainSim(drops = 80) {
+      if (!DATA_READY) return;
+      const keep = document.getElementById("keepVisuals").checked;
+      if (!keep) simRootLayer.clearLayers();
+      for (let i = 0; i < drops; i++) {
+        const stop = randomStopWithin(0, 80);
+        if (!stop) continue;
+        const jitterLat = stop.lat + kmToDegLat((rand() - 0.5) * 0.6);
+        const jitterLon = stop.lon + kmToDegLon((rand() - 0.5) * 0.6, stop.lat);
+        const travel = randomTravelPlan(jitterLat, jitterLon);
+        if (!travel || !travel.near || !isValidStop(travel.near.stop)) continue;
+        const modeColor = MODE_COLORS[travel.mode || "auto"] || MODE_COLORS.fallback;
+        L.polyline(travel.path, { color: modeColor, weight: 1.5, opacity: 0.4 }).addTo(simRootLayer);
+      }
+      document.getElementById("status").textContent = `Rain sim: ${drops} drops`;
+    }
+
     function simulateRadial(rings = [5, 12, 25], perRing = 6) {
       if (!DATA_READY) return;
       const keep = document.getElementById("keepVisuals").checked;
@@ -1888,6 +1906,9 @@
         L.polyline(travel.path, { color: modeColor, weight: 2, opacity: 0.6 }).addTo(simRootLayer);
       });
       document.getElementById("status").textContent = `Rush sim: ${batch.length} starts`;
+    });
+    document.getElementById("rainSim").addEventListener("click", () => {
+      rainSim(100);
     });
     document.getElementById("scenarioPreset").addEventListener("change", (e) => {
       const v = e.target.value;
