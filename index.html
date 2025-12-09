@@ -312,11 +312,12 @@
         <input type="number" id="carSpeed" value="70" min="10" step="5" />
       </label>
     </div>
-    <div class="controls">
+    <div class="controls" style="flex-wrap: wrap;">
       <button id="simulateRandom">Random sim</button>
       <button id="radialSim">Radial sims</button>
       <button id="rushSim">CBD rush</button>
       <button id="rainSim">Rain</button>
+      <button id="demoRun">Demo</button>
       <label style="display:flex;align-items:center;gap:6px;">
         <input type="checkbox" id="keepVisuals" />
         Keep visuals
@@ -325,8 +326,8 @@
     <div class="controls">
       <button id="recompute">Recompute</button>
       <button id="saveSnapshot">Snapshot</button>
-      <button id="demoRun">Demo</button>
       <button id="clearVisuals">Clear visuals</button>
+      <button id="clearCaches">Reset caches</button>
     </div>
     <div class="controls">
       <label style="display:flex;align-items:center;gap:6px;">
@@ -341,7 +342,6 @@
         <input type="checkbox" id="toggleRoads" />
         Roads
       </label>
-      <button id="clearCaches">Reset caches</button>
     </div>
     <div class="row">
       <label>Suburb experiment
