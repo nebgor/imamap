@@ -8,16 +8,19 @@ async function main() {
   try {
     await page.goto(url, { waitUntil: "networkidle" });
     await page.waitForSelector("#status", { timeout: 30000 });
-    await page.waitForFunction(() => {
-      const meta = document.getElementById("debug-meta");
-      const status = document.getElementById("status");
-      return (
-        meta &&
-        /Stops: \d+/.test(meta.textContent || "") &&
-        status &&
-        /(Ready|Rendered)/.test(status.textContent || "")
-      );
-    }, { timeout: 30000 });
+    await page.waitForFunction(
+      () => {
+        const meta = document.getElementById("debug-meta");
+        const status = document.getElementById("status");
+        return (
+          meta &&
+          /Stops: \d+/.test(meta.textContent || "") &&
+          status &&
+          /(Ready|Rendered|Using)/.test(status.textContent || "")
+        );
+      },
+      { timeout: 30000 }
+    );
     const metaText = await page.textContent("#debug-meta");
     summary.meta = metaText;
     if (/Stops: 0/.test(metaText || "")) {
@@ -25,7 +28,7 @@ async function main() {
     }
     const { x, y } = await page.$eval("#map", (el) => {
       const rect = el.getBoundingClientRect();
-      return { x: rect.left + rect.width * 0.7, y: rect.top + rect.height * 0.5 };
+      return { x: rect.left + rect.width * 0.72, y: rect.top + rect.height * 0.42 };
     });
     await page.mouse.click(x, y);
     await page.waitForFunction(
