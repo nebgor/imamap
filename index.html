@@ -506,7 +506,7 @@
       }
       routes.forEach((r) => {
         (r.paths || []).forEach((path) => {
-          const dense = densifyLine(path, 0.5);
+          const dense = densifyLine(path, 0.2);
           for (let i = 0; i < dense.length - 1; i++) {
             addEdge(dense[i], dense[i + 1]);
           }
@@ -1219,7 +1219,7 @@
       return dense;
     }
 
-    function densifyPathPoints(path, stepKm = 0.25) {
+    function densifyPathPoints(path, stepKm = 0.15) {
       if (!Array.isArray(path) || path.length < 2) return path || [];
       const dense = [];
       for (let i = 0; i < path.length - 1; i++) {
@@ -2613,13 +2613,13 @@
       const busSpan = busChoice ? Math.abs(busChoice.stopIdx - busChoice.cbdIdx) : Infinity;
 
       if (busChoice && busSpan <= railSpan) {
-        buildCorridor(busChoice, densifyLine(busChoice.points, 0.6));
+        buildCorridor(busChoice, densifyLine(busChoice.points, 0.3));
       } else if (railChoice) {
-        buildCorridor(railChoice, densifyLine(railChoice.line.points, 0.6));
+        buildCorridor(railChoice, densifyLine(railChoice.line.points, 0.3));
       }
 
       path.push([target.lat, target.lon]);
-      const dense = densifyLine(path, 0.6);
+      const dense = densifyLine(path, 0.3);
       return { path: dense, near, railChoice, busChoice };
     }
 
@@ -2694,6 +2694,10 @@
       if (!best) {
         lastError = "No routed path";
         return null;
+      }
+      const dense = densifyPathPoints(best.path, 0.15);
+      if (dense && dense.length >= 5) {
+        best.path = dense;
       }
       return best;
     }
