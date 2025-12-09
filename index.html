@@ -2297,6 +2297,13 @@
       }
       return d;
     }
+    function pathHasLongSegment(path, maxKm = 3) {
+      for (let i = 0; i < path.length - 1; i++) {
+        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+        if (seg > maxKm) return true;
+      }
+      return false;
+    }
 
     let busTargetKey = null;
     let railTargetKey = null;
@@ -2322,7 +2329,14 @@
           stBusKey
         );
         const railPart = shortestPath(railGraph, { lat: st.lat, lon: st.lon }, target, railTargetKey || stRailKey);
-        if (busPart && busPart.length && railPart && railPart.length) {
+        if (
+          busPart &&
+          busPart.length > 2 &&
+          railPart &&
+          railPart.length > 2 &&
+          !pathHasLongSegment(busPart) &&
+          !pathHasLongSegment(railPart)
+        ) {
           const len = pathLength(busPart) + pathLength(railPart);
           if (!best || len < best.len) {
             best = { busPart, railPart, station: st, len };
@@ -2337,14 +2351,20 @@
     function graphRouteToCBD(start) {
       if (!busGraph || !busGraph.nodes || busGraph.nodes.size === 0 || !window.__stops) return null;
       const near = nearestStop(start.lat, start.lon);
-      if (!near.stop) return null;
-      if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
+      const cbdAnchor = nearestStop(target.lat, target.lon);
+      if (!near.stop || !cbdAnchor.stop) return null;
+      if (!busTargetKey) busTargetKey = nearestNodeKey(busGraph.nodes, cbdAnchor.stop.lat, cbdAnchor.stop.lon);
       const walkLeg = [
         [start.lat, start.lng],
         [near.stop.lat, near.stop.lon]
       ];
-      const p = shortestPath(busGraph, { lat: near.stop.lat, lon: near.stop.lon }, target, busTargetKey);
-      if (p && p.length > 2) {
+      const p = shortestPath(
+        busGraph,
+        { lat: near.stop.lat, lon: near.stop.lon },
+        { lat: cbdAnchor.stop.lat, lon: cbdAnchor.stop.lon },
+        busTargetKey
+      );
+      if (p && p.length > 2 && !pathHasLongSegment(p)) {
         return {
           path: walkLeg.concat(p),
           near,
@@ -2390,6 +2410,7 @@
       }
 
       path.push([target.lat, target.lon]);
+      if (pathHasLongSegment(path, 5)) return null;
       return { path, near, railChoice, busChoice };
     }
 
