@@ -1465,6 +1465,13 @@
         el.classList.add("hidden");
       }
     }
+    function scheduleIdle(fn) {
+      if (window.requestIdleCallback) {
+        requestIdleCallback(fn, { timeout: 50 });
+      } else {
+        setTimeout(fn, 0);
+      }
+    }
 
     function updateDebugMeta(overrides = {}) {
       metaState = { ...metaState, ...overrides };
@@ -1485,26 +1492,39 @@
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
       const total = stops.length;
       const step = total > 4000 ? Math.ceil(total / 4000) : 1;
-      stops.forEach((stop, idx) => {
-        if (step > 1 && idx % step !== 0 && !majorPattern.test(stop.stopname || "")) return;
-        const commute = computeCommute(stop, baseWait, netSpeed);
-        const color = colourForMinutes(commute);
-        const isMajor = majorPattern.test(stop.stopname || "");
-        L.circleMarker([stop.lat, stop.lon], {
-          radius: isMajor ? 8 : 5.5,
-          color: isMajor ? "#d9f99d" : "#0d1b2a",
-          weight: 1,
-          fillColor: color,
-          fillOpacity: 0.9
-        })
-          .bindPopup(
-            `<strong>${stop.stopname || "Stop"}</strong><br>ID: ${stop.stopid}<br>${commute.toFixed(1)} min`
-          )
-          .addTo(stopsLayer);
-      });
-      const rendered = step > 1 ? Math.ceil(total / step) : total;
-      document.getElementById("status").textContent = `Rendered ${rendered}/${total} stops`;
-      updateDebugMeta({ stops: total, baseWait, speed: netSpeed, data: DATA_SOURCE });
+      let idx = 0;
+      function processChunk(deadline) {
+        let renderedCount = 0;
+        while ((deadline ? deadline.timeRemaining() > 2 : true) && idx < total) {
+          const stop = stops[idx];
+          idx += 1;
+          if (step > 1 && (idx - 1) % step !== 0 && !majorPattern.test(stop.stopname || "")) continue;
+          const commute = computeCommute(stop, baseWait, netSpeed);
+          const color = colourForMinutes(commute);
+          const isMajor = majorPattern.test(stop.stopname || "");
+          L.circleMarker([stop.lat, stop.lon], {
+            radius: isMajor ? 8 : 5.5,
+            color: isMajor ? "#d9f99d" : "#0d1b2a",
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.9
+          })
+            .bindPopup(
+              `<strong>${stop.stopname || "Stop"}</strong><br>ID: ${stop.stopid}<br>${commute.toFixed(1)} min`
+            )
+            .addTo(stopsLayer);
+          renderedCount += 1;
+        }
+        if (idx < total) {
+          document.getElementById("status").textContent = `Rendering stops… ${idx}/${total}`;
+          scheduleIdle(processChunk);
+        } else {
+          const rendered = step > 1 ? Math.ceil(total / step) : total;
+          document.getElementById("status").textContent = `Rendered ${rendered}/${total} stops`;
+          updateDebugMeta({ stops: total, baseWait, speed: netSpeed, data: DATA_SOURCE });
+        }
+      }
+      scheduleIdle(processChunk);
     }
 
     function pauseHeavyLayers() {
