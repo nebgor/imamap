@@ -88,3 +88,118 @@ describe("routing helpers", () => {
     expect(pathHasLongSegment(coarse, Infinity, false)).toBe(false);
   });
 });
+
+// Minimal graph harness copied from the app for routing sanity checks.
+function nearestNodeKey(nodes, lat, lon) {
+  let best = null;
+  let bestDist = Infinity;
+  nodes.forEach((n, k) => {
+    const d = haversine(lat, lon, n.lat, n.lon);
+    if (d < bestDist) {
+      bestDist = d;
+      best = k;
+    }
+  });
+  return best;
+}
+
+function buildRouteGraph(routes) {
+  const nodes = new Map();
+  const key = (lat, lon) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
+  function addEdge(a, b) {
+    const ka = key(a[0], a[1]);
+    const kb = key(b[0], b[1]);
+    const d = haversine(a[0], a[1], b[0], b[1]);
+    if (!nodes.has(ka)) nodes.set(ka, { lat: a[0], lon: a[1], edges: [] });
+    if (!nodes.has(kb)) nodes.set(kb, { lat: b[0], lon: b[1], edges: [] });
+    nodes.get(ka).edges.push({ k: kb, w: d });
+    nodes.get(kb).edges.push({ k: ka, w: d });
+  }
+  routes.forEach((r) => {
+    (r.paths || []).forEach((path) => {
+      for (let i = 0; i < path.length - 1; i++) {
+        addEdge(path[i], path[i + 1]);
+      }
+    });
+  });
+  return { nodes, routes };
+}
+
+function shortestPath(graph, start, goal) {
+  const nodes = graph.nodes;
+  const startKey = nearestNodeKey(nodes, start.lat, start.lon);
+  const goalKey = nearestNodeKey(nodes, goal.lat, goal.lon);
+  if (!startKey || !goalKey) return null;
+  const dist = new Map();
+  const prev = new Map();
+  const pq = [];
+  function push(k, d) {
+    pq.push({ k, d });
+    pq.sort((a, b) => a.d - b.d);
+  }
+  nodes.forEach((_, k) => dist.set(k, Infinity));
+  dist.set(startKey, 0);
+  push(startKey, 0);
+  while (pq.length) {
+    const { k } = pq.shift();
+    if (k === goalKey) break;
+    const n = nodes.get(k);
+    if (!n) continue;
+    n.edges.forEach((e) => {
+      const alt = dist.get(k) + e.w;
+      if (alt < dist.get(e.k)) {
+        dist.set(e.k, alt);
+        prev.set(e.k, k);
+        push(e.k, alt);
+      }
+    });
+  }
+  if (!prev.has(goalKey) && startKey !== goalKey) return null;
+  const path = [];
+  let u = goalKey;
+  while (u) {
+    const n = nodes.get(u);
+    if (!n) break;
+    path.unshift([n.lat, n.lon]);
+    if (u === startKey) break;
+    u = prev.get(u);
+  }
+  return path;
+}
+
+function buildGridRoutes(size = 10, step = 0.01, origin = [-32.0, 115.8]) {
+  const paths = [];
+  const [lat0, lon0] = origin;
+  // horizontal lines
+  for (let r = 0; r < size; r++) {
+    const row = [];
+    for (let c = 0; c < size; c++) {
+      row.push([lat0 + r * step, lon0 + c * step]);
+    }
+    paths.push(row);
+  }
+  // vertical lines
+  for (let c = 0; c < size; c++) {
+    const col = [];
+    for (let r = 0; r < size; r++) {
+      col.push([lat0 + r * step, lon0 + c * step]);
+    }
+    paths.push(col);
+  }
+  return [{ name: "grid", paths }];
+}
+
+describe("grid routing sanity", () => {
+  it("routes across a 10x10 grid with many segments", () => {
+    const routes = buildGridRoutes(10, 0.01);
+    const graph = buildRouteGraph(routes);
+    const start = { lat: -32.0, lon: 115.8 };
+    const goal = { lat: -31.91, lon: 115.89 };
+    const path = shortestPath(graph, start, goal);
+    expect(path).toBeTruthy();
+    expect(path.length).toBeGreaterThan(10);
+    const dense = densifyPathPoints(path, 0.2);
+    expect(dense.length).toBeGreaterThan(10);
+    expect(pathHasLongSegment(dense, 1, true)).toBe(false);
+  });
+});
