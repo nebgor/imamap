@@ -1713,6 +1713,7 @@
           const rendered = step > 1 ? Math.ceil(total / step) : total;
           document.getElementById("status").textContent = `Rendered ${rendered}/${total} stops`;
           updateDebugMeta({ stops: total, baseWait, speed: netSpeed, data: DATA_SOURCE });
+          refreshDeckLayers();
         }
       }
       scheduleIdle(processChunk);
@@ -1791,12 +1792,23 @@
           canvas: deckCanvas,
           controller: false
         });
+      refreshDeckLayers(viewState, size);
+      stopsLayer.remove();
+      heatLineLayer.clearLayers();
+      heatVisLayer.setLatLngs([]);
+    }
+
+    function refreshDeckLayers(viewState = null, sizeOverride = null) {
+      if (!USE_DECK || !deckInstance) return;
+      const size = sizeOverride || map.getSize();
+      const center = map.getCenter();
+      const vs = viewState || { longitude: center.lng, latitude: center.lat, zoom: map.getZoom() };
       const layers = buildDeckLayers();
       const t0 = performance.now();
       deckInstance.setProps({
         width: size.x,
         height: size.y,
-        viewState,
+        viewState: vs,
         layers
       });
       const t1 = performance.now();
@@ -1805,9 +1817,6 @@
         stopCount: window.__stops ? window.__stops.length : 0,
         pathCount: layers[1] && layers[1].props && layers[1].props.data ? layers[1].props.data.length : 0
       };
-      stopsLayer.remove();
-      heatLineLayer.clearLayers();
-      heatVisLayer.setLatLngs([]);
       updateDebugMeta();
     }
 
@@ -2187,6 +2196,7 @@
       });
       heatVisLayer.setLatLngs(heatPoints);
       ensureHeatCanvasHint();
+      refreshDeckLayers();
     }
 
     function samplePath(path) {
