@@ -64,6 +64,21 @@ describe("routing helpers", () => {
     expect(dense.length).toBeGreaterThan(5);
   });
 
+  it("flags Scarborough to CBD coarse straight hop as invalid in cityStrict", () => {
+    const scarbToCbd = [
+      [-31.894, 115.751],
+      [-31.9523, 115.8590]
+    ];
+    expect(pathHasLongSegment(scarbToCbd, 2.5, true)).toBe(true);
+  });
+
+  it("densifies a 10km path into 10+ segments for smooth sim", () => {
+    const start = [-31.95, 115.7];
+    const end = [-31.95, 115.9];
+    const dense = densifyPathPoints([start, end], 0.2);
+    expect(dense.length).toBeGreaterThan(10);
+  });
+
   it("allows long segments when cityStrict is false", () => {
     const coarse = [
       [-32.5, 115.7],
