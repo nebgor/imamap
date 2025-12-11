@@ -500,14 +500,20 @@
   <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
   <script src="https://unpkg.com/deck.gl@8.9.36/dist.min.js"></script>
   <script>
+    let walkGraphCache = null;
     function buildWalkGraph(stops) {
+      if (!stops || !stops.length) return { nodes: new Map(), routes: [] };
+      const cacheKey = `${stops.length}-${stops[0].lat}-${stops[0].lon}`;
+      if (walkGraphCache && walkGraphCache.key === cacheKey) return walkGraphCache.graph;
       const routes = [
         {
           name: "walk-grid",
           paths: stopNeighborPaths(stops, 6, 0.6)
         }
       ];
-      return buildRouteGraph(routes, true);
+      const graph = buildRouteGraph(routes, true);
+      walkGraphCache = { key: cacheKey, graph };
+      return graph;
     }
 
     function buildRouteGraph(routes, skipDensify = false) {
