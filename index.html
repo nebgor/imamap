@@ -2904,7 +2904,9 @@
         lastError = "No routed path";
         return null;
       }
-      const dense = densifyPathPoints(best.path, 0.1, 25);
+      const estLen = pathLength(best.path);
+      const minPts = Math.min(50, Math.max(12, Math.ceil(estLen / 0.3))); // adaptive to path length
+      const dense = densifyPathPoints(best.path, 0.1, minPts);
       if (dense && dense.length >= 5) {
         best.path = dense;
       }
