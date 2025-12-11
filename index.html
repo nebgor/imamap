@@ -1242,7 +1242,7 @@
       return dense;
     }
 
-    function densifyPathPoints(path, stepKm = 0.15) {
+    function densifyPathPoints(path, stepKm = 0.15, minPts = 0) {
       if (!Array.isArray(path) || path.length < 2) return path || [];
       const dense = [];
       for (let i = 0; i < path.length - 1; i++) {
@@ -1256,6 +1256,11 @@
         }
       }
       dense.push(path[path.length - 1]);
+      if (minPts && dense.length < minPts) {
+        // refine further to reach minimum points
+        const targetStep = (stepKm * dense.length) / Math.max(minPts, 1);
+        return densifyPathPoints(path, targetStep, 0);
+      }
       return dense;
     }
 
@@ -2899,7 +2904,7 @@
         lastError = "No routed path";
         return null;
       }
-      const dense = densifyPathPoints(best.path, 0.15);
+      const dense = densifyPathPoints(best.path, 0.1, 25);
       if (dense && dense.length >= 5) {
         best.path = dense;
       }
