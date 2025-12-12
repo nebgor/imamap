@@ -738,6 +738,8 @@
     let USE_DECK = false;
     let deckStats = null;
     let simTimers = [];
+    let deckRefreshPending = false;
+    let lastPerf = { routeMs: 0, densePts: 0 };
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
       radius: 18,
@@ -1637,6 +1639,7 @@
           .bindTooltip(st.name, { permanent: false, direction: "top", offset: [0, -4] })
           .addTo(stationLayer);
       });
+      scheduleDeckRefresh();
     }
 
     let metaState = { stops: 0, baseWait: Number(baseWait.value), speed: Number(netSpeed.value), data: "unknown" };
@@ -1724,7 +1727,7 @@
           const rendered = step > 1 ? Math.ceil(total / step) : total;
           document.getElementById("status").textContent = `Rendered ${rendered}/${total} stops`;
           updateDebugMeta({ stops: total, baseWait, speed: netSpeed, data: DATA_SOURCE });
-          refreshDeckLayers();
+          scheduleDeckRefresh();
         }
       }
       scheduleIdle(processChunk);
@@ -1829,6 +1832,15 @@
         pathCount: layers[1] && layers[1].props && layers[1].props.data ? layers[1].props.data.length : 0
       };
       updateDebugMeta();
+    }
+
+    function scheduleDeckRefresh() {
+      if (!USE_DECK || deckRefreshPending) return;
+      deckRefreshPending = true;
+      requestAnimationFrame(() => {
+        deckRefreshPending = false;
+        refreshDeckLayers();
+      });
     }
 
     function pauseHeavyLayers() {
@@ -2207,7 +2219,7 @@
       });
       heatVisLayer.setLatLngs(heatPoints);
       ensureHeatCanvasHint();
-      refreshDeckLayers();
+      scheduleDeckRefresh();
     }
 
     function samplePath(path) {
