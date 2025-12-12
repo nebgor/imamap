@@ -2906,15 +2906,54 @@
           }
         }
       }
+      const estLen = best ? pathLength(best.path) : 0;
+      const minPts = best ? Math.min(50, Math.max(12, Math.ceil(estLen / 0.3))) : 0; // adaptive to path length
+      if (best) {
+        const dense = densifyPathPoints(best.path, 0.1, minPts);
+        if (dense && dense.length >= 5) {
+          best.path = dense;
+        }
+      }
+
+      // If the chosen path is still coarse or has long city segments, try walk fallback as a quality boost
+      const coarse =
+        !best ||
+        best.path.length < 10 ||
+        pathHasLongSegment(best.path, 2.5, true) ||
+        (best.maxSeg && best.maxSeg > 1.0);
+      if (coarse && window.__stops && window.__stops.length) {
+        const walkGraph = buildWalkGraph(window.__stops);
+        const near = nearestStop(clickLatLng.lat, clickLatLng.lng);
+        const cbd = nearestStop(target.lat, target.lon);
+        if (near.stop && cbd.stop) {
+          const p = shortestPath(
+            walkGraph,
+            { lat: near.stop.lat, lon: near.stop.lon },
+            { lat: cbd.stop.lat, lon: cbd.stop.lon }
+          );
+          if (p && p.length) {
+            const fallbackPath = densifyPathPoints(
+              [
+                [clickLatLng.lat, clickLatLng.lng],
+                [near.stop.lat, near.stop.lon],
+                ...p
+              ],
+              0.1,
+              25
+            );
+            best = {
+              path: fallbackPath,
+              near,
+              mode: best ? best.mode : "walk-fallback",
+              quality: "ok"
+            };
+          }
+        }
+      }
+
       if (!best) {
         lastError = "No routed path";
         return null;
-      }
-      const estLen = pathLength(best.path);
-      const minPts = Math.min(50, Math.max(12, Math.ceil(estLen / 0.3))); // adaptive to path length
-      const dense = densifyPathPoints(best.path, 0.1, minPts);
-      if (dense && dense.length >= 5) {
-        best.path = dense;
       }
       return best;
     }
