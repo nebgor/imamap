@@ -740,6 +740,9 @@
     let simTimers = [];
     let deckRefreshPending = false;
     let lastPerf = { routeMs: 0, densePts: 0 };
+    let stopCommuteCache = { key: "", values: new Map() };
+    let isDragging = false;
+    let lastDragEnd = 0;
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
       radius: 18,
@@ -1684,11 +1687,20 @@
       const deckInfo = deckStats
         ? ` · Deck: on (${deckStats.stopCount} stops, ${deckStats.pathCount} paths, ${deckStats.renderMs.toFixed(1)}ms)`
         : " · Deck: off";
-      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Properties: ${PROPERTY_DATA.length} pts/${suburbAreas} areas · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}${deckInfo}`;
+      const perfInfo = lastPerf.routeMs
+        ? ` · Route ${lastPerf.routeMs.toFixed(1)}ms · Dense ${lastPerf.densePts}`
+        : "";
+      meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Properties: ${PROPERTY_DATA.length} pts/${suburbAreas} areas · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}${deckInfo}${perfInfo}`;
     }
 
     function renderStops(stops, baseWait, netSpeed) {
       stopsLayer.clearLayers();
+      if (document.getElementById("toggleDeck")?.checked && USE_DECK) {
+        document.getElementById("status").textContent = "Stops via WebGL";
+        updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed, data: DATA_SOURCE });
+        scheduleDeckRefresh();
+        return;
+      }
       if (!document.getElementById("toggleStops").checked) {
         document.getElementById("status").textContent = "Stops hidden";
         updateDebugMeta({ stops: stops.length, baseWait, speed: netSpeed, data: DATA_SOURCE });
@@ -1696,7 +1708,7 @@
       }
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
       const total = stops.length;
-      const step = 1;
+      const step = total > 12000 ? 3 : total > 8000 ? 2 : 1;
       let idx = 0;
       function processChunk(deadline) {
         let renderedCount = 0;
@@ -1707,17 +1719,19 @@
           const commute = computeCommute(stop, baseWait, netSpeed);
           const color = colourForMinutes(commute);
           const isMajor = majorPattern.test(stop.stopname || "");
-          L.circleMarker([stop.lat, stop.lon], {
+          const marker = L.circleMarker([stop.lat, stop.lon], {
             radius: isMajor ? 8 : 5.5,
             color: isMajor ? "#d9f99d" : "#0d1b2a",
             weight: 1,
             fillColor: color,
             fillOpacity: 0.9
           })
-            .bindPopup(
-              `<strong>${stop.stopname || "Stop"}</strong><br>ID: ${stop.stopid}<br>${commute.toFixed(1)} min`
-            )
             .addTo(stopsLayer);
+          if (isMajor) {
+            marker.bindPopup(
+              `<strong>${stop.stopname || "Stop"}</strong><br>ID: ${stop.stopid}<br>${commute.toFixed(1)} min`
+            );
+          }
           renderedCount += 1;
         }
         if (idx < total) {
@@ -1743,15 +1757,29 @@
       ];
     }
 
+    function getStopCommute(stop, baseWait, netSpeed) {
+      const key = `${baseWait}-${netSpeed}`;
+      if (stopCommuteCache.key !== key) {
+        stopCommuteCache = { key, values: new Map() };
+      }
+      const id = stop.stopid || `${stop.lat},${stop.lon}`;
+      if (stopCommuteCache.values.has(id)) return stopCommuteCache.values.get(id);
+      const commute = computeCommute(stop, baseWait, netSpeed);
+      stopCommuteCache.values.set(id, commute);
+      return commute;
+    }
+
     function buildDeckLayers() {
       if (!USE_DECK || !window.deck || !window.__stops) return [];
       const stops = window.__stops || [];
       const heat = loadHeat();
+      const base = Number(baseWait.value);
+      const speed = Number(netSpeed.value);
       const stopLayer = new deck.ScatterplotLayer({
         id: "stops-layer",
         data: stops,
         getPosition: (d) => [d.lon, d.lat],
-        getFillColor: (d) => hexToRgbArray(colourForMinutes(computeCommute(d, Number(baseWait.value), Number(netSpeed.value)))).concat(200),
+        getFillColor: (d) => hexToRgbArray(colourForMinutes(getStopCommute(d, base, speed))).concat(200),
         getRadius: 60,
         radiusUnits: "meters",
         stroked: false,
@@ -2207,8 +2235,13 @@
     function renderHeat() {
       heatLineLayer.clearLayers();
       const heat = loadHeat();
+      if (USE_DECK) {
+        heatVisLayer.setLatLngs([]);
+        scheduleDeckRefresh();
+        return;
+      }
       const heatPoints = [];
-      heat.forEach((h) => {
+      heat.slice(0, 80).forEach((h) => {
         L.polyline(h.path, {
           color: h.color,
           weight: 2,
@@ -2224,15 +2257,23 @@
 
     function samplePath(path) {
       const pts = [];
+      const totalLen = pathLength(path);
+      const step = totalLen > 30 ? 0.8 : totalLen > 15 ? 0.5 : 0.35;
       for (let i = 0; i < path.length - 1; i++) {
         const a = path[i];
         const b = path[i + 1];
         const seg = haversine(a[0], a[1], b[0], b[1]);
-        const steps = Math.max(1, Math.floor(seg / 0.35)); // sample roughly every 350m
+        const steps = Math.max(1, Math.floor(seg / step));
         for (let s = 0; s <= steps; s++) {
           const t = s / steps;
           pts.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
         }
+      }
+      if (pts.length > 600) {
+        const stride = Math.ceil(pts.length / 600);
+        const slim = [];
+        for (let i = 0; i < pts.length; i += stride) slim.push(pts[i]);
+        return slim;
       }
       return pts;
     }
@@ -2823,6 +2864,7 @@
     }
 
     function buildTravelPath(clickLatLng) {
+      const routeStart = performance.now();
       const pref = document.getElementById("modePref").value || MODE_PREF;
       const allow = document.getElementById("allowTransfer").value === "true";
       MODE_PREF = pref;
@@ -2967,6 +3009,8 @@
         lastError = "No routed path";
         return null;
       }
+      lastPerf.routeMs = performance.now() - routeStart;
+      lastPerf.densePts = best.path ? best.path.length : 0;
       return best;
     }
 
@@ -3104,6 +3148,7 @@
     }
 
     map.on("click", (e) => {
+      if (isDragging || Date.now() - lastDragEnd < 160) return;
       try {
         document.getElementById("status").textContent = `Click at ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
         animateTravel(e.latlng);
@@ -3123,6 +3168,13 @@
     map.on("zoomend", () => {
       resumeHeavyLayers();
       setBusy("", false);
+    });
+    map.on("dragstart", () => {
+      isDragging = true;
+    });
+    map.on("dragend", () => {
+      isDragging = false;
+      lastDragEnd = Date.now();
     });
     document.getElementById("panelToggle").addEventListener("click", () => {
       const p = document.querySelector(".panel");
