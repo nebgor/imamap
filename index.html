@@ -728,6 +728,7 @@
     const railLayer = L.layerGroup().addTo(map);
     const stationLayer = L.layerGroup().addTo(map);
     const simRootLayer = L.layerGroup().addTo(map);
+    const routeCompareLayer = L.layerGroup().addTo(map);
     const roadsLayer = L.layerGroup();
     const propertyLayer = L.layerGroup();
     let stopsHiddenForZoom = false;
@@ -743,6 +744,7 @@
     let stopCommuteCache = { key: "", values: new Map() };
     let isDragging = false;
     let lastDragEnd = 0;
+    let shiftRouteStart = null;
     const heatLineLayer = L.layerGroup().addTo(map);
     const heatVisLayer = L.heatLayer([], {
       radius: 18,
@@ -2863,6 +2865,33 @@
       return null;
     }
 
+    function buildRouteBetween(startLatLng, destLatLng) {
+      if (!window.__stops || !window.__stops.length) return null;
+      const nearStart = nearestStop(startLatLng.lat, startLatLng.lng);
+      const nearDest = nearestStop(destLatLng.lat, destLatLng.lng);
+      if (!nearStart.stop || !nearDest.stop) return null;
+      const graph = busGraph && busGraph.nodes && busGraph.nodes.size > 0 ? busGraph : buildWalkGraph(window.__stops);
+      const p = shortestPath(
+        graph,
+        { lat: nearStart.stop.lat, lon: nearStart.stop.lon },
+        { lat: nearDest.stop.lat, lon: nearDest.stop.lon },
+        null
+      );
+      if (!p || !p.length) return null;
+      const path = densifyPathPoints(
+        [
+          [startLatLng.lat, startLatLng.lng],
+          [nearStart.stop.lat, nearStart.stop.lon],
+          ...p,
+          [nearDest.stop.lat, nearDest.stop.lon],
+          [destLatLng.lat, destLatLng.lng]
+        ],
+        0.1,
+        25
+      );
+      return { path, start: nearStart, dest: nearDest, mode: "bus-graph" };
+    }
+
     function buildTravelPath(clickLatLng) {
       const routeStart = performance.now();
       const pref = document.getElementById("modePref").value || MODE_PREF;
@@ -3150,6 +3179,40 @@
     map.on("click", (e) => {
       if (isDragging || Date.now() - lastDragEnd < 160) return;
       try {
+        // shift-click routing between two points
+        if (e.originalEvent && e.originalEvent.shiftKey) {
+          if (!shiftRouteStart) {
+            shiftRouteStart = e.latlng;
+            routeCompareLayer.clearLayers();
+            L.marker(e.latlng, { interactive: false }).addTo(routeCompareLayer);
+            document.getElementById("status").textContent = "Select destination (shift+click)";
+            return;
+          } else {
+            const route = buildRouteBetween(shiftRouteStart, e.latlng);
+            routeCompareLayer.clearLayers();
+            if (route && route.path && route.path.length > 1) {
+              const lenKm = pathLength(route.path).toFixed(1);
+              const speed = Number(netSpeed.value);
+              const eta = ((pathLength(route.path) / Math.max(speed, 1)) * 60).toFixed(1);
+              L.polyline(route.path, { color: "#22c55e", weight: 4, opacity: 0.9 }).addTo(routeCompareLayer);
+              L.marker(route.path[route.path.length - 1], {
+                icon: L.divIcon({
+                  className: "rail-label",
+                  html: `Route: ${lenKm} km · ${eta} min`,
+                  iconSize: null
+                })
+              }).addTo(routeCompareLayer);
+              document.getElementById("status").textContent = `Route preview · ${lenKm} km · ${eta} min`;
+            } else {
+              document.getElementById("status").textContent = "No route between points";
+            }
+            shiftRouteStart = null;
+            return;
+          }
+        }
+        // normal click: clear compare layer and run sim
+        shiftRouteStart = null;
+        routeCompareLayer.clearLayers();
         document.getElementById("status").textContent = `Click at ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
         animateTravel(e.latlng);
       } catch (err) {
