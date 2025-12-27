@@ -312,6 +312,21 @@
   <button id="panelToggle" class="busy-banner" style="left:14px; right:auto; top:auto; bottom:12px;">Toggle panel</button>
   <div class="panel">
     <h1>Perth PT commute sketch</h1>
+    <div class="row">
+      <label>Transport
+        <select id="transportMode">
+          <option value="ground" selected>Ground</option>
+          <option value="flight">Flight</option>
+        </select>
+      </label>
+      <label>Ground mode
+        <select id="modePref">
+          <option value="mixed">mixed</option>
+          <option value="bus">bus only</option>
+          <option value="rail">rail only</option>
+        </select>
+      </label>
+    </div>
     <div class="section">
       <h2>Rendering</h2>
       <label style="display:flex;align-items:center;gap:6px;">
@@ -698,6 +713,7 @@
     const ROUTE_CACHE_KEY = "routesCacheV2";
     const ROUTE_CACHE_MAX_AGE_HRS = 12;
     const MAX_WALK_KM = Infinity;
+    let TRANSPORT_TYPE = "ground";
     let MODE_PREF = "mixed";
     let ALLOW_TRANSFER = true;
     let BUS_SPEED = 40;
