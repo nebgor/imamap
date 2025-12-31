@@ -725,6 +725,8 @@
     let ERROR_COUNT = 0;
     let busGraph = null;
     let railGraph = null;
+    let busTargetKey = null;
+    let railTargetKey = null;
     const rand = () => {
       if (crypto && crypto.getRandomValues) {
         const buf = new Uint32Array(1);
@@ -2115,6 +2117,8 @@
           busGraph = buildWalkGraph(window.__stops || []);
         }
         railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
+        busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
+        railTargetKey = nearestNodeKey(railGraph.nodes, target.lat, target.lon);
         updateDebugMeta();
         const dbg = sampleCorridorDebug(-31.96, 115.86);
         document.getElementById("debug-corridor").textContent = `CBD sample corridor factor: ${dbg.factor.toFixed(2)} · est ${dbg.mins.toFixed(1)} min`;
