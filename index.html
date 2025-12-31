@@ -501,6 +501,7 @@
     <div id="debug-meta"></div>
     <div id="debug-corridor"></div>
     <div id="debug-path"></div>
+    <div id="debug-graph"></div>
   </div>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -2117,6 +2118,8 @@
           busGraph = buildWalkGraph(window.__stops || []);
         }
         railGraph = buildRouteGraph(railLines.map((r) => ({ name: r.name, paths: [r.points] })));
+        busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
+        railTargetKey = nearestNodeKey(railGraph.nodes, target.lat, target.lon);
         busTargetKey = nearestNodeKey(busGraph.nodes, target.lat, target.lon);
         railTargetKey = nearestNodeKey(railGraph.nodes, target.lat, target.lon);
         updateDebugMeta();
