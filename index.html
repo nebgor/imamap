@@ -45,13 +45,13 @@
       position: absolute;
       top: 14px;
       left: 14px;
-      width: 340px;
+      width: 320px;
       max-height: 90vh;
       overflow-y: auto;
       background: var(--panel-bg);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 14px 12px;
+      border-radius: 12px;
+      padding: 12px 12px 10px;
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
       z-index: 1200;
@@ -63,10 +63,17 @@
       font-weight: 700;
       color: #e0fbff;
     }
+    .subhead {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
     .row {
       display: flex;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
     }
     .row label {
       flex: 1;
@@ -78,8 +85,8 @@
     }
     input[type="number"] {
       width: 100%;
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 7px 10px;
+      border-radius: 9px;
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.06);
       color: var(--panel-text);
@@ -87,8 +94,8 @@
     }
     select {
       width: 100%;
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 7px 10px;
+      border-radius: 9px;
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.06);
       color: var(--panel-text);
@@ -98,10 +105,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-size: 13px;
       color: var(--muted);
       flex-wrap: wrap;
+    }
+    .controls.tight {
+      gap: 6px;
+      margin-bottom: 6px;
     }
     button {
       padding: 8px 12px;
@@ -161,18 +172,37 @@
       color: var(--muted);
     }
     .section {
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
       margin-top: 8px;
       display: grid;
-      gap: 8px;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.02);
     }
-    .section h2 {
-      margin: 0;
+    .section summary {
+      margin: 0 -2px;
+      padding: 4px 0;
       font-size: 12px;
       letter-spacing: 0.3px;
       color: #cbd5e1;
       text-transform: uppercase;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .section summary::-webkit-details-marker {
+      display: none;
+    }
+    .section[open] summary::after {
+      content: "–";
+      float: right;
+      color: var(--muted);
+    }
+    .section:not([open]) summary::after {
+      content: "+";
+      float: right;
+      color: var(--muted);
     }
     .busy-banner {
       position: fixed;
@@ -312,6 +342,7 @@
   <button id="panelToggle" class="busy-banner" style="left:14px; right:auto; top:auto; bottom:12px;">Toggle panel</button>
   <div class="panel">
     <h1>Perth PT commute sketch</h1>
+    <p class="subhead">Click anywhere to estimate a commute to the CBD. Random sim paints sample traces.</p>
     <div class="row">
       <label>Transport
         <select id="transportMode">
@@ -319,102 +350,79 @@
           <option value="flight">Flight</option>
         </select>
       </label>
-      <label>Ground mode
+      <label>Mode
         <select id="modePref">
           <option value="mixed">mixed</option>
           <option value="bus">bus only</option>
           <option value="rail">rail only</option>
+          <option value="car">car</option>
+        </select>
+      </label>
+      <label>Transfer
+        <select id="allowTransfer">
+          <option value="true" selected>enabled</option>
+          <option value="false">disabled</option>
         </select>
       </label>
     </div>
-    <div class="section">
-      <h2>Rendering</h2>
-      <label style="display:flex;align-items:center;gap:6px;">
+    <div class="row">
+      <label>Base wait (min)
+        <input type="number" id="baseWait" value="8" min="0" step="1" />
+      </label>
+      <label>Headway (min)
+        <select id="headway">
+          <option value="6">peak 6</option>
+          <option value="10" selected>interpeak 10</option>
+          <option value="15">off-peak 15</option>
+        </select>
+      </label>
+      <label>Scenario
+        <select id="scenarioPreset">
+          <option value="custom" selected>custom</option>
+          <option value="peak">peak</option>
+          <option value="interpeak">interpeak</option>
+          <option value="night">night</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label>Network speed (km/h)
+        <input type="number" id="netSpeed" value="40" min="10" step="5" />
+      </label>
+      <label>Bus speed (km/h)
+        <input type="number" id="busSpeed" value="40" min="5" step="5" />
+      </label>
+      <label>Rail speed (km/h)
+        <input type="number" id="railSpeed" value="65" min="10" step="5" />
+      </label>
+    </div>
+    <div class="row">
+      <label>Car speed (km/h)
+        <input type="number" id="carSpeed" value="70" min="10" step="5" />
+      </label>
+      <label>Random wait
+        <select id="randomWait">
+          <option value="true" selected>on</option>
+          <option value="false">off</option>
+        </select>
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;flex:1;">
         <input type="checkbox" id="toggleDeck" />
         WebGL (deck.gl)
       </label>
     </div>
-    <div class="section">
-      <h2>Scenario</h2>
-      <div class="row">
-        <label>Base wait (min)
-          <input type="number" id="baseWait" value="8" min="0" step="1" />
-        </label>
-        <label>Headway (min)
-          <select id="headway">
-            <option value="6">peak 6</option>
-            <option value="10" selected>interpeak 10</option>
-            <option value="15">off-peak 15</option>
-          </select>
-        </label>
-        <label>Scenario
-          <select id="scenarioPreset">
-            <option value="custom" selected>custom</option>
-            <option value="peak">peak</option>
-            <option value="interpeak">interpeak</option>
-            <option value="night">night</option>
-          </select>
-        </label>
-      </div>
-      <div class="row">
-        <label>Mode
-          <select id="modePref">
-            <option value="mixed">mixed</option>
-            <option value="bus">bus only</option>
-            <option value="rail">rail only</option>
-            <option value="car">car</option>
-          </select>
-        </label>
-        <label>Transfer
-          <select id="allowTransfer">
-            <option value="true">enabled</option>
-            <option value="false">disabled</option>
-          </select>
-        </label>
-        <label>Random wait
-          <select id="randomWait">
-            <option value="true" selected>on</option>
-            <option value="false">off</option>
-          </select>
-        </label>
-      </div>
+    <div class="controls tight">
+      <button class="btn-compact" id="simulateRandom">Random sim</button>
+      <button class="btn-compact" id="recompute">Recompute</button>
+      <button class="btn-compact btn-tiny" id="clearVisuals">Clear visuals</button>
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="keepVisuals" />
+        Keep visuals
+      </label>
     </div>
-    <div class="section">
-      <h2>Speeds</h2>
-      <div class="row">
-        <label>Network speed (km/h)
-          <input type="number" id="netSpeed" value="40" min="10" step="5" />
-        </label>
-        <label>Bus speed (km/h)
-          <input type="number" id="busSpeed" value="40" min="5" step="5" />
-        </label>
-        <label>Rail speed (km/h)
-          <input type="number" id="railSpeed" value="65" min="10" step="5" />
-        </label>
-      </div>
-      <div class="row">
-        <label>Car speed (km/h)
-          <input type="number" id="carSpeed" value="70" min="10" step="5" />
-        </label>
-      </div>
-    </div>
-    <div class="section">
-      <h2>Simulate</h2>
-      <div class="controls">
-        <button class="btn-compact" id="simulateRandom">Random sim</button>
-        <button class="btn-compact" id="radialSim">Radial sims</button>
-        <button class="btn-compact" id="rushSim">CBD rush</button>
-        <button class="btn-compact" id="rainSim">Rain</button>
-        <button class="btn-compact" id="demoRun">Demo</button>
-        <label style="display:flex;align-items:center;gap:6px;">
-          <input type="checkbox" id="keepVisuals" />
-          Keep visuals
-        </label>
-      </div>
-    </div>
-    <div class="section">
-      <h2>Layers & maintenance</h2>
-      <div class="controls">
+    <details class="section" open>
+      <summary>Layers & toggles</summary>
+      <div class="controls tight">
         <label style="display:flex;align-items:center;gap:6px;">
           <input type="checkbox" id="toggleStops" checked />
           Stops
@@ -427,17 +435,6 @@
           <input type="checkbox" id="toggleRoads" />
           Roads
         </label>
-      </div>
-      <div class="controls">
-        <button class="btn-compact btn-tiny" id="recompute">Recompute</button>
-        <button class="btn-compact btn-tiny" id="saveSnapshot">Snapshot</button>
-        <button class="btn-compact btn-tiny" id="clearVisuals">Clear visuals</button>
-        <button class="btn-compact btn-tiny" id="clearCaches">Reset caches</button>
-      </div>
-    </div>
-    <div class="section">
-      <h2>Property insight</h2>
-      <div class="controls">
         <label style="display:flex;align-items:center;gap:6px;">
           <input type="checkbox" id="toggleProperty" checked />
           Suburb prices
@@ -447,6 +444,10 @@
           Price pins
         </label>
       </div>
+      <div class="controls tight">
+        <button class="btn-compact btn-tiny" id="saveSnapshot">Snapshot</button>
+        <button class="btn-compact btn-tiny" id="clearCaches">Reset caches</button>
+      </div>
       <div class="legend price" id="propertyLegend">
         Property price ($k)
         <div class="legend-bar"></div>
@@ -454,9 +455,19 @@
           <span id="propertyMin">$—</span><span>higher</span><span id="propertyMax">$—</span>
         </div>
       </div>
-    </div>
-    <div class="section">
-      <h2>Experiments</h2>
+    </details>
+    <details class="section" open>
+      <summary>More simulations</summary>
+      <div class="controls tight">
+        <button class="btn-compact btn-tiny" id="radialSim">Radial sims</button>
+        <button class="btn-compact btn-tiny" id="rushSim">CBD rush</button>
+        <button class="btn-compact btn-tiny" id="rainSim">Rain</button>
+        <button class="btn-compact btn-tiny" id="demoRun">Demo</button>
+        <button class="btn-compact btn-tiny" id="scarboroughDemo">Scarborough demo</button>
+      </div>
+    </details>
+    <details class="section">
+      <summary>Presets</summary>
       <div class="row">
         <label>Suburb experiment
           <select id="presetSelect">
@@ -465,15 +476,14 @@
             <option value="fremantle">Fremantle</option>
             <option value="midland">Midland</option>
             <option value="armadale">Armadale</option>
-          <option value="ellenbrook">Ellenbrook</option>
-        </select>
-      </label>
-      <label style="align-self:flex-end;">
-        <button id="runPreset">Run preset</button>
-      </label>
-      <button class="btn-compact btn-tiny" id="scarboroughDemo">Scarborough demo</button>
+            <option value="ellenbrook">Ellenbrook</option>
+          </select>
+        </label>
+        <label style="align-self:flex-end;">
+          <button id="runPreset">Run preset</button>
+        </label>
       </div>
-    </div>
+    </details>
     <div class="legend">
       Commute minutes
       <div class="legend-bar"></div>
@@ -726,8 +736,9 @@
     let ERROR_COUNT = 0;
     let busGraph = null;
     let railGraph = null;
-let busTargetKey = null;
-let railTargetKey = null;
+    let busTargetKey = null;
+    let railTargetKey = null;
+    let clickLock = false;
     const rand = () => {
       if (crypto && crypto.getRandomValues) {
         const buf = new Uint32Array(1);
@@ -1712,6 +1723,11 @@ let railTargetKey = null;
         ? ` · Route ${lastPerf.routeMs.toFixed(1)}ms · Dense ${lastPerf.densePts}`
         : "";
       meta.textContent = `Stops: ${metaState.stops} · Base wait: ${metaState.baseWait} min · Speed: ${metaState.speed} km/h · Data: ${metaState.data} · Graphs: bus ${busNodes} nodes/${busRoutes} routes, rail ${railNodes} nodes · Properties: ${PROPERTY_DATA.length} pts/${suburbAreas} areas · Errors: ${ERROR_COUNT}${lastError ? ` (last: ${lastError})` : ""}${deckInfo}${perfInfo}`;
+      const graphNodeCount = routeGraph && routeGraph.nodes ? routeGraph.nodes.size : 0;
+      const graphDbg = document.getElementById("debug-graph");
+      if (graphDbg) {
+        graphDbg.textContent = `Graph health — bus ${busNodes} nodes/${busRoutes} routes · rail ${railNodes} nodes · walk/road ${graphNodeCount} nodes`;
+      }
     }
 
     function renderStops(stops, baseWait, netSpeed) {
@@ -3065,136 +3081,157 @@ let railTargetKey = null;
     }
 
     function animateTravel(clickLatLng) {
-      if (!window.__stops) {
-        document.getElementById("status").textContent = "Stops not loaded yet";
+      if (clickLock) {
+        document.getElementById("status").textContent = "Routing… please wait";
         return;
       }
-      if (!DATA_READY) {
-        document.getElementById("status").textContent = "Still loading data… (using fallbacks)";
-      }
+      clickLock = true;
+      setBusy("Routing…", true);
+      const release = () => {
+        setBusy("", false);
+        clickLock = false;
+      };
+      try {
+        if (!window.__stops) {
+          document.getElementById("status").textContent = "Stops not loaded yet";
+          return;
+        }
+        if (!DATA_READY) {
+          document.getElementById("status").textContent = "Still loading data… (using fallbacks)";
+        }
 
-      const travel = buildTravelPath(clickLatLng);
-      if (!travel || !travel.path || travel.path.length < 3 || !travel.near || !isValidStop(travel.near.stop)) {
-        document.getElementById("status").textContent = "No path found for click (need bus/rail data)";
-        return;
-      }
-      const { path, near } = travel;
-      const mode = travel.mode || "auto";
-      const nearestProp = nearestProperty(path[0][0], path[0][1]);
-      // persist heat contribution for this click
-      const base = mode === "car" ? 0 : computeWait();
-      const speed = mode === "car" ? Number(document.getElementById("carSpeed").value || CAR_SPEED) : Number(netSpeed.value);
-      const commute = computeCommute(near.stop, base, speed, { path, mode });
-      addHeatPath(path, commute);
+        const travel = buildTravelPath(clickLatLng);
+        if (!travel || !travel.path || travel.path.length < 3 || !travel.near || !isValidStop(travel.near.stop)) {
+          document.getElementById("status").textContent = "No path found for click (need bus/rail data)";
+          return;
+        }
+        const { path, near } = travel;
+        const mode = travel.mode || "auto";
+        const nearestProp = nearestProperty(path[0][0], path[0][1]);
+        // persist heat contribution for this click
+        const base = mode === "car" ? 0 : computeWait();
+        const speed = mode === "car" ? Number(document.getElementById("carSpeed").value || CAR_SPEED) : Number(netSpeed.value);
+        const commute = computeCommute(near.stop, base, speed, { path, mode });
+        addHeatPath(path, commute);
 
-      const totalLen = pathLength(path);
-      const { quality, maxSeg } = pathQuality(path, 3);
-      const debugPath = document.getElementById("debug-path");
-      debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
-        1
-      )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""} · quality ${quality} (max seg ${maxSeg.toFixed(2)} km)`;
-      const modeBadge = L.marker(path[path.length - 1], {
-        icon: L.divIcon({
-          className: "rail-label",
-          html: mode,
-          iconSize: null
-        })
-      }).addTo(simRootLayer);
-      console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
+        const totalLen = pathLength(path);
+        const { quality, maxSeg } = pathQuality(path, 3);
+        const debugPath = document.getElementById("debug-path");
+        debugPath.textContent = `Path pts: ${path.length} · len ${totalLen.toFixed(1)} km · ETA ${commute.toFixed(
+          1
+        )}m · mode ${mode}${nearestProp ? ` · price $${nearestProp.property.priceK}k (${nearestProp.property.name})` : ""} · quality ${quality} (max seg ${maxSeg.toFixed(2)} km)`;
+        const modeBadge = L.marker(path[path.length - 1], {
+          icon: L.divIcon({
+            className: "rail-label",
+            html: mode,
+            iconSize: null
+          })
+        }).addTo(simRootLayer);
+        console.log("Sim path", { mode, base, speed, commute, totalLen, points: path, nearStop: near.stop });
 
-      const segLengths = [];
-      let totalSegLen = 0;
-      for (let i = 0; i < path.length - 1; i++) {
-        const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
-        segLengths.push(seg);
-        totalSegLen += seg;
-      }
+        const segLengths = [];
+        let totalSegLen = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+          const seg = haversine(path[i][0], path[i][1], path[i + 1][0], path[i + 1][1]);
+          segLengths.push(seg);
+          totalSegLen += seg;
+        }
 
-      const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
-      const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
+        const waitRatio = Math.min(0.6, base / Math.max(commute, 0.1));
+        const totalSec = Math.max(4, Math.min(10, commute / 8)); // scale visual time
 
-      const simLayer = L.layerGroup().addTo(simRootLayer);
-      const modeColor = colourForMinutes(commute);
-      for (let i = 0; i < path.length - 1; i++) {
-        const start = path[i];
-        const end = path[i + 1];
-        L.polyline([start, end], { color: modeColor, weight: 3, opacity: 0.8 }).addTo(simLayer);
-      }
+        const simLayer = L.layerGroup().addTo(simRootLayer);
+        const modeColor = colourForMinutes(commute);
+        for (let i = 0; i < path.length - 1; i++) {
+          const start = path[i];
+          const end = path[i + 1];
+          L.polyline([start, end], { color: modeColor, weight: 3, opacity: 0.8 }).addTo(simLayer);
+        }
 
-      const startMarker = L.circleMarker(path[0], { radius: 5, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
-      startMarker.bindTooltip("Clicked origin", { direction: "top", offset: [0, -4], permanent: false });
-      const stopMarker = L.circleMarker(path[1], { radius: 7, color: "#f97316", fillColor: "#f97316", fillOpacity: 0.9 }).addTo(simLayer);
-      stopMarker.bindTooltip(`Nearest stop: ${near.stop.stopname || near.stop.stopid}`, { direction: "top", offset: [0, -4], permanent: false });
+        const startMarker = L.circleMarker(path[0], { radius: 5, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
+        startMarker.bindTooltip("Clicked origin", { direction: "top", offset: [0, -4], permanent: false });
+        const stopMarker = L.circleMarker(path[1], { radius: 7, color: "#f97316", fillColor: "#f97316", fillOpacity: 0.9 }).addTo(simLayer);
+        stopMarker.bindTooltip(`Nearest stop: ${near.stop.stopname || near.stop.stopid}`, { direction: "top", offset: [0, -4], permanent: false });
 
-      const mover = L.circleMarker(path[1], { radius: 6, color: "#f59e0b", fillColor: "#f59e0b", fillOpacity: 0.95 }).addTo(simLayer);
-      const label = L.marker(path[1], {
-        icon: L.divIcon({
-          className: "rail-label",
-          html: "",
-          iconSize: null
-        })
-      }).addTo(simLayer);
+        const mover = L.circleMarker(path[1], { radius: 6, color: "#f59e0b", fillColor: "#f59e0b", fillOpacity: 0.95 }).addTo(simLayer);
+        const label = L.marker(path[1], {
+          icon: L.divIcon({
+            className: "rail-label",
+            html: "",
+            iconSize: null
+          })
+        }).addTo(simLayer);
 
-      const startTs = performance.now();
-      const timer = setInterval(() => {
-        const elapsed = (performance.now() - startTs) / 1000;
-        const progress = Math.min(1, elapsed / totalSec);
-        const minutesUsed = progress * commute;
-        const minutesLeft = Math.max(0, commute - minutesUsed);
+        const startTs = performance.now();
+        const timer = setInterval(() => {
+          const elapsed = (performance.now() - startTs) / 1000;
+          const progress = Math.min(1, elapsed / totalSec);
+          const minutesUsed = progress * commute;
+          const minutesLeft = Math.max(0, commute - minutesUsed);
 
-        if (progress < waitRatio) {
-          mover.setLatLng(path[1]);
-          label.setLatLng(path[1]);
-          label.setIcon(
-            L.divIcon({
-              className: "rail-label",
-              html: `Waiting… ${minutesLeft.toFixed(1)}m`,
-              iconSize: null
-            })
-          );
-        } else {
-          const moveProgress = (progress - waitRatio) / (1 - waitRatio);
-          const moveDist = moveProgress * totalLen;
-          let acc = 0;
-          let segIndex = 0;
-          while (segIndex < segLengths.length && acc + segLengths[segIndex] < moveDist) {
-            acc += segLengths[segIndex];
-            segIndex++;
-          }
-          if (segIndex >= segLengths.length) {
-            mover.setLatLng(path[path.length - 1]);
-            label.setLatLng(path[path.length - 1]);
+          if (progress < waitRatio) {
+            mover.setLatLng(path[1]);
+            label.setLatLng(path[1]);
+            label.setIcon(
+              L.divIcon({
+                className: "rail-label",
+                html: `Waiting… ${minutesLeft.toFixed(1)}m`,
+                iconSize: null
+              })
+            );
           } else {
-            const segStart = path[segIndex];
-            const segEnd = path[segIndex + 1];
-            const segFrac = (moveDist - acc) / Math.max(segLengths[segIndex], 0.0001);
-            const lat = segStart[0] + (segEnd[0] - segStart[0]) * segFrac;
-            const lon = segStart[1] + (segEnd[1] - segStart[1]) * segFrac;
-            mover.setLatLng([lat, lon]);
-            label.setLatLng([lat, lon]);
+            const moveProgress = (progress - waitRatio) / (1 - waitRatio);
+            const moveDist = moveProgress * totalLen;
+            let acc = 0;
+            let segIndex = 0;
+            while (segIndex < segLengths.length && acc + segLengths[segIndex] < moveDist) {
+              acc += segLengths[segIndex];
+              segIndex++;
+            }
+            if (segIndex >= segLengths.length) {
+              mover.setLatLng(path[path.length - 1]);
+              label.setLatLng(path[path.length - 1]);
+            } else {
+              const segStart = path[segIndex];
+              const segEnd = path[segIndex + 1];
+              const segFrac = (moveDist - acc) / Math.max(segLengths[segIndex], 0.0001);
+              const lat = segStart[0] + (segEnd[0] - segStart[0]) * segFrac;
+              const lon = segStart[1] + (segEnd[1] - segStart[1]) * segFrac;
+              mover.setLatLng([lat, lon]);
+              label.setLatLng([lat, lon]);
+            }
+            label.setIcon(
+              L.divIcon({
+                className: "rail-label",
+                html: `ETA ${minutesLeft.toFixed(1)}m`,
+                iconSize: null
+              })
+            );
           }
-          label.setIcon(
-            L.divIcon({
-              className: "rail-label",
-              html: `ETA ${minutesLeft.toFixed(1)}m`,
-              iconSize: null
-            })
-          );
-        }
 
-        if (progress >= 1) {
-          clearInterval(timer);
-          simTimers = simTimers.filter((t) => t !== timer);
-          label.setIcon(
-            L.divIcon({
-              className: "rail-label",
-              html: "Arrived CBD",
-              iconSize: null
-            })
-          );
-        }
-      }, 30);
-      simTimers.push(timer);
+          if (progress >= 1) {
+            clearInterval(timer);
+            simTimers = simTimers.filter((t) => t !== timer);
+            label.setIcon(
+              L.divIcon({
+                className: "rail-label",
+                html: "Arrived CBD",
+                iconSize: null
+              })
+            );
+          }
+        }, 30);
+        simTimers.push(timer);
+      } catch (err) {
+        ERROR_COUNT += 1;
+        lastError = err.message || String(err);
+        console.error(err);
+        document.getElementById("status").textContent = "Error during simulation";
+        document.getElementById("debug-path").textContent = `Errors: ${ERROR_COUNT} (last: ${lastError})`;
+        updateDebugMeta();
+      } finally {
+        release();
+      }
     }
 
     map.on("click", (e) => {
