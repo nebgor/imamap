@@ -1665,7 +1665,7 @@
       });
       railStations.forEach((st) => {
         const zoom = map.getZoom ? map.getZoom() : 11;
-        const r = Math.max(3.5, Math.min(7, (zoom - 9) * 1.1 + 4.5));
+        const r = Math.max(3, Math.min(6.5, (zoom - 10) * 1.0 + 4));
         L.circleMarker([st.lat, st.lon], {
           radius: r,
           color: "#0b1220",
@@ -1747,7 +1747,7 @@
       }
       const majorPattern = /(station|busport|interchange|terminus|bus station)/i;
       const zoom = map.getZoom ? map.getZoom() : 11;
-      const baseRadius = Math.max(3, Math.min(8, (zoom - 8) * 1.3 + 3));
+      const baseRadius = Math.max(2.5, Math.min(6, (zoom - 10) * 1.0 + 3));
       const total = stops.length;
       const step = total > 12000 ? 3 : total > 8000 ? 2 : 1;
       let idx = 0;
@@ -1761,7 +1761,7 @@
           const color = colourForMinutes(commute);
           const isMajor = majorPattern.test(stop.stopname || "");
           const marker = L.circleMarker([stop.lat, stop.lon], {
-            radius: isMajor ? baseRadius + 1.5 : baseRadius,
+            radius: isMajor ? baseRadius + 1.2 : baseRadius,
             color: isMajor ? "#d9f99d" : "#0d1b2a",
             weight: 1,
             fillColor: color,
@@ -3155,8 +3155,8 @@
         }
 
       const zoom = map.getZoom ? map.getZoom() : 11;
-      const simRadius = Math.max(4, Math.min(7, (zoom - 9) + 5));
-      const startMarker = L.circleMarker(path[0], { radius: simRadius - 1, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
+      const simRadius = Math.max(3.5, Math.min(6, (zoom - 10) * 0.8 + 4.5));
+      const startMarker = L.circleMarker(path[0], { radius: simRadius - 0.8, color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.8 }).addTo(simLayer);
       startMarker.bindTooltip("Clicked origin", { direction: "top", offset: [0, -4], permanent: false });
       const stopMarker = L.circleMarker(path[1], { radius: simRadius + 1, color: "#f97316", fillColor: "#f97316", fillOpacity: 0.9 }).addTo(simLayer);
       stopMarker.bindTooltip(`Nearest stop: ${near.stop.stopname || near.stop.stopid}`, { direction: "top", offset: [0, -4], permanent: false });
