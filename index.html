@@ -2940,12 +2940,14 @@
         updateDebugMeta();
         return null;
       }
-      const attempts = [
-        pref === "car" ? () => carRouteToCBD(clickLatLng) : null,
-        pref !== "rail" && pref !== "car" ? () => busToRailRoute(clickLatLng) : null,
-        pref !== "car" ? () => graphRouteToCBD(clickLatLng) : null,
-        pref !== "car" ? () => multimodalPath(clickLatLng, pref, allow) : null
-      ].filter(Boolean);
+      const attempts = [];
+      if (pref === "car") {
+        attempts.push(() => carRouteToCBD(clickLatLng));
+      } else {
+        if (pref !== "rail") attempts.push(() => graphRouteToCBD(clickLatLng)); // bus-first
+        if (pref === "mixed" && allow) attempts.push(() => busToRailRoute(clickLatLng));
+        attempts.push(() => multimodalPath(clickLatLng, pref, allow));
+      }
       let best = null;
       let bestScore = -1;
       for (const fn of attempts) {
