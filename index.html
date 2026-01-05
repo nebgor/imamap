@@ -2947,6 +2947,9 @@
       const attempts = [];
       if (pref === "car") {
         attempts.push(() => carRouteToCBD(clickLatLng));
+      } else if (pref === "bus") {
+        attempts.push(() => graphRouteToCBD(clickLatLng)); // bus-first only
+        attempts.push(() => multimodalPath(clickLatLng, pref, allow)); // bus graph again, fallback
       } else {
         if (pref !== "rail") attempts.push(() => graphRouteToCBD(clickLatLng)); // bus-first
         if (pref === "mixed" && allow) attempts.push(() => busToRailRoute(clickLatLng));
@@ -2957,8 +2960,16 @@
       for (const fn of attempts) {
         const travel = fn();
         if (travel && travel.path && travel.path.length > 2 && !pathHasLongSegment(travel.path, 2.5, true)) {
-          const pq = pathQuality(travel.path);
-          const score = pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0;
+          const pq = pathQuality(travel.path, 1.6);
+          const modeBoost =
+            travel.mode === "bus-graph"
+              ? 1.0
+              : travel.mode === "bus"
+                ? 0.4
+                : travel.mode === "mixed-transfer"
+                  ? 0.2
+                  : 0;
+          const score = (pq.quality === "good" ? 2 : pq.quality === "ok" ? 1 : 0) + modeBoost;
           if (score > bestScore) {
             best = { ...travel, quality: pq.quality, maxSeg: pq.maxSeg };
             bestScore = score;
