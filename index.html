@@ -1514,14 +1514,54 @@
       renderStops(window.__stops || [], Number(baseWait.value), Number(netSpeed.value));
     }
 
+    function flattenLineCoords(geom) {
+      if (!geom) return [];
+      if (geom.type === "LineString") return geom.coordinates || [];
+      if (geom.type === "MultiLineString") return geom.coordinates.flat();
+      return [];
+    }
+    function stopDensityForLine(coords, stops, radiusKm = 0.35) {
+      if (!coords || !coords.length || !stops || !stops.length) return 0;
+      const radius = radiusKm;
+      let count = 0;
+      stops.forEach((s) => {
+        const near = coords.some((c) => haversine(c[1], c[0], s.lat, s.lon) <= radius);
+        if (near) count += 1;
+      });
+      const lengthKm = pathLength(coords.map((c) => [c[1], c[0]])) || 1;
+      return count / lengthKm;
+    }
+    function roadDensityColor(density) {
+      // density expressed as stops per km along the corridor
+      const t = Math.max(0, Math.min(1, density / 6)); // 0-6 stops/km
+      const hue = 190 - t * 140; // teal -> amber/red
+      const sat = 70 + t * 20;
+      const light = 45 + t * 10;
+      return `hsl(${hue}, ${sat}%, ${light}%)`;
+    }
+
     async function loadRoads() {
       try {
         const res = await fetch("data/roads-major.geojson");
         if (!res.ok) throw new Error("roads fetch failed");
         const geo = await res.json();
+        const stops = window.__stops || [];
+        const densityMap = new Map();
+        (geo.features || []).forEach((f, idx) => {
+          const coords = flattenLineCoords(f.geometry);
+          const density = stopDensityForLine(coords, stops);
+          densityMap.set(idx, density);
+          f.properties = { ...(f.properties || {}), __idx: idx, density };
+        });
         roadsLayer.clearLayers();
         L.geoJSON(geo, {
-          style: () => ({ color: "#94a3b8", weight: 1, opacity: 0.5 })
+          style: (feature) => {
+            const idx = feature?.properties?.__idx;
+            const d = densityMap.get(idx) || 0;
+            const color = roadDensityColor(d);
+            const weight = Math.max(1, Math.min(5, 1 + d));
+            return { color, weight, opacity: 0.85 };
+          }
         }).addTo(roadsLayer);
         if (document.getElementById("toggleRoads").checked) {
           roadsLayer.addTo(map);
