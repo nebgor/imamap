@@ -217,6 +217,33 @@
       z-index: 1500;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #eaf3ff;
+      font-size: 12px;
+      border: 1px solid var(--border);
+    }
+    .status-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+      flex-shrink: 0;
+    }
+    .status-pill.pending .dot {
+      background: #f59e0b;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    }
+    .status-pill.error .dot {
+      background: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+    }
     .hidden {
       display: none;
     }
@@ -342,6 +369,7 @@
   <button id="panelToggle" class="busy-banner" style="left:14px; right:auto; top:auto; bottom:12px;">Toggle panel</button>
   <div class="panel">
     <h1>Perth PT commute sketch</h1>
+    <div class="status" id="initStatus" style="margin:4px 0 6px;">Booting…</div>
     <p class="subhead">Click anywhere to estimate a commute to the CBD. Random sim paints sample traces.</p>
     <div class="row">
       <label>Transport
@@ -2148,17 +2176,28 @@
       return { factor, mins };
     }
 
+    function setInitStatus(msg, state = "pending") {
+      const el = document.getElementById("initStatus");
+      if (!el) return;
+      el.className = `status status-pill ${state}`;
+      el.innerHTML = `<span class="dot"></span><span>${msg}</span>`;
+    }
+
     async function init() {
       try {
         setBusy("Loading data…", true);
+        setInitStatus("Fetching stops…", "pending");
         const stops = await fetchStops();
         window.__stops = stops;
+        setInitStatus(`Rendering ${stops.length} stops…`, "pending");
         renderStops(stops, Number(baseWait.value), Number(netSpeed.value));
         renderRailLines(toggleRail.checked);
+        setInitStatus("Loading roads/property…", "pending");
         await Promise.all([loadRoads(), loadPropertyData()]);
         ensureDeck();
         // prefetch metro routes
         const stopPaths = stopNeighborPaths(window.__stops || [], 8, 0.6);
+        setInitStatus("Building graphs…", "pending");
         try {
           const routes = await fetchRoutes([-32.6, 115.5, -31.4, 116.2]);
           routeGraph = buildRouteGraph(routes);
@@ -2188,6 +2227,7 @@
         document.getElementById("debug").firstElementChild.textContent = "Debug — ok";
         DATA_READY = true;
         document.getElementById("status").textContent = "Ready (click map to simulate)";
+        setInitStatus("Ready — click the map", "ok");
         setBusy("", false);
         if (window.innerWidth < 720 && panel) panel.classList.add("hidden");
       } catch (e) {
@@ -2195,6 +2235,7 @@
         document.getElementById("debug").firstElementChild.textContent = `Debug — ${e.message}`;
         console.error(e);
         setBusy(e.message, false);
+        setInitStatus("Init failed — using fallbacks", "error");
       }
     }
 
