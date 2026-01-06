@@ -3228,6 +3228,13 @@
       }
     }
 
+    init().catch((err) => {
+      console.error("Init failed", err);
+      document.getElementById("status").textContent = "Init failed";
+      lastError = err.message || String(err);
+      updateDebugMeta();
+    });
+
     map.on("click", (e) => {
       if (isDragging || Date.now() - lastDragEnd < 160) return;
       try {
